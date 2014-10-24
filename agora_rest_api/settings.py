@@ -58,8 +58,12 @@ WSGI_APPLICATION = 'agora_rest_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sustainability_app',
+        'USER': 'khandy',
+        'PASSWORD': 'Rusty3220',
+        'HOST': '147.222.165.3',
+        'PORT': '3306'  
     }
 }
 
