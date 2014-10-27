@@ -52,6 +52,10 @@ ROOT_URLCONF = 'agora_rest_api.urls'
 
 WSGI_APPLICATION = 'agora_rest_api.wsgi.application'
 
+# REST FRAMEWORK CONFIG
+REST_FRAMEWORK = {
+
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
