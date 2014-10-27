@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'agora_rest_api.user_service',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -67,9 +68,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sustainability_app',
         'USER': 'khandy',
-        'PASSWORD': 'Rusty3220',
+        'PASSWORD': '',
         'HOST': '147.222.165.3',
-        'PORT': '3306'  
+        'PORT': '3306',
     }
 }
 
