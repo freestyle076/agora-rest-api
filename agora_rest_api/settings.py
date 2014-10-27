@@ -56,6 +56,7 @@ WSGI_APPLICATION = 'agora_rest_api.wsgi.application'
 # REST FRAMEWORK CONFIG
 REST_FRAMEWORK = {
     #place rest framework configurations here
+    'PAGINATE_BY' : 10
 }
 
 # Database
