@@ -19,11 +19,10 @@ class LdapAuthRequest:
     
 class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = LdapAuthRequst
+        model = LdapAuthRequest
         fields = ('username','password')
 
-@api_view(['POST'])
+@api_view(['GET'])
 def ldap_authenticate(request):
-    print user
-    print pwd
+    return status.HTTP_400_BAD_REQUEST
     
