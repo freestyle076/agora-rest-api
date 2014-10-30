@@ -4,6 +4,7 @@ from user_service import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
+router.register(r'ldap', views.ldapViewSet)
 
 urlpatterns = patterns('',
     # Examples:
