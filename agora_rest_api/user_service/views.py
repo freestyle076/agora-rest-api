@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import serializers
+from django.http import HttpResponse
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,5 +25,5 @@ class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
 
 @api_view(['GET'])
 def ldap_authenticate(request):
-    return status.HTTP_400_BAD_REQUEST
+    return HttpResponse(status=200)
     
