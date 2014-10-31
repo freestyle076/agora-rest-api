@@ -2,21 +2,15 @@ from django.shortcuts import render
 from models import User
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework import serializers
 from serializers import UserSerializer
 from django.http import HttpResponse, HttpResponseNotFound
-<<<<<<< HEAD
-
+from rest_framework.decorators import api_view
+from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import serializers
-=======
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import serializers
-from django.http import HttpResponse
 import ldap
->>>>>>> 42061dfadc3f327c2515816708aa4c01017dae0c
+import ast
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -26,11 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ldapViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-<<<<<<< HEAD
-        
-=======
->>>>>>> 42061dfadc3f327c2515816708aa4c01017dae0c
-
+'''
 class LdapAuthRequest:
     def __init__(usrnm,pwd):
         self.username = usrnm
@@ -40,24 +30,25 @@ class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = LdapAuthRequest
         fields = ('username','password')
-
-@api_view(['GET'])
+'''
+@api_view(['POST'])
 def ldap_authenticate(request):
-    print request['username']
-    print request['password']
+    info = ast.literal_eval(request.body)
+    info['username'] = info['username'] + '@zagmail.gonzaga.edu'
     try:
         #attempt connection to ldap server
         handle = ldap.open('dc-ad-gonzaga.gonzaga.edu')
         try:
             #attempt bind with username and password gonzaga.edu
-            handle.simple_bind_s('khandy@gonzaga.edu', 'wrong')
+            handle.simple_bind_s(info['username'], 'wrong')
             #if successful return OK, username+pwd is in the ldap database!
             return HttpResponse(status=status.HTTP_200_OK)
             
         except ldap.LDAPError, error_message:
             try:
+                info['username'] = info['username'].replace('@zagmail.gonzaga.edu','@gonzaga.edu')
                 #attempt bind with username and password gonzaga.edu
-                handle.simple_bind_S('khandy@zagmail.gonzaga.edu','wrong')
+                handle.simple_bind_s(info['username'],info['password'])
                 #if successful return OK, username+pwd is in the ldap database!
                 return HttpResponse(status=status.HTTP_200_OK)
                 
@@ -74,7 +65,3 @@ def ldap_authenticate(request):
         return response
         
     
-<<<<<<< HEAD
-
-=======
->>>>>>> 42061dfadc3f327c2515816708aa4c01017dae0c
