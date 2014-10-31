@@ -3,12 +3,9 @@ from rest_framework import routers
 #from user_service import views
 
 router = routers.DefaultRouter()
-<<<<<<< HEAD
 router.register(r'users', views.UserViewSet)
 router.register(r'ldap', views.ldapViewSet)
-=======
-#router.register(r'users', views.UserViewSet)
->>>>>>> 2824223e4db6ffe319926745aa09fcf78a393187
+
 
 urlpatterns = patterns('',
     # Examples:
