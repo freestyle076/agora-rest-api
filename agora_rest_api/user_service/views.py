@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from models import User
 from rest_framework import viewsets
+from rest_framework import status
 from serializers import UserSerializer
+from django.http import HttpResponse, HttpResponseNotFound
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -11,6 +13,10 @@ import ldap
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+class ldapViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -26,7 +32,8 @@ class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
 
 @api_view(['GET'])
 def ldap_authenticate(request):
-    print "inside ldap auth function"
+    print request['username']
+    print request['password']
     try:
         #attempt connection to ldap server
         handle = ldap.open('dc-ad-gonzaga.gonzaga.edu')
@@ -55,5 +62,4 @@ def ldap_authenticate(request):
         response.write(error_message)
         return response
         
-    
     
