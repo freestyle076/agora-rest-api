@@ -12,6 +12,7 @@ from rest_framework.response import Response
 import ldap
 import json
 import ast
+import sys
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -22,13 +23,20 @@ class UserViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def create_user(request):
     new_user_info = ast.literal_eval(request.body)
-    created_user = User.objects.create(
-        username=new_user_info['username'],
-        email=new_user_info['email'],
-        first_name=new_user_info['first_name'],
-        last_name=new_user_info['last_name'],
-        phone=new_user_info['phone'])
-    created_user.save()
+    try:
+        created_user = User.objects.create(
+            username=new_user_info['username'],
+            email=new_user_info['email'],
+            first_name=new_user_info['first_name'],
+            last_name=new_user_info['last_name'],
+            phone=new_user_info['phone'])
+        created_user.save()
+        return HttpResponse(status=status.HTTP_200_OK)
+    except:
+        e = sys.exc_info()[0]
+        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+        response.write(e)
+        return response
 
 @api_view(['POST'])
 def ldap_authenticate(request):
