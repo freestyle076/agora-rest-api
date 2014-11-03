@@ -41,10 +41,12 @@ def create_user(request):
 @api_view(['POST'])
 def ldap_authenticate(request):
     info = ast.literal_eval(request.body)
+    username = info['username']
     info['username'] = info['username'] + '@zagmail.gonzaga.edu'
     json_data = {}
     if(info['password'] == ""):
-        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        json_data['Message'] = 'Empty Password'
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
     try:
         #attempt connection to ldap server
@@ -54,7 +56,9 @@ def ldap_authenticate(request):
             handle.simple_bind_s(info['username'], info['password'])
             #if successful return OK, username+pwd is in the ldap database!
             json_data['email'] = info['username']
-            response = HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
+            json_data['Message'] = 'Everything Worked!' #Have to assign all parameters, Used or not
+            json_data['username'] = username
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
             return response
             
         except ldap.LDAPError, error_message:
@@ -63,10 +67,11 @@ def ldap_authenticate(request):
                 
                 #attempt bind with username and password gonzaga.edu
                 handle.simple_bind_s(info['username'],info['password'])
-
                 #if successful return OK, username+pwd is in the ldap database!
                 json_data['email'] = info['username']
-                response = HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
+                json_data['username'] = username
+                json_data['Message'] = 'Everything Worked!'
+                response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
                 return response
                 
             except ldap.LDAPError, error_message:
