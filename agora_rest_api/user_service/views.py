@@ -2,15 +2,16 @@ from django.shortcuts import render
 from models import User
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework import serializers
 from serializers import UserSerializer
 from django.http import HttpResponse, HttpResponseNotFound
-from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import serializers
-from django.http import HttpResponse
 import ldap
 import json
+import ast
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -20,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ldapViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
+'''
 class LdapAuthRequest:
     def __init__(usrnm,pwd):
         self.username = usrnm
@@ -34,24 +35,38 @@ class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
 @api_view(['POST'])
 def ldap_authenticate(request):
     json_data = {}
+=======
+'''
+
+@api_view(['POST'])
+def ldap_authenticate(request):
+    info = ast.literal_eval(request.body)
+    info['username'] = info['username'] + '@zagmail.gonzaga.edu'
+    json_data = {}
+    if(info['password'] == ""):
+        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
     try:
         #attempt connection to ldap server
         handle = ldap.open('dc-ad-gonzaga.gonzaga.edu')
         try:
             #attempt bind with username and password gonzaga.edu
-            handle.simple_bind_s('khandy@gonzaga.edu', 'wrong')
+            handle.simple_bind_s(info['username'], info['password'])
             #if successful return OK, username+pwd is in the ldap database!
-            json_data['email'] = 'khandy@gonzaga.edu'
-            response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+            json_data['email'] = info['username']
+            response = HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
             return response
             
         except ldap.LDAPError, error_message:
             try:
+                info['username'] = info['username'].replace('@zagmail.gonzaga.edu','@gonzaga.edu')
+                
                 #attempt bind with username and password gonzaga.edu
-                handle.simple_bind_s('khandy@zagmail.gonzaga.edu','wrong')
+                handle.simple_bind_s(info['username'],info['password'])
+
                 #if successful return OK, username+pwd is in the ldap database!
-                json_data['email'] = 'khandy@gonzaga.edu'
-                response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+                json_data['email'] = info['username']
+                response = HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
                 return response
                 
             except ldap.LDAPError, error_message:
