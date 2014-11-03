@@ -17,20 +17,18 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-class ldapViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-'''
-class LdapAuthRequest:
-    def __init__(usrnm,pwd):
-        self.username = usrnm
-        self.password = pwd
-    
-class LdapAuthRequestSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = LdapAuthRequest
-        fields = ('username','password')
-'''
+@api_view(['POST'])
+def create_user(request):
+    new_user_info = ast.literal_eval(request.body)
+    created_user = User.objects.create(
+        username=new_user_info['username'],
+        email=new_user_info['email'],
+        first_name=new_user_info['first_name'],
+        last_name=new_user_info['last_name'],
+        phone=new_user_info['phone'])
+    created_user.save()
+
+   
 @api_view(['POST'])
 def ldap_authenticate(request):
     info = ast.literal_eval(request.body)
