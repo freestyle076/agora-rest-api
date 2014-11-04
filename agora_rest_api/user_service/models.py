@@ -1,5 +1,5 @@
 from django.db import models
-from user_service import validators
+from phonenumber_field.modelfields import PhoneNumberField
 '''
 Object-relational models for database tables. Each class represents
 a MySQL schema; Django handles managing the database to mirror the classes
@@ -17,5 +17,5 @@ class User(models.Model):
     last_name = models.CharField(max_length=40)
     gonzaga_email = models.EmailField()
     pref_email = models.EmailField(blank=True)
-    phone = models.CharField(validator=validators.phone_validator, blank=True)
+    phone = PhoneNumberField(null=True,blank=True)
 
