@@ -98,7 +98,7 @@ def ldap_authenticate(request):
             
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
-            json_data['gonzaga_email'] = info['username']
+            json_data['email'] = info['username']
             json_data['username'] = username
             info = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -115,7 +115,7 @@ def ldap_authenticate(request):
                 
                 #if successful return OK, username+pwd is in the ldap database!
                 json_data['message'] = 'Authentication succesful!'
-                json_data['gonzaga_email'] = info['username']
+                json_data['email'] = info['username']
                 json_data['username'] = username
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
                 info = None #clear traces of user information after done using
