@@ -28,6 +28,8 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
+    if let httpResponse = response as? NSHTTPURLResponse {
+        var status_code = httpResponse.statusCode
     var jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
     var err: NSError?
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
@@ -39,52 +41,43 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
         
     else {
-        // The JSONObjectWithData constructor didn't return an error. But, we should still
-        // check and make sure that json has a value using optional binding.
         if let parseJSON = json as? Dictionary<String,AnyObject>{
             // Okay, the parsedJSON is here, let's get the value for 'success' out of it
-            if let message = parseJSON["message"] as? String{
-                println("message: \(message)")
-            }
+            //200 = OK, valid credentials
             if let email = parseJSON["email"] as? String{
                 println("email: \(email)")
             }
             if let username = parseJSON["username"] as? String{
                 println("username: \(username)")
             }
-            
+            if let message = parseJSON["message"] as? String{
+                println("message: \(message)")
+            }
         }
         else {
             // Woa, okay the json object was nil, something went worng. Maybe the server isn't running?
             let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
             println("Error could not parse JSON: \(jsonStr)")
         }
+        if(status_code == 200){
+
+
+            println("Valid credentials! Carry on to main page...")
+            // The JSONObjectWithData constructor didn't return an error. But, we should still
+            // check and make sure that json has a value using optional binding.
+        }
+            //400 = BAD_REQUEST, invalid crentials
+        else if(status_code == 400){
+        }
+            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        else if(status_code == 500){
+            println("The server is down! Call the fire!")
+        }
+        else {
+            println("Error in casting response, data incomplete")
+            }
     }
-    
-    /*
-    if let httpResponse = response as? NSHTTPURLResponse {
-    var status_code = httpResponse.statusCode
-    println("response \(httpResponse)")
-    
-    //200 = OK, valid credentials
-    if(status_code == 200){
-    println("Valid credentials! Carry on to main page...")
     }
-    
-    //400 = BAD_REQUEST, invalid crentials
-    else if(status_code == 400){
-    println("Invalid credentials, you are not allowed in!")
-    }
-    
-    //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
-    else if(status_code == 500){
-    println("The server is down! Call the fire!")
-    }
-    
-    
-    } else {
-    println("Error in casting response, data incomplete")
-    }*/
     
 })
 
