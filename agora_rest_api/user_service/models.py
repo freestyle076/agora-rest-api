@@ -15,7 +15,7 @@ class User(models.Model):
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=40)
-    gonzaga_email = models.EmailField()
+    gonzaga_email = models.EmailField(unique=True)
     pref_email = models.EmailField(blank=True)
     phone = models.CharField(validator=validators.phone_validator, blank=True)
 
