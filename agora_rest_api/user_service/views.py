@@ -41,10 +41,20 @@ def create_user(request):
         pref_email: User provided preferred email*
         phone: User provided phone number*
     *-Nullable values
+    route: /createuser/
     '''
     
     #parse request body for user information
     new_user_info = ast.literal_eval(request.body)
+    
+    #validate the preferred email field if provided
+    if new_user_info['pref_email'] not in ["",None]:
+        pref_email = new_user_info['pref_email']
+        #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
+        if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
+            #return bad_request 400 code
+            response = HttpResponse(json.dumps({'message':'Preferred email cannot be a Gonzaga University domain'}),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response
     
     #try to create and save the user
     try:
@@ -75,6 +85,7 @@ def ldap_authenticate(request):
     following data in JSON format:
         username: username of the user to authenticate
         password: entered password to authenticate
+    route: /ldapauth/
     '''
     #parse request body for incoming login data
     info = ast.literal_eval(request.body)
