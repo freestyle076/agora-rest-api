@@ -45,6 +45,7 @@ def ldap_authenticate(request):
     json_data = {}
     if(info['password'] == ""):
         response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        response.write("You didn't enter a password")        
         return response
     try:
         #attempt connection to ldap server
