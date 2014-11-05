@@ -16,7 +16,7 @@ var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
 var username = "khandy" //set username value here
-var password =  "Rusty3220" //set password value here
+var password =  "" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 
@@ -33,7 +33,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     var jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
     var err: NSError?
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
-    
+
     if(err != nil) {
         println(err!.localizedDescription)
         let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)

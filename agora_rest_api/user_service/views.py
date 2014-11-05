@@ -5,6 +5,7 @@ from rest_framework import serializers
 from serializers import UserSerializer
 from django.http import HttpResponse
 from django.db import utils
+from django.core import validators
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 from rest_framework.decorators import api_view
@@ -45,8 +46,19 @@ def create_user(request):
     route: /createuser/
     '''
     
+    #json dictionary
+    json_data = {}    
+    
     #parse request body for user information
     new_user_info = ast.literal_eval(request.body)
+    
+    #validate gonzaga email using email validator 
+    try:
+        validators.validate_email(new_user_info['gonzaga_email'])
+    except validators.ValidationError as e:
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response    
     
     #validate the preferred email field if provided
     if new_user_info['pref_email'] not in ["",None]:
@@ -54,8 +66,15 @@ def create_user(request):
         #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
         if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
             #return bad_request 400 code
-            response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-            response.write("ERROR: The submitted user preferred email is suffixed with a Gonzaga domain.")
+            json_data['message'] = "The submitted user preferred email is suffixed with a Gonzaga domain."
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response
+        #while we are here we will validate the preferred email as an email address
+        try:
+            validators.validate_email(new_user_info['pref_email'])
+        except validators.ValidationError as e:
+            json_data['message'] = str(e)
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
     
     #try to create and save the user
@@ -70,19 +89,20 @@ def create_user(request):
         created_user.save()
         
         #if no exception thrown return success
-        return HttpResponse(status=status.HTTP_200_OK)
+        json_data['message'] = "Successfully created user!"
+        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         
     #IntegrityError indicates create user failed from 
     #bad foreign key or duplicate primary key, in this case
     #gonzaga_email or username
     except utils.IntegrityError as e:
-        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-        response.write(str(e))
+        json_data['message'] = str(e) + " - broken uniqueness or foreign key constraint in create"
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
+    #general exception catching
     except:
-        e = sys.exc_info()[0]
-        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-        response.write(e)
+        json_data['message'] = sys.exc_info()[0]
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
 
 

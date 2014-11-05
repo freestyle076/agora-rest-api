@@ -11,12 +11,12 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var username = "khandy3"
-var first_name = "Kyle"
-var last_name = "Handy"
-var g_email = "khandy3@zagmail.gonzaga.edu"
-var p_email = "k@gmail.com"
-var phone = "abanana"
+var username = "tmiller13"
+var first_name = "Trenton"
+var last_name = "Miller"
+var g_email = "t2@zagmail.gonzaga.edu"
+var p_email = ""
+var phone = ""
 
 //prepare parameters for json serialization
 var params = ["username":username, "first_name":first_name, "last_name":last_name, "gonzaga_email":g_email, "pref_email":p_email, "phone":phone] as Dictionary<String, String>
@@ -31,6 +31,20 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
 
+    //read the message from the response
+    var message = ""
+    var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
+    if(err != nil) {
+        println(err!.localizedDescription)
+        let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+        println("Error could not parse JSON: '\(jsonStr)'")
+    }
+    else{
+        if let parseJSON = json as? Dictionary<String,AnyObject>{
+            message = parseJSON["message"] as String
+        }
+    }
+    
     //downcast NSURLResponse object to NSHTTPURLResponse
     if let httpResponse = response as? NSHTTPURLResponse {
         
@@ -39,16 +53,12 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         
         //200 = OK: user created, carry on!
         if(status_code == 200){
-            println("User has been created! Good work gentlemen!")
+            println(message)
         }
     
         //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
-        
-            let responseBody = NSString(data: data, encoding: NSUTF8StringEncoding)
-            println(responseBody)
-            
-
+            println(message)
         }
     
         //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
@@ -60,6 +70,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     } else {
         println("Error in casting response, data incomplete")
     }
+
     
 })
 
