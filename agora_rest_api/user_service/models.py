@@ -16,6 +16,6 @@ class User(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=40)
     gonzaga_email = models.EmailField(unique=True)
-    pref_email = models.EmailField(blank=True)
+    pref_email = models.EmailField(null=True,blank=True)
     phone = PhoneNumberField(null=True,blank=True)
 

@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework import serializers
 from serializers import UserSerializer
 from django.http import HttpResponse
+from django.db import utils
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 from rest_framework.decorators import api_view
@@ -53,7 +54,8 @@ def create_user(request):
         #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
         if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
             #return bad_request 400 code
-            response = HttpResponse(json.dumps({'message':'Preferred email cannot be a Gonzaga University domain'}),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            response.write("ERROR: The submitted user preferred email is suffixed with a Gonzaga domain.")
             return response
     
     #try to create and save the user
@@ -70,7 +72,13 @@ def create_user(request):
         #if no exception thrown return success
         return HttpResponse(status=status.HTTP_200_OK)
         
-    #exception indicates create user failed, respond bad_request status w/error
+    #IntegrityError indicates create user failed from 
+    #bad foreign key or duplicate primary key, in this case
+    #gonzaga_email or username
+    except utils.IntegrityError as e:
+        response = HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+        response.write(str(e))
+        return response
     except:
         e = sys.exc_info()[0]
         response = HttpResponse(status=status.HTTP_400_BAD_REQUEST)
