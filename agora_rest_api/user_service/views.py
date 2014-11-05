@@ -46,8 +46,7 @@ def create_user(request):
     '''
     
     #parse request body for user information
-    new_user_info = ast.literal_eval(request.body)
-    
+    new_user_info = ast.literal_eval(request.body)    
     #validate the preferred email field if provided
     if new_user_info['pref_email'] not in ["",None]:
         pref_email = new_user_info['pref_email']
@@ -85,7 +84,23 @@ def create_user(request):
         response.write(e)
         return response
 
-
+@api_view(['POST'])
+def view_user(request):
+    '''
+    GET method for retrieving User data to be viewed. 
+    Request body must contain the following data in JSON format:
+        username: username of the user to authenticate
+    route: /userprofile/
+    '''
+    json_data = {}
+    #parse request body for incoming login data
+    info = ast.literal_eval(request.body)
+    user = info['username']
+    json_data['firstname'] = User.objects.get(username=user).first_name
+    json_data['lastname'] = User.objects.get(username=user).last_name
+    response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+    return response
+    
 @api_view(['POST'])
 def ldap_authenticate(request):
     '''
@@ -97,7 +112,7 @@ def ldap_authenticate(request):
     '''
     #parse request body for incoming login data
     info = ast.literal_eval(request.body)
-    username = info['username']
+    user = info['username']
     info['username'] = info['username'] + '@zagmail.gonzaga.edu'
     json_data = {}
     
@@ -117,8 +132,12 @@ def ldap_authenticate(request):
             
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
+            #checks if user is already in our database, assigns variable yes if so
+            if User.objects.filter(username=user).exists():
+                json_data['exists'] ='yes'
+            else:
+                json_data['exists'] ='no'
             json_data['email'] = info['username']
-            json_data['username'] = username
             info = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
             return response
@@ -134,20 +153,28 @@ def ldap_authenticate(request):
                 
                 #if successful return OK, username+pwd is in the ldap database!
                 json_data['message'] = 'Authentication succesful!'
+                
+                #checks if user is already in our database, assigns variable yes if so
+                if User.objects.filter(username=user).exists():
+                    json_data['exists'] ='yes'
+                else:
+                    json_data['exists'] ='no'
+                    
                 json_data['email'] = info['username']
-                json_data['username'] = username
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
                 info = None #clear traces of user information after done using
                 return response
             
             #catch exception, neither username+email_suffix+password in ldap database, return bad request
             except ldap.LDAPError, error_message:
-                response = HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                json_data['message'] = 'Invalid Credentials'
+                response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 return response
                 
     #failure to connect to ldap server, return internal server error   
     except ldap.LDAPError, error_message:
-        response = HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR,content_type='application/json')
+        json_data['message'] = 'Error Connecting to Ldap Server'
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_500_INTERNAL_SERVER_ERROR,content_type='application/json')
         response.write(error_message)
         return response
         
