@@ -50,9 +50,6 @@ def create_user(request):
     json_data = {}    
     
     #parse request body for user information
-<<<<<<< HEAD
-    new_user_info = ast.literal_eval(request.body)    
-=======
     new_user_info = ast.literal_eval(request.body)
     
     #validate gonzaga email using email validator 
@@ -63,7 +60,6 @@ def create_user(request):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response    
     
->>>>>>> 4b7214297e88d86b4e1a688114005182af1b5e43
     #validate the preferred email field if provided
     if new_user_info['pref_email'] not in ["",None]:
         pref_email = new_user_info['pref_email']
