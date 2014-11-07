@@ -1,5 +1,4 @@
 from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
 '''
 Object-relational models for database tables. Each class represents
 a MySQL schema; Django handles managing the database to mirror the classes
@@ -17,5 +16,5 @@ class User(models.Model):
     last_name = models.CharField(max_length=40)
     gonzaga_email = models.EmailField(unique=True)
     pref_email = models.EmailField(null=True,blank=True)
-    phone = PhoneNumberField(null=True,blank=True)
+    phone = models.CharField(max_length=11,null=True,blank=True)
 
