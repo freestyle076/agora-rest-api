@@ -156,8 +156,13 @@ def ldap_authenticate(request):
             #checks if user is already in our database, assigns variable yes if so
             if User.objects.filter(username=user).exists():
                 json_data['exists'] ='yes'
+                json_data['first_name'] = User.objects.get(username=user).first_name
+                json_data['last_name'] = User.objects.get(username=user).last_name
+                json_data['p_email'] = User.objects.get(username=user).pref_email
+                json_data['phone'] = User.objects.get(username=user).phone               
             else:
                 json_data['exists'] ='no'
+            json_data['username'] = user
             json_data['email'] = info['username']
             info = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -178,9 +183,13 @@ def ldap_authenticate(request):
                 #checks if user is already in our database, assigns variable yes if so
                 if User.objects.filter(username=user).exists():
                     json_data['exists'] ='yes'
+                    json_data['first_name'] = User.objects.get(username=user).first_name
+                    json_data['last_name'] = User.objects.get(username=user).last_name
+                    json_data['p_email'] = User.objects.get(username=user).pref_email
+                    json_data['phone'] = User.objects.get(username=user).phone  
                 else:
                     json_data['exists'] ='no'
-                    
+                json_data['username'] = user                   
                 json_data['email'] = info['username']
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
                 info = None #clear traces of user information after done using
