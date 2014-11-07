@@ -2,21 +2,21 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createuser/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createuser/")!)
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createuser/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createuser/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var username = "tmiller13"
+var username = "khandy"
 var first_name = "Trenton"
 var last_name = "Miller"
-var g_email = "t2@zagmail.gonzaga.edu"
-var p_email = ""
-var phone = ""
+var g_email = "tmiller13@zagmail.gonzaga.edu" //core.data.user.g_email?????
+var p_email = "t@gmail.com"
+var phone = "923619631"
 
 //prepare parameters for json serialization
 var params = ["username":username, "first_name":first_name, "last_name":last_name, "gonzaga_email":g_email, "pref_email":p_email, "phone":phone] as Dictionary<String, String>

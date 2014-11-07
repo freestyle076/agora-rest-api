@@ -16,7 +16,7 @@ var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
 var username = "khandy" //set username value here
-var password =  "" //set password value here
+var password =  "Rusty3220" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 
@@ -28,30 +28,48 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    if let httpResponse = response as? NSHTTPURLResponse {
-        var status_code = httpResponse.statusCode
+    //variables to store incoming data
+    var username = ""
+    var first_name = ""
+    var last_name = ""
+    var g_email = ""
+    var p_email = ""
+    var phone = ""
+    
+    
+    var status_code = (response as NSHTTPURLResponse).statusCode
+    
     var jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
     var err: NSError?
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
 
+    //check for error in deserialization
     if(err != nil) {
         println(err!.localizedDescription)
         let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
         println("Error could not parse JSON: '\(jsonStr)'")
     }
-        
+    //else parse JSON and receive user data values
     else {
+        //parse JSON for data values
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            // Okay, the parsedJSON is here, let's get the value for 'success' out of it
-            //200 = OK, valid credentials
-            if let email = parseJSON["email"] as? String{
-                println("email: \(email)")
+            if let _username = parseJSON["username"] as? String{
+                username = _username
             }
-            if let username = parseJSON["username"] as? String{
-                println("username: \(username)")
+            if let first = parseJSON["first_name"] as? String{
+                first_name = first
             }
-            if let message = parseJSON["message"] as? String{
-                println("message: \(message)")
+            if let last = parseJSON["last_name"] as? String{
+                last_name = last
+            }
+            if let _g_email = parseJSON["g_email"] as? String{
+                g_email = _g_email
+            }
+            if let _p_email = parseJSON["p_email"] as? String{
+                p_email = _p_email
+            }
+            if let _phone = parseJSON["phone"] as? String{
+                phone = _phone
             }
         }
         else {
@@ -59,25 +77,30 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
             println("Error could not parse JSON: \(jsonStr)")
         }
+        //200 = OK
         if(status_code == 200){
-
-
             println("Valid credentials! Carry on to main page...")
-            // The JSONObjectWithData constructor didn't return an error. But, we should still
-            // check and make sure that json has a value using optional binding.
+            println("username: \(username)")
+            println("first_name: \(first_name)")
+            println("last_name: \(last_name)")
+            println("g_email: \(g_email)")
+            println("p_email: \(p_email)")
+            println("phone: \(phone)")
         }
-            //400 = BAD_REQUEST, invalid crentials
+        //400 = BAD_REQUEST, invalid crentials
         else if(status_code == 400){
+            print("Invalid credentials")
         }
-            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
             println("The server is down! Call the fire!")
         }
         else {
             println("Error in casting response, data incomplete")
-            }
+        }
     }
-    }
+    
+    
     
 })
 
