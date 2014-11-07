@@ -163,7 +163,7 @@ def ldap_authenticate(request):
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
-            json_data['email'] = info['username']
+            json_data['g_email'] = info['username']
             info = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
             return response
@@ -190,7 +190,7 @@ def ldap_authenticate(request):
                 else:
                     json_data['exists'] ='no'
                 json_data['username'] = user                   
-                json_data['email'] = info['username']
+                json_data['g_email'] = info['username']
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
                 info = None #clear traces of user information after done using
                 return response
