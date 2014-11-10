@@ -12,9 +12,9 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 var username = "khandy"     //primary key, uneditable
-var first_name = "Trenton"  //editable field
-var last_name = "Miller"    //editable field
-var p_email = "t@gmail.com" //editable field
+var first_name = "Kyle"  //editable field
+var last_name = "Handy"    //editable field
+var p_email = "k@gmail.com" //editable field
 var phone = "923619631"     //editable field
 
 //prepare parameters for json serialization
