@@ -38,21 +38,22 @@ def edit_user(request):
     try:
         info = ast.literal_eval(request.body)
     
-        #validate preferred email using email validator 
-        try:
-            validators.validate_email(info['pref_email'])
-        except validators.ValidationError as e:
-            json_data['message'] = str(e)
-            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-            return response     
-    
+        if(info['pref_email'] != ""):
+            try:
+                validators.validate_email(info['pref_email'])
+            except validators.ValidationError as e:
+                json_data['message'] = str(e)
+                response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                return response     
+
         edit_user = User.objects.get(username=info['username'])
         edit_user.first_name = info['first_name']
         edit_user.last_name = info['last_name']
         edit_user.pref_email = info['pref_email']
         edit_user.phone = info['phone']
         edit_user.save()
-        return HttpResponse(status=status.HTTP_200_OK)
+        json_data['message'] = "Successfully edited user " + info['username']
+        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     except:
         json_data['message'] = sys.exc_info()[0]
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_500_BAD_REQUEST,content_type='application/json')
