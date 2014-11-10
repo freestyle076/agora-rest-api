@@ -34,7 +34,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @api_view(['PUT'])
 def edit_user(request):
-    print request.body
+    info = ast.literal_eval(request.body)
+    user = info['username']
+    edit_user = User.objects.get(username=user)
+    edit_user.first_name = info['first_name']
+    edit_user.last_name = info['last_name']
+    edit_user.pref_email = info['pref_email']
+    edit_user.phone = info['phone']
+    edit_user.save()
     return HttpResponse(status=status.HTTP_200_OK)
 
 @api_view(['POST'])

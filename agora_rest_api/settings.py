@@ -69,7 +69,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sustainability_app',
-        'USER': 'khandy',
+        'USER': 'tmiller12',
+        'PASSWORD': 'tmiller121234',
         'HOST': '147.222.165.3',
         'PORT': '3306',
     }
