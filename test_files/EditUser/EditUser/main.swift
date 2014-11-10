@@ -2,24 +2,23 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createuser/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/edituser/")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createuser/")!)
-request.HTTPMethod = "POST"
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/edituser/")!)
+request.HTTPMethod = "PUT"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var username = "khandy"
-var first_name = "Trenton"
-var last_name = "Miller"
-var g_email = "tmiller13@zagmail.gonzaga.edu" //core.data.user.g_email?????
-var p_email = "t@gmail.com"
-var phone = "923619631"
+var username = "khandy"     //primary key, uneditable
+var first_name = "Trenton"  //editable field
+var last_name = "Miller"    //editable field
+var p_email = "t@gmail.com" //editable field
+var phone = "923619631"     //editable field
 
 //prepare parameters for json serialization
-var params = ["username":username, "first_name":first_name, "last_name":last_name, "gonzaga_email":g_email, "pref_email":p_email, "phone":phone] as Dictionary<String, String>
+var params = ["username":username, "first_name":first_name, "last_name":last_name, "pref_email":p_email, "phone":phone] as Dictionary<String, String>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
@@ -31,8 +30,7 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    //read the message from the response
-    var message = ""
+    
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -41,7 +39,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            message = parseJSON["message"] as String
+            
         }
     }
     
@@ -53,15 +51,15 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         
         //200 = OK: user created, carry on!
         if(status_code == 200){
-            println(message)
+            
         }
             
-            //400 = BAD_REQUEST: error in creating user, display error!
+        //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
-            println(message)
+            
         }
             
-            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
             println("The server is down! Call the fire department!")
         }

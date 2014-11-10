@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 import ldap
 import json
 import ast
@@ -30,6 +31,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
+@api_view(['PUT'])
+def edit_user(request):
+    print request.body
+    return HttpResponse(status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def create_user(request):

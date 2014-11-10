@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     (r'^ldapauth/','agora_rest_api.user_service.views.ldap_authenticate'),
     (r'^createuser/','agora_rest_api.user_service.views.create_user'),
     (r'^userprofile/','agora_rest_api.user_service.views.view_user'),
+    (r'^edituser/','agora_rest_api.user_service.views.edit_user'),
 )
 
