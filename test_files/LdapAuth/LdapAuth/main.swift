@@ -10,8 +10,8 @@ import Foundation
 
 
 
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/ldapauth/")!)
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/ldapauth/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
@@ -80,12 +80,12 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         //200 = OK
         if(status_code == 200){
             println("Valid credentials! Carry on to main page...")
-            println("username: \(username)")
-            println("first_name: \(first_name)")
-            println("last_name: \(last_name)")
-            println("g_email: \(g_email)")
-            println("p_email: \(p_email)")
-            println("phone: \(phone)")
+            NSUserDefaults.standardUserDefaults().setObject(username, forKey: "username")
+            NSUserDefaults.standardUserDefaults().setObject(first_name, forKey: "first_name")
+            NSUserDefaults.standardUserDefaults().setObject(last_name, forKey: "last_name")
+            NSUserDefaults.standardUserDefaults().setObject(g_email, forKey: "gonzaga_email")
+            NSUserDefaults.standardUserDefaults().setObject(p_email, forKey: "pref_email")
+            NSUserDefaults.standardUserDefaults().setObject(phone, forKey: "phone")
         }
         //400 = BAD_REQUEST, invalid crentials
         else if(status_code == 400){
@@ -100,6 +100,8 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         }
     }
     
+    var test = NSUserDefaults.standardUserDefaults().objectForKey("username") as String
+    println("test \(test)")
     
     
 })
