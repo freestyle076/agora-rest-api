@@ -34,10 +34,25 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @api_view(['PUT'])
 def edit_user(request):
-    json_data = {}
-    try:
-        info = ast.literal_eval(request.body)
+    '''
+    PUT method for creating a user. Request body must contain the following
+    data in JSON format:
+        username: username of the existing user
+        first_name: New first name of user
+        last_name: New Llast name of user
+        pref_email: New user provided preferred email*
+        phone: New user provided phone number*
+    *-Nullable values
+    route: /edituser/
+    '''
     
+    json_data = {}
+    
+    #attempting edit on provided json data
+    try:
+        info = ast.literal_eval(request.body) #parse data
+    
+        #changes to pref_email must be validatad as email (pass empty string)
         if(info['pref_email'] != ""):
             try:
                 validators.validate_email(info['pref_email'])
@@ -46,17 +61,21 @@ def edit_user(request):
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 return response     
 
+        #make edits
         edit_user = User.objects.get(username=info['username'])
         edit_user.first_name = info['first_name']
         edit_user.last_name = info['last_name']
         edit_user.pref_email = info['pref_email']
         edit_user.phone = info['phone']
-        edit_user.save()
+        edit_user.save() #save edits
+        
+        #respond with success and HTTP 200 OK 
         json_data['message'] = "Successfully edited user " + info['username']
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     except:
+        #error occured in parsing data or assigning edits
         json_data['message'] = sys.exc_info()[0]
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_500_BAD_REQUEST,content_type='application/json')
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
 
 @api_view(['POST'])
@@ -136,7 +155,7 @@ def create_user(request):
 @api_view(['POST'])
 def view_user(request):
     '''
-    GET method for retrieving User data to be viewed. 
+    POST method for retrieving User data to be viewed. 
     Request body must contain the following data in JSON format:
         username: username of the user to authenticate
     route: /userprofile/
