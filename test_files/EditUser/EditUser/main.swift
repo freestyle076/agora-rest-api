@@ -2,9 +2,9 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/edituser/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/edituser/")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/edituser/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/edituser/")!)
 request.HTTPMethod = "PUT"
 
 //open NSURLSession
@@ -12,9 +12,9 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 var username = "khandy"     //primary key, uneditable
-var first_name = "Kyle"  //editable field
-var last_name = "Handy"    //editable field
-var p_email = "k@gmail.com" //editable field
+var first_name = "Trenton"  //editable field
+var last_name = "Miller"    //editable field
+var p_email = "t@gmail.com" //editable field
 var phone = "923619631"     //editable field
 
 //prepare parameters for json serialization
@@ -30,7 +30,7 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    
+    var message = ""
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -39,7 +39,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            
+            message = parseJSON["message"] as String
         }
     }
     
@@ -51,17 +51,17 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         
         //200 = OK: user created, carry on!
         if(status_code == 200){
-            
+            println(message)
         }
             
         //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
-            
+            println(message)
         }
             
         //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
-            println("The server is down! Call the fire department!")
+            println(message)
         }
         
         
