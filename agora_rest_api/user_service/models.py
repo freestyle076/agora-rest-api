@@ -11,7 +11,7 @@ class User(models.Model):
     User schema class model. Holds information on the user and the user's
     contact information.
     '''
-    username = models.CharField(max_length=50, unique=True)
+    username = models.CharField(max_length=50, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=40)
     gonzaga_email = models.EmailField(unique=True)
