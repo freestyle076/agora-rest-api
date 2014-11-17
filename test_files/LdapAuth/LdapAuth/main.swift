@@ -71,6 +71,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             if let _phone = parseJSON["phone"] as? String{
                 phone = _phone
             }
+            
         }
         else {
             // Woa, okay the json object was nil, something went worng. Maybe the server isn't running?
