@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'agora_rest_api.user_service',
+    'agora_rest_api.post_service',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,7 +76,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

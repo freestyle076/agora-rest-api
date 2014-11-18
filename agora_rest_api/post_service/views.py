@@ -51,9 +51,15 @@ def create_post(request):
             return create_rideshare_post(request_data)
         else:
             json_data = {'message': 'Error in creating post: Invalid category'}
-            return HttpResponse(json.dumps(json_data),status=HTTP_400_BAD_REQUEST,content_type='application/json')
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
     except:
         #error occured in parsing data or assigning edits
         json_data = {'message': str(sys.exc_info()[0])}
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
+        
+@api_view(['POST'])
+def upload_image(request):
+    print "chyea baby, here's dat pic post"
+    print request
+    return HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
