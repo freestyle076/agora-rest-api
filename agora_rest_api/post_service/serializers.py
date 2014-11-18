@@ -14,3 +14,4 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         model = Post
         fields = ('postid', 'username', 'title', 'category', 'description', 'gonzaga_email', 'pref_email', 'phone', 'price')
         
+        
