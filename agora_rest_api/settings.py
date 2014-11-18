@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'agora_rest_api.user_service',
+    'agora_rest_api.post_service',
 )
 
 MIDDLEWARE_CLASSES = (
