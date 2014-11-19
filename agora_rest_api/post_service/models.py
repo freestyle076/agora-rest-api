@@ -1,6 +1,6 @@
 from django.db import models
 import datetime
-
+"""
 class ListPost(models.Model):
     '''
     Class for storing data on our post and displaying in List Format
@@ -13,7 +13,7 @@ class ListPost(models.Model):
     
     class Meta:
         abstract = True
-    
+  
 class Post(ListPost):
     '''
     General Post Schema,
@@ -26,7 +26,7 @@ class Post(ListPost):
     class Meta:
         abstract = True
 
-class ItemPost(Post):
+class ItemPost(models.Model):
     '''
     Items works for our item categories
     Electronics, furniture, appliances/kitchen, and recreation
@@ -60,3 +60,4 @@ class RideSharePost(Post):
     trip = models.CharField(max_length=50,default='')
     round_trip = models.BooleanField(default=True)
     username = models.ForeignKey('user_service.User')
+"""
