@@ -1,5 +1,5 @@
 from models import BookPost, DateLocationPost, ItemPost, RideSharePost
-from user_service.models import User
+from agora_rest_api.user_service.models import User
 from rest_framework import status
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
@@ -16,22 +16,21 @@ datelocation_categories = ['Services','Events']
 
   
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 def create_post(request):
     #json dictionary to pass back data
     json_data = {}
-    print "recognize Item"
     try:
         request_data = ast.literal_eval(request.body) #parse data
         category = request_data['category']
         if category in item_categories:
-            return create_item_post(request_data)
+            return create_item_post(request_data,json_data)
         elif category in book_category:
-            return create_book_post(request_data)
+            return create_book_post(request_data,json_data)
         elif category in datelocation_categories:
-            return create_datelocation_post(request_data)
+            return create_datelocation_post(request_data,json_data)
         elif category in rideshare_category:
-            return create_rideshare_post(request_data)
+            return create_rideshare_post(request_data,json_data)
         else:
             json_data = {'message': 'Error in creating post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
@@ -145,8 +144,8 @@ def create_item_post(request_data,json_data):
         pref_email = this_user.pref_email
     if request_data['phone'] == '1':
         phoneNumber = this_user.phone
-    
     try:
+        print "create_book"
         created_post = ItemPost.objects.create(
             username=request_data['username'],
             title=request_data['title'],
@@ -157,6 +156,7 @@ def create_item_post(request_data,json_data):
             pref_email=pref_email,
             phone=phoneNumber)
         created_post.save()
+
         json_data['message'] = "Succesfully created Book Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
