@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework import serializers
+import datetime
 from models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
 from rest_framework import status
@@ -21,7 +21,7 @@ datelocation_categories = ['Services','Events']
 
   
 
-@api_view(['POST','GET'])
+@api_view(['POST'])
 def create_post(request):
     #json dictionary to pass back data
     json_data = {}
@@ -46,26 +46,19 @@ def create_post(request):
         return response
         
 def create_book_post(request_data,json_data):  
-    this_user = User.objects.get(username=request_data['username'])
-    gonzaga_email = pref_email = phoneNumber = ''
-    if request_data['gonzaga_email'] == '1':
-        gonzaga_email = this_user.gonzaga_email
-    if request_data['pref_email'] == '1':
-        pref_email = this_user.pref_email
-    if request_data['phone'] == '1':
-        phoneNumber = this_user.phone
-    
+   
     try:
         created_post = BookPost.objects.create(
-            username=request_data['username'],
+            username_id=request_data['username'],
             title=request_data['title'],
             price=request_data['price'],
             category=request_data['category'],
             description=request_data['description'],
             isbn=request_data['isbn'],
-            gonzaga_email= gonzaga_email,
-            pref_email=pref_email,
-            phone=phoneNumber)
+            gonzaga_email= request_data['gonzaga_email'],
+            pref_email=request_data['pref_email'],
+            phone=request_data['phone'],
+            display_value = int(request_data['price']))
         created_post.save()
         json_data['message'] = "Succesfully created Book Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -75,30 +68,23 @@ def create_book_post(request_data,json_data):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response 
         
-def create_datelocation_post(request_data,json_data):  
-    this_user = User.objects.get(username=request_data['username'])
-    gonzaga_email = pref_email = phoneNumber = ''
-    if request_data['gonzaga_email'] == '1':
-        gonzaga_email = this_user.gonzaga_email
-    if request_data['pref_email'] == '1':
-        pref_email = this_user.pref_email
-    if request_data['phone'] == '1':
-        phoneNumber = this_user.phone
-    
+def create_datelocation_post(request_data,json_data): 
+    post_date_time = request_data[]
     try:
         created_post = DateLocationPost.objects.create(
-            username=request_data['username'],
+            username_id=request_data['username'],
             title=request_data['title'],
             price=request_data['price'],
             category=request_data['category'],
             description=request_data['description'],
             date_time=request_data['date_time'],
             location=request_data['location'],
-            gonzaga_email= gonzaga_email,
-            pref_email=pref_email,
-            phone=phoneNumber)
+            gonzaga_email= request_data['gonzaga_email'],
+            pref_email=request_data['pref_email'],
+            phone=request_data['phone'],
+            display_value = int(request_data['date_time']))
         created_post.save()
-        json_data['message'] = "Succesfully created Book Post!"
+        json_data['message'] = "Succesfully created Date_location Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except:
@@ -107,18 +93,9 @@ def create_datelocation_post(request_data,json_data):
         return response  
         
 def create_rideshare_post(request_data,json_data):  
-    this_user = User.objects.get(username=request_data['username'])
-    gonzaga_email = pref_email = phoneNumber = ''
-    if request_data['gonzaga_email'] == '1':
-        gonzaga_email = this_user.gonzaga_email
-    if request_data['pref_email'] == '1':
-        pref_email = this_user.pref_email
-    if request_data['phone'] == '1':
-        phoneNumber = this_user.phone
-    
     try:
         created_post = RideSharePost.objects.create(
-            username=request_data['username'],
+            username_id=request_data['username'],
             title=request_data['title'],
             price=request_data['price'],
             category=request_data['category'],
@@ -127,11 +104,12 @@ def create_rideshare_post(request_data,json_data):
             trip=request_data['trip'],
             return_date_time = request_data['return_date_time'],
             round_trip = request_data['round_trip'],
-            gonzaga_email= gonzaga_email,
-            pref_email=pref_email,
-            phone=phoneNumber)
+            gonzaga_email= request_data['gonzaga_email'],
+            pref_email=request_data['pref_email'],
+            phone=request_data['phone'],
+            display_value = int(request_data['departure_date_time']))
         created_post.save()
-        json_data['message'] = "Succesfully created Book Post!"
+        json_data['message'] = "Succesfully created RideShare Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except:
@@ -140,29 +118,19 @@ def create_rideshare_post(request_data,json_data):
         return response  
         
 def create_item_post(request_data,json_data):  
-    this_user = User.objects.get(username=request_data['username'])
-    gonzaga_email = pref_email =  ''
-    phoneNumber = 1
-    if request_data['gonzaga_email'] == '1':
-        gonzaga_email = this_user.gonzaga_email
-    if request_data['pref_email'] == '1':
-        pref_email = this_user.pref_email
-    if request_data['phone'] == '1':
-        phoneNumber = this_user.phone
     try:
-        print "create_book"
         created_post = ItemPost.objects.create(
-            username=request_data['username'],
+            username_id=request_data['username'],
             title=request_data['title'],
-            price=request_data['price'],
+            price=int(request_data['price']),
             category=request_data['category'],
             description=request_data['description'],
-            gonzaga_email= gonzaga_email,
-            pref_email=pref_email,
-            phone=phoneNumber)
+            gonzaga_email= int(request_data['gonzaga_email']),
+            pref_email=int(request_data['pref_email']),
+            phone=int(request_data['phone']),
+            display_value = int(request_data['price']))        
         created_post.save()
-
-        json_data['message'] = "Succesfully created Book Post!"
+        json_data['message'] = "Succesfully created Item Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except:
