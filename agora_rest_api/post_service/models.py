@@ -10,6 +10,8 @@ class ListPost(models.Model):
     title = models.CharField(max_length=50)
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField(default=datetime.datetime.now())
+    image1 = models.CharField(max_length=26,blank=True)
+    
     
     class Meta:
         abstract = True
@@ -25,6 +27,8 @@ class ItemPost(ListPost):
     phone = models.CharField(max_length=11,null=True)
     price = models.PositiveIntegerField()
     username = models.ForeignKey('user_service.User')
+    image2 = models.CharField(max_length=26,blank=True)
+    image3 = models.CharField(max_length=26,blank=True)  
     
 class BookPost(ListPost):
     '''
@@ -37,6 +41,8 @@ class BookPost(ListPost):
     phone = models.CharField(max_length=11,null=True)
     price = models.PositiveIntegerField()
     username = models.ForeignKey('user_service.User')
+    image2 = models.CharField(max_length=26,blank=True)
+    image3 = models.CharField(max_length=26,blank=True)  
     
 class DateLocationPost(ListPost):
     '''
@@ -51,6 +57,8 @@ class DateLocationPost(ListPost):
     phone = models.CharField(max_length=11,null=True)
     price = models.PositiveIntegerField()
     username = models.ForeignKey('user_service.User')
+    image2 = models.CharField(max_length=26,blank=True)
+    image3 = models.CharField(max_length=26,blank=True)  
     
 class RideSharePost(ListPost):
     '''
@@ -69,3 +77,5 @@ class RideSharePost(ListPost):
     phone = models.CharField(max_length=11,null=True)
     price = models.PositiveIntegerField()
     username = models.ForeignKey('user_service.User')
+    image2 = models.CharField(max_length=26,blank=True)
+    image3 = models.CharField(max_length=26,blank=True)  
