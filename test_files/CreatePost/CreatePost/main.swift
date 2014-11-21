@@ -2,13 +2,26 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/uploadimage/")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/uploadimage/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
+
+//image urls
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisguy.png")!,NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisotherguy.png")!]
+
+//formulate imageBase64 array
+var imagesBase64:[String] = []
+var imageData:NSData
+var imageBase64:String
+for url in imageUrls{
+    imageData = NSData(contentsOfURL:url)!
+    imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
+    imagesBase64.append(imageBase64)
+}
 
 //parameter values
 var username = "tmiller12"
@@ -26,7 +39,8 @@ var pref_email = "1"
 var phone = "1"
 
 //prepare parameters for json serialization
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "departure_date_time":departure_date_time, "round_trip":round_trip, "return_date_time":return_date_time,"start_location":start_location,"end_location":end_location] as Dictionary<String, String>
+
+var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"isbn":isbn,"images":imagesBase64] as Dictionary<String,AnyObject>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
@@ -37,6 +51,9 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
+    
+    println(response)
+    
     
     //read the message from the response
     var message = ""
@@ -63,12 +80,12 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             println(message)
         }
             
-            //400 = BAD_REQUEST: error in creating user, display error!
+        //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
             println(message)
         }
             
-            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
             println("The server is down! Call the fire department!")
         }
@@ -77,6 +94,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     } else {
         println("Error in casting response, data incomplete")
     }
+
     
     
 })
@@ -85,3 +103,4 @@ task.resume()
 
 
 sleep(5)
+

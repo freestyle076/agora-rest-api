@@ -18,7 +18,6 @@ item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation'
 book_category = ['Books']
 rideshare_category = ['Rideshare']
 datelocation_categories = ['Services','Events']
-
   
 
 @api_view(['POST'])
@@ -69,8 +68,12 @@ def create_book_post(request_data,json_data):
         return response 
         
 def create_datelocation_post(request_data,json_data): 
+<<<<<<< HEAD
     date_time_format = "%d %m %Y %H"
     post_date_time = datetime.datetime.strptime(request_data['date_time'],date_time_format)
+=======
+    #post_date_time = request_data[]
+>>>>>>> 068a37d95bddc2a626231d8bcacd06a893584c52
     try:
         created_post = DateLocationPost.objects.create(
             username_id=request_data['username'],
@@ -148,12 +151,16 @@ def create_item_post(request_data,json_data):
 def upload_image(request):
     try:   
         request_data = ast.literal_eval(request.body)
-        imagestr = request_data['image']
-        print imagestr
+        imageBase64Array = request_data['images']
+        for i in range(len(imageBase64Array)):
+            imageData = decodestring(imageBase64)
+            
+            
+        '''
         imagedata = decodestring(imagestr)
         imagefile = open("badass.png","wb")
         imagefile.write(imagedata)
-        
+        '''
         return HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
     except:
         print str(sys.exc_info()[0])
