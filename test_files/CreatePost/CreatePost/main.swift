@@ -13,15 +13,7 @@ var session = NSURLSession.sharedSession()
 //image urls
 var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisguy.png")!,NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisotherguy.png")!]
 
-//parameter values
-var username = "tmiller12"
-var description = "This is the description"
-var price = "99"
-var title = "Selling my girlfriend"
-var category = "Recreation"
-var gonzaga_email = "1" //boolean
-var pref_email = "1" //boolean
-var phone = "1" //boolean
+//formulate imageBase64 array
 var imagesBase64:[String] = []
 var imageData:NSData
 var imageBase64:String
@@ -31,10 +23,19 @@ for url in imageUrls{
     imagesBase64.append(imageBase64)
 }
 
+//parameter values
+var username = "tmiller12"
+var description = ""
+var price = "99"
+var title = "Tent"
+var category = "Books"
+var isbn = "123456789"
+var gonzaga_email = "1"
+var pref_email = "1"
+var phone = "1"
 
 //prepare parameters for json serialization
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "images":imagesBase64] as Dictionary<String, AnyObject>
-
+var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"isbn":isbn,"images":imagesBase64] as Dictionary<String,AnyObject>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
