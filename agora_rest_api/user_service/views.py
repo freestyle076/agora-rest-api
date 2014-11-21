@@ -103,7 +103,7 @@ def create_user(request):
         return response    
     
     #validate the preferred email field if provided
-    if new_user_info['pref_email'] not in ["",None]:
+    if new_user_info['pref_email']: #test!
         pref_email = new_user_info['pref_email']
         #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
         if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:

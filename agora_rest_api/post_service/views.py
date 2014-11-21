@@ -1,3 +1,7 @@
+from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework import status
+from rest_framework import serializers
 from models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
 from rest_framework import status
@@ -6,6 +10,7 @@ from rest_framework.decorators import api_view
 import json
 import ast
 import sys
+from base64 import decodestring
 
 # Create your views here.
 
@@ -167,6 +172,23 @@ def create_item_post(request_data,json_data):
          
 @api_view(['POST'])
 def upload_image(request):
-    print "chyea baby, here's dat pic post"
-    print request
-    return HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
+    try:   
+        request_data = ast.literal_eval(request.body)
+        imagestr = request_data['image']
+        print imagestr
+        imagedata = decodestring(imagestr)
+        imagefile = open("badass.png","wb")
+        imagefile.write(imagedata)
+        
+        return HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
+    except:
+        print str(sys.exc_info()[0])
+        
+def convert_hexstring_to_hex(hexstring):
+    print "in convert"
+    while hexstring != '':
+        rgba = hexstring[0:8]    
+        print hex(rgba)
+        hexstring = hexstring[8:]
+    
+    
