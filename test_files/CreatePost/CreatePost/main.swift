@@ -14,15 +14,19 @@ var session = NSURLSession.sharedSession()
 var username = "tmiller12"
 var description = ""
 var price = "99"
-var title = "Tent"
-var category = "Books"
-var isbn = "123456789"
+var title = "Heading Home"
+var category = "Rideshare"
+var departure_date_time = "01 04 2011 16"
+var start_location = "Spokane"
+var end_location = "Yakima"
+var round_trip = "1"
+var return_date_time = "01 04 2011 10"
 var gonzaga_email = "1"
 var pref_email = "1"
 var phone = "1"
 
 //prepare parameters for json serialization
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"isbn":isbn] as Dictionary<String, String>
+var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "departure_date_time":departure_date_time, "round_trip":round_trip, "return_date_time":return_date_time,"start_location":start_location,"end_location":end_location] as Dictionary<String, String>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?

@@ -69,7 +69,8 @@ def create_book_post(request_data,json_data):
         return response 
         
 def create_datelocation_post(request_data,json_data): 
-    post_date_time = request_data[]
+    date_time_format = "%d %m %Y %H"
+    post_date_time = datetime.datetime.strptime(request_data['date_time'],date_time_format)
     try:
         created_post = DateLocationPost.objects.create(
             username_id=request_data['username'],
@@ -77,12 +78,12 @@ def create_datelocation_post(request_data,json_data):
             price=request_data['price'],
             category=request_data['category'],
             description=request_data['description'],
-            date_time=request_data['date_time'],
+            date_time=post_date_time,
             location=request_data['location'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
-            display_value = int(request_data['date_time']))
+            display_value = post_date_time)
         created_post.save()
         json_data['message'] = "Succesfully created Date_location Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -93,6 +94,11 @@ def create_datelocation_post(request_data,json_data):
         return response  
         
 def create_rideshare_post(request_data,json_data):  
+    date_time_format = "%d %m %Y %H"
+    departure_date_time = datetime.datetime.strptime(request_data['departure_date_time'],date_time_format)
+    return_date_time = datetime.datetime.strptime(request_data['return_date_time'],date_time_format)
+    trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
+    print "almost"
     try:
         created_post = RideSharePost.objects.create(
             username_id=request_data['username'],
@@ -100,14 +106,14 @@ def create_rideshare_post(request_data,json_data):
             price=request_data['price'],
             category=request_data['category'],
             description=request_data['description'],
-            departure_date_time=request_data['departure_date_time'],
-            trip=request_data['trip'],
-            return_date_time = request_data['return_date_time'],
+            departure_date_time=departure_date_time,
+            trip=trip_details,
+            return_date_time = return_date_time,
             round_trip = request_data['round_trip'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
-            display_value = int(request_data['departure_date_time']))
+            display_value = trip_details)
         created_post.save()
         json_data['message'] = "Succesfully created RideShare Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
