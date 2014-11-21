@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FF1791C21A15359B004C32DB /* CreatePost.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1791C11A15359B004C32DB /* CreatePost.swift */; };
+		FF1791C21A15359B004C32DB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1791C11A15359B004C32DB /* main.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,7 @@
 
 /* Begin PBXFileReference section */
 		FF1791BE1A15359B004C32DB /* CreatePost */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CreatePost; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF1791C11A15359B004C32DB /* CreatePost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePost.swift; sourceTree = "<group>"; };
+		FF1791C11A15359B004C32DB /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +57,7 @@
 		FF1791C01A15359B004C32DB /* CreatePost */ = {
 			isa = PBXGroup;
 			children = (
-				FF1791C11A15359B004C32DB /* CreatePost.swift */,
+				FF1791C11A15359B004C32DB /* main.swift */,
 			);
 			path = CreatePost;
 			sourceTree = "<group>";
@@ -118,7 +118,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF1791C21A15359B004C32DB /* CreatePost.swift in Sources */,
+				FF1791C21A15359B004C32DB /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,6 +233,7 @@
 				FF1791C71A15359B004C32DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

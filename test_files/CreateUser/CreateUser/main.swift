@@ -11,7 +11,7 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var username = "khandy"
+var username = "tmiller12"
 var first_name = "Trenton"
 var last_name = "Miller"
 var g_email = "tmiller13@zagmail.gonzaga.edu" //core.data.user.g_email?????
