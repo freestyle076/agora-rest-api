@@ -8,8 +8,8 @@ class ListPost(models.Model):
     display_value = models.CharField(max_length=40)
     title = models.CharField(max_length=50)
     category = models.CharField(max_length=30)
-    post_date_time = models.DateTimeField(default=datetime.datetime.now())
-    image1 = models.CharField(max_length=26,blank=True) #url
+    post_date_time = models.DateTimeField()
+    image1 = models.CharField(max_length=26,blank=True,default='') #url
     
     class Meta:
         abstract = True
@@ -25,8 +25,8 @@ class ItemPost(ListPost):
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
     phone = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True) #url
-    image3 = models.CharField(max_length=26,blank=True) #url
+    image2 = models.CharField(max_length=26,blank=True,default='') #url
+    image3 = models.CharField(max_length=26,blank=True,default='') #url
     
 class BookPost(ListPost):
     '''
@@ -39,8 +39,8 @@ class BookPost(ListPost):
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
     phone = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True) #url
-    image3 = models.CharField(max_length=26,blank=True) #url
+    image2 = models.CharField(max_length=26,blank=True,default='') #url
+    image3 = models.CharField(max_length=26,blank=True,default='') #url
 
     
 class DateLocationPost(ListPost):
@@ -56,8 +56,8 @@ class DateLocationPost(ListPost):
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
     phone = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True) #url
-    image3 = models.CharField(max_length=26,blank=True) #url
+    image2 = models.CharField(max_length=26,blank=True,default='') #url
+    image3 = models.CharField(max_length=26,blank=True,default='') #url
 
     
 class RideSharePost(ListPost):
@@ -76,6 +76,6 @@ class RideSharePost(ListPost):
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
     phone = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True) #url
-    image3 = models.CharField(max_length=26,blank=True) #url    
+    image2 = models.CharField(max_length=26,blank=True,default='') #url
+    image3 = models.CharField(max_length=26,blank=True,default='') #url    
     
