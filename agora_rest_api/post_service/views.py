@@ -123,6 +123,12 @@ def create_rideshare_post(request_data,json_data):
         
 def create_item_post(request_data,json_data):  
     try:
+        imagesBase64Array = request_data['images']
+        imagesArray = ['','','']
+        for i in range(len(imagesBase64Array)):
+            imageData = decodestring(imagesBase64Array[i])
+            imagesArray[i] = imageData
+        print imagesArray
         created_post = ItemPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
@@ -132,7 +138,7 @@ def create_item_post(request_data,json_data):
             gonzaga_email= int(request_data['gonzaga_email']),
             pref_email=int(request_data['pref_email']),
             phone=int(request_data['phone']),
-            display_value = int(request_data['price']))        
+            display_value = int(request_data['price']))
         created_post.save()
         json_data['message'] = "Succesfully created Item Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -146,9 +152,15 @@ def create_item_post(request_data,json_data):
 def upload_image(request):
     try:   
         request_data = ast.literal_eval(request.body)
-        imageBase64Array = request_data['images']
-        for i in range(len(imageBase64Array)):
-            imageData = decodestring(imageBase64)
+        category = request_data['username']
+        
+        imagesBase64Array = request_data['images']
+        imagesArray = ['','','']
+        for i in range(len(imagesBase64Array)):
+            imageData = decodestring(imagesBase64Array[i])
+            imagesArray[i] = imageData
+            imagefile = open()
+        print imagesArray
         '''
         imagedata = decodestring(imagestr)
         imagefile = open("badass.png","wb")
@@ -157,12 +169,6 @@ def upload_image(request):
         return HttpResponse(status=status.HTTP_200_OK,content_type='application/json')
     except:
         print str(sys.exc_info()[0])
-        
-def convert_hexstring_to_hex(hexstring):
-    print "in convert"
-    while hexstring != '':
-        rgba = hexstring[0:8]    
-        print hex(rgba)
-        hexstring = hexstring[8:]
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
     
     

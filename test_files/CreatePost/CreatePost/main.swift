@@ -40,7 +40,7 @@ var phone = "1"
 
 //prepare parameters for json serialization
 
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"isbn":isbn,"images":imagesBase64] as Dictionary<String,AnyObject>
+var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"images":imagesBase64] as Dictionary<String,AnyObject>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
