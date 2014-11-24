@@ -24,6 +24,7 @@ datelocation_categories = ['Services','Events']
 def create_post(request):
     #json dictionary to pass back data
     json_data = {}
+    
     try:
         request_data = ast.literal_eval(request.body) #parse data
         category = request_data['category']

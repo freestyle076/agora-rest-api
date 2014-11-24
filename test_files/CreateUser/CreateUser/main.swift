@@ -4,7 +4,7 @@ import Foundation
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createuser/")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:2000/createuser/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createuser/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession

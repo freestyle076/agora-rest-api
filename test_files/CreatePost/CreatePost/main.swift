@@ -2,14 +2,14 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/uploadimage/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createpost"")!)
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/uploadimage/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
-
+/*
 //image urls
 var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisguy.png")!,NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisotherguy.png")!]
 
@@ -22,10 +22,10 @@ for url in imageUrls{
     imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
     imagesBase64.append(imageBase64)
 }
-
+*/
 //parameter values
 var username = "tmiller12"
-var description = ""
+var description = "g"
 var price = "99"
 var title = "Heading Home"
 var category = "Rideshare"
@@ -40,7 +40,8 @@ var phone = "1"
 
 //prepare parameters for json serialization
 
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone,"images":imagesBase64] as Dictionary<String,AnyObject>
+
+var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "return_date_time":return_date_time, "end_location":end_location, "start_location":start_location, "round_trip":round_trip, "departure_date_time":departure_date_time] as Dictionary<String,AnyObject>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
@@ -51,9 +52,6 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-    
-    println(response)
-    
     
     //read the message from the response
     var message = ""
