@@ -48,6 +48,7 @@ def create_post(request):
         
 def create_book_post(request_data,json_data):
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    print request_data
     try:
         '''partially create post, hold for images'''
         created_post = BookPost.objects.create(
@@ -87,6 +88,7 @@ def create_book_post(request_data,json_data):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
+        print e
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response 

@@ -60,7 +60,7 @@ let params = ["username":username,          //common post information
             "category":category,            // |
             "gonzaga_email":gonzaga_email,  // |
             "pref_email":pref_email,        // |
-            "phone":phone,                  // |
+            "call":phone,                  // |
             "text":text,                    // <
             "departure_date_time":departure_date_time,  //rideshare specific
             "start_location":start_location,            // |
