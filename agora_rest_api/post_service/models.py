@@ -1,5 +1,4 @@
 from django.db import models
-import datetime
 
 class ListPost(models.Model):
     '''
