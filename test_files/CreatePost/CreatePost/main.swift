@@ -34,6 +34,7 @@ let category = "Furniture"
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
+let text = "1" //boolean contact option
 
 //rideshare specific
 var departure_date_time = "01 04 2011 16"
@@ -59,7 +60,8 @@ let params = ["username":username,          //common post information
             "category":category,            // |
             "gonzaga_email":gonzaga_email,  // |
             "pref_email":pref_email,        // |
-            "phone":phone,                  // <
+            "phone":phone,                  // |
+            "text":text,                    // <
             "departure_date_time":departure_date_time,  //rideshare specific
             "start_location":start_location,            // |
             "end_location":end_location,                // |
@@ -71,33 +73,6 @@ let params = ["username":username,          //common post information
             "images":imagesBase64]  //images array
     as Dictionary<String,AnyObject>
 
-/* ITEM POSTS
-//prepare parameters for json serialization
-var category = "Furniture"
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "images":imagesBase64] as Dictionary<String,AnyObject>
-*/
-
-/* RIDESHARE POST
-//prepare parameters for json serialization
-var category = "Rideshare"
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "return_date_time":return_date_time, "end_location":end_location, "start_location":start_location, "round_trip":round_trip, "departure_date_time":departure_date_time,"images":imagesBase64] as Dictionary<String,AnyObject>
-*/
-
-/* DATELOCATION POST
-//prepare parameters for json serialization
-var category = "Events"
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "date_time":return_date_time, "location":location,"images":imagesBase64] as Dictionary<String,AnyObject>
-*/
-
-/* TEXTBOOK POST
-//prepare parameters for json serialization
-var category = "Books"
-var params = ["username":username, "description":description, "price":price, "title":title, "category":category, "gonzaga_email":gonzaga_email, "pref_email":pref_email, "phone":phone, "isbn":isbn, "images":imagesBase64] as Dictionary<String,AnyObject>
-*/
-
-
-
-
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?
@@ -108,8 +83,6 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-    
-    println(response)
     
     //read the message from the response
     var message = ""
