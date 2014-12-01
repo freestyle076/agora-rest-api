@@ -4,7 +4,7 @@ from rest_framework import status
 from serializers import UserSerializer
 from django.http import HttpResponse
 from django.db import utils
-from django.core import validators
+from django.core import validators,serializers
 from rest_framework.decorators import api_view
 import ldap
 import json
@@ -41,11 +41,11 @@ def edit_user(request):
     route: /edituser/
     '''
     json_data = {}
-    
+
     #attempting edit on provided json data
     try:
         info = ast.literal_eval(request.body) #parse data
-    
+        serializer_data = serializers.serialize('json',User.objects.filter(username=info['username']))
         #changes to pref_email must be validatad as email (pass empty string)
         if(info['pref_email'] != ""):
             try:
@@ -154,10 +154,10 @@ def view_user(request):
         username: username of the user to authenticate
     route: /userprofile/
     '''
-    json_data = {}
-    #parse request body for incoming login data
+        #parse request body for incoming login data
     info = ast.literal_eval(request.body)
     user = info['username']
+    json_data = {}
     json_data['firstname'] = User.objects.get(username=user).first_name
     json_data['lastname'] = User.objects.get(username=user).last_name
     response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
