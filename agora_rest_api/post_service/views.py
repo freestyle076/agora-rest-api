@@ -18,7 +18,7 @@ import pytz
 
 item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
 book_category = ['Books']
-rideshare_category = ['Rideshare']
+rideshare_category = ['Ride Shares']
 datelocation_categories = ['Services','Events']
 
 date_time_format = "%d %m %Y %H"
@@ -48,6 +48,7 @@ def create_post(request):
         
 def create_book_post(request_data,json_data):
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    print request_data
     try:
         '''partially create post, hold for images'''
         created_post = BookPost.objects.create(
@@ -59,7 +60,7 @@ def create_book_post(request_data,json_data):
             isbn=request_data['isbn'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = int(request_data['price']),
             post_date_time = now)
@@ -87,6 +88,7 @@ def create_book_post(request_data,json_data):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
+        print e
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response 
@@ -106,7 +108,7 @@ def create_datelocation_post(request_data,json_data):
             location=request_data['location'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = input_date_time,
             post_date_time = now)
@@ -157,7 +159,7 @@ def create_rideshare_post(request_data,json_data):
             round_trip = request_data['round_trip'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = trip_details,
             post_date_time = now)
@@ -201,7 +203,7 @@ def create_item_post(request_data,json_data):
             description=request_data['description'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = request_data['price'],
             post_date_time = now)
