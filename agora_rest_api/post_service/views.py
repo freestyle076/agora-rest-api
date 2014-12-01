@@ -60,6 +60,7 @@ def create_book_post(request_data,json_data):
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
+            text=request_data['text'],
             display_value = int(request_data['price']),
             post_date_time = now)
             
@@ -106,6 +107,7 @@ def create_datelocation_post(request_data,json_data):
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
+            text=request_data['text'],
             display_value = input_date_time,
             post_date_time = now)
             
@@ -156,6 +158,7 @@ def create_rideshare_post(request_data,json_data):
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
+            text=request_data['text'],
             display_value = trip_details,
             post_date_time = now)
             
@@ -199,6 +202,7 @@ def create_item_post(request_data,json_data):
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
             phone=request_data['phone'],
+            text=request_data['text'],
             display_value = request_data['price'],
             post_date_time = now)
         
