@@ -2,16 +2,16 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/edituser/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/edituser/")!)
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/edituser/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/edituser/")!)
 request.HTTPMethod = "PUT"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var username = "khandy"     //primary key, uneditable
+var username = "tmiller12"     //primary key, uneditable
 var first_name = "Trenton"  //editable field
 var last_name = "Miller"    //editable field
 var p_email = "t@gmail.com" //editable field
