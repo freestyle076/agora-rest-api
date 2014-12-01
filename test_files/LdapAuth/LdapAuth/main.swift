@@ -10,13 +10,13 @@ import Foundation
 
 
 
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/ldapauth/")!)
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/ldapauth/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
-var username = "khandy" //set username value here
-var password =  "Rusty3220" //set password value here
+var username = "tmiller12" //set username value here
+var password =  "Shibby21" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 

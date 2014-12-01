@@ -23,7 +23,7 @@ class ItemPost(ListPost):
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
-    phone = models.BooleanField(default=False)
+    call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
     image2 = models.CharField(max_length=26,blank=True,default='') #url
     image3 = models.CharField(max_length=26,blank=True,default='') #url
@@ -38,7 +38,7 @@ class BookPost(ListPost):
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
-    phone = models.BooleanField(default=False)
+    call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
     image2 = models.CharField(max_length=26,blank=True,default='') #url
     image3 = models.CharField(max_length=26,blank=True,default='') #url
@@ -56,7 +56,7 @@ class DateLocationPost(ListPost):
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
-    phone = models.BooleanField(default=False)
+    call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
     image2 = models.CharField(max_length=26,blank=True,default='') #url
     image3 = models.CharField(max_length=26,blank=True,default='') #url
@@ -77,7 +77,7 @@ class RideSharePost(ListPost):
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
-    phone = models.BooleanField(default=False)
+    call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
     image2 = models.CharField(max_length=26,blank=True,default='') #url
     image3 = models.CharField(max_length=26,blank=True,default='') #url    

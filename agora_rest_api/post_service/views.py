@@ -18,10 +18,10 @@ import pytz
 
 item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
 book_category = ['Books']
-rideshare_category = ['Rideshare']
+rideshare_category = ['Ride Shares']
 datelocation_categories = ['Services','Events']
 
-date_time_format = "%d %m %Y %H"
+date_time_format = "%m\/%d\/%Y %I:%M %p"
 
 @api_view(['POST'])
 def create_post(request):
@@ -59,7 +59,7 @@ def create_book_post(request_data,json_data):
             isbn=request_data['isbn'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = int(request_data['price']),
             post_date_time = now)
@@ -92,8 +92,13 @@ def create_book_post(request_data,json_data):
         return response 
         
 def create_datelocation_post(request_data,json_data): 
-    input_date_time = datetime.datetime.strptime(request_data['date_time'],date_time_format)
+    split_date = request_data['date_time'].split(",")
+    date_part_1 = split_date[0][0:-2]
+    date_part_2 = split_date[0][-2:]
+    full_date = date_part_1 + "20" + date_part_2 + split_date[1]
+    input_date_time = datetime.datetime.strptime(full_date,date_time_format)
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+
     try:
         '''partially create post, hold for images'''
         created_post = DateLocationPost.objects.create(
@@ -106,7 +111,7 @@ def create_datelocation_post(request_data,json_data):
             location=request_data['location'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = input_date_time,
             post_date_time = now)
@@ -138,9 +143,17 @@ def create_datelocation_post(request_data,json_data):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response  
         
-def create_rideshare_post(request_data,json_data):  
-    departure_date_time = datetime.datetime.strptime(request_data['departure_date_time'],date_time_format)
-    return_date_time = datetime.datetime.strptime(request_data['return_date_time'],date_time_format)
+def create_rideshare_post(request_data,json_data):
+    split_date_1 = request_data['departure_date_time'].split(",")
+    date_part_1 = split_date_1[0][0:-2]
+    date_part_2 = split_date_1[0][-2:]
+    full_departure_date = date_part_1 + "20" + date_part_2 + split_date_1[1]
+    split_date_2 = request_data['return_date_time'].split(",")
+    date_part_3 = split_date_2[0][0:-2]
+    date_part_4 = split_date_2[0][-2:]
+    full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
+    departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
+    return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
     try:
@@ -157,7 +170,7 @@ def create_rideshare_post(request_data,json_data):
             round_trip = request_data['round_trip'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = trip_details,
             post_date_time = now)
@@ -201,7 +214,7 @@ def create_item_post(request_data,json_data):
             description=request_data['description'],
             gonzaga_email= request_data['gonzaga_email'],
             pref_email=request_data['pref_email'],
-            phone=request_data['phone'],
+            call=request_data['call'],
             text=request_data['text'],
             display_value = request_data['price'],
             post_date_time = now)

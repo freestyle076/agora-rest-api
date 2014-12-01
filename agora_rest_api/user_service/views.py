@@ -45,7 +45,6 @@ def edit_user(request):
     #attempting edit on provided json data
     try:
         info = ast.literal_eval(request.body) #parse data
-        serializer_data = serializers.serialize('json',User.objects.filter(username=info['username']))
         #changes to pref_email must be validatad as email (pass empty string)
         if(info['pref_email'] != ""):
             try:
@@ -194,13 +193,14 @@ def ldap_authenticate(request):
             
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
+            
             #checks if user is already in our database, assigns variable yes if so
             if User.objects.filter(username=user).exists():
                 json_data['exists'] ='yes'
                 json_data['first_name'] = User.objects.get(username=user).first_name
                 json_data['last_name'] = User.objects.get(username=user).last_name
                 json_data['p_email'] = User.objects.get(username=user).pref_email
-                json_data['phone'] = User.objects.get(username=user).phone               
+                json_data['phone'] = User.objects.get(username=user).phone 
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
