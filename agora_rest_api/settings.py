@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '_yx2*)2l9=s-!!kke!xj_p18td#ie^uci@^s0lv&!sor=)hr6a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
@@ -90,7 +90,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-MEDIA_ROOT = '/Users/kylehandy/Documents/SpyderWorkspace/agora-rest-api/agora_rest_api/media/'
+PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
+
+MEDIA_ROOT = PROJECT_PATH + '/agora_rest_api/media/'
+
+IMAGES_ROOT = MEDIA_ROOT + 'images/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/

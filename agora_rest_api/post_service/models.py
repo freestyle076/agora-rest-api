@@ -52,7 +52,7 @@ class DateLocationPost(ListPost):
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
     price = models.PositiveIntegerField()
-    date_time = models.DateTimeField(default=datetime.date.today())
+    date_time = models.DateTimeField()
     location = models.CharField(max_length=20)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
@@ -71,8 +71,8 @@ class RideSharePost(ListPost):
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
     price = models.PositiveIntegerField()
-    departure_date_time = models.DateTimeField(default=datetime.date.today())
-    return_date_time = models.DateTimeField(default=datetime.date.today())
+    departure_date_time = models.DateTimeField()
+    return_date_time = models.DateTimeField()
     trip = models.CharField(max_length=50)
     round_trip = models.BooleanField(default=False) 
     username = models.ForeignKey('user_service.User')

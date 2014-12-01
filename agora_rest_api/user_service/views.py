@@ -40,7 +40,6 @@ def edit_user(request):
     *-Nullable values
     route: /edituser/
     '''
-    
     json_data = {}
 
     #attempting edit on provided json data
