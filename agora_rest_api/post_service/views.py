@@ -23,6 +23,32 @@ datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
+
+api_view(['POST'])
+def view_detailed_post(request):
+    '''
+    POST method for retrieving detailed Post data to be viewed. 
+    Request body must contain the following data in JSON format:
+        postId: Identifier for what particular post to grab
+        category: Category to signify which table to search through. 
+    route: /viewdetailedpost/
+    '''
+    json_data = {}
+    try:
+        request_data = ast.literal_eval(request.body) #parse data
+        category = request_data['category'] #switch on category
+        if category in item_categories: 
+            return create_item_post(request_data,json_data)
+        elif category in book_category:
+            return create_book_post(request_data,json_data)
+        elif category in datelocation_categories:
+            return create_datelocation_post(request_data,json_data)
+        elif category in rideshare_category:
+            return create_rideshare_post(request_data,json_data)
+        else:
+            json_data = {'message': 'Error in creating post: Invalid category'}
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+    
 @api_view(['POST'])
 def create_post(request):
     #json dictionary to pass back data
@@ -48,7 +74,6 @@ def create_post(request):
         
 def create_book_post(request_data,json_data):
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
-    print request_data
     try:
         '''partially create post, hold for images'''
         created_post = BookPost.objects.create(
