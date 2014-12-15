@@ -70,9 +70,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sustainability_app',
-        'USER': 'khandy',
-        'PASSWORD' : 'Rusty3220',
-        'HOST': '147.222.165.3',
+        'USER': 'sustainability',
+        'PASSWORD' : 'Dh4Pks7.6',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }

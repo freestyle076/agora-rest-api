@@ -163,6 +163,7 @@ def view_user(request):
     return response
     
 @api_view(['POST'])
+@permission_classes(('allowany',))
 def ldap_authenticate(request):
     '''
     POST method for authenticating a user login. Request body must contain the 
