@@ -8,9 +8,7 @@
 
 import Foundation
 
-
-
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/ldapauth/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/ldapauth/")!)
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
@@ -111,4 +109,6 @@ task.resume()
 
 
 
-sleep(15)
+sleep(5)
+
+println("done")

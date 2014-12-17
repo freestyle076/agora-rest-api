@@ -26,7 +26,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
 @api_view(['PUT'])
 def edit_user(request):
     '''
