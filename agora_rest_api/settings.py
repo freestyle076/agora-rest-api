@@ -62,7 +62,6 @@ REST_FRAMEWORK = {
     #place rest framework configurations here
     'PAGINATE_BY' : 10
 }
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -70,8 +69,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sustainability_app',
-        'USER': 'khandy',
-        'PASSWORD' : 'Rusty3220',
+        'USER': 'sustainability',
+        'PASSWORD' : 'Dh4Pks7.6',
         'HOST': '147.222.165.3',
         'PORT': '3306',
     }
