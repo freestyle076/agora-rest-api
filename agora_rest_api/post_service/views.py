@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import status
 import datetime
-from models import BookPost, DateLocationPost, ItemPost, RideSharePost
+from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
 from agora_rest_api import settings
 from rest_framework import status
@@ -24,7 +24,29 @@ datelocation_categories = ['Services','Events']
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
 
-api_view(['POST'])
+@api_view(['GET'])
+def filter_post_list(request):
+    json_data = {}
+    print "we made it!"
+    try:
+        #get filter parameters from request
+        request_data = ast.literal_eval(request.body)
+        keyword = request_data['keyword']
+        category = request_data['category']
+        max_price = request_data['max_price']
+        min_price = request_data['min_price']
+        free = request_data['free']
+        books = BookPost.objects
+        print books
+    except Exception,e:
+        json_data['message'] = str(e)
+        print(str(e))
+        print 
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
+
+
+@api_view(['POST'])
 def view_detailed_post(request):
     '''
     POST method for retrieving detailed Post data to be viewed. 
@@ -48,9 +70,13 @@ def view_detailed_post(request):
         else:
             json_data = {'message': 'Error in creating post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-    
+    except:
+        print "ahahahahahaha"
+
+
 @api_view(['POST'])
 def create_post(request):
+    print "inside create_post"
     #json dictionary to pass back data
     json_data = {}
     try:

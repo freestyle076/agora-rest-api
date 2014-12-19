@@ -19,7 +19,7 @@ class ItemPost(ListPost):
     Electronics, furniture, appliances/kitchen, and recreation
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=6,decimal_places=2)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
@@ -33,7 +33,7 @@ class BookPost(ListPost):
     Class for Books, additional Attribute is ISBN
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=6,decimal_places=2)
     isbn = models.CharField(max_length=12)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
@@ -50,7 +50,7 @@ class DateLocationPost(ListPost):
     Events, Services
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=6,decimal_places=2)
     date_time = models.DateTimeField()
     location = models.CharField(max_length=20)
     username = models.ForeignKey('user_service.User')
@@ -69,7 +69,7 @@ class RideSharePost(ListPost):
     return_date_time only needed if it is a round trip
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=6,decimal_places=2)
     departure_date_time = models.DateTimeField()
     return_date_time = models.DateTimeField()
     trip = models.CharField(max_length=50)
