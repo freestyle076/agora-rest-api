@@ -2,7 +2,7 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 request.HTTPMethod = "POST"
@@ -28,7 +28,7 @@ for url in imageUrls{
 //common post information
 let username = "tmiller12"
 let description = "g"
-let price = "99"
+let price = "99.0"
 let title = "Heading Home"
 let category = "Furniture"
 let gonzaga_email = "1" //boolean contact option
