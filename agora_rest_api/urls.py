@@ -20,6 +20,6 @@ urlpatterns = patterns('',
     #post service
     (r'^createpost/','agora_rest_api.post_service.views.create_post'),
     (r'^uploadimage/','agora_rest_api.post_service.views.upload_image'),
-    (r'^postlist/','agora_rest_api.post_service.views.filter_post_list'),
+    (r'^postquery/','agora_rest_api.post_service.views.filter_post_list'),
 )
 
