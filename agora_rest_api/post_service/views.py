@@ -5,17 +5,17 @@ import datetime
 
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
-from agora_rest_api.post_service.models import ItemPost, BookPost, DateLocationPost, RideSharePost
 from agora_rest_api import settings
 
 from rest_framework import viewsets
-from rest_framework import status
 from rest_framework import status
 from rest_framework.decorators import api_view
 
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q
+from django.core.context_processors import csrf
+from django.shortcuts import render_to_response
 
 from base64 import decodestring
 from base64 import encodestring
@@ -24,21 +24,18 @@ import datetime
 import json
 import ast
 import sys
-from base64 import decodestring, encodestring
 import pytz
-from django.core.context_processors import csrf
-from django.shortcuts import render_to_response
+import pytz
 
-import pytz
 
 item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
-book_category = ['Books']
-rideshare_category = ['Ride Shares']
+book_categories = ['Books']
+rideshare_categories = ['Ride Shares']
 datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
-# Create your views here.
+
 def prepare_results(items, books, DLs, RSs):
     '''
     Prepares a list a filter request results, each in listview post format.
@@ -48,40 +45,66 @@ def prepare_results(items, books, DLs, RSs):
     DLs: DateLocationPost resultset
     RSs: RidesharePost resultset
     
+    
+    
+    ****THIS NEEDS SORTING IMPLEMENTED****
     '''
+    print "inside prepare_results"     
+    
     posts = []
 
-    #items    
-    for item in items:
-        image = open(str(item.image1),'rb').read()
-        imageString = encodestring(image) #encode image data as string for port of JSON
-        listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString}
-        posts.append(listview_item)
-        
+    #items
+    if items:  
+        for item in items:
+            image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
+            imageString = encodestring(image) #encode image data as string for port of JSON
+            listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+            posts.append(listview_item)
+
+            
     #books
-    for book in books:
-        image = open(str(book.image1),'rb').read()
-        imageString = encodestring(image) #encode image data as string for port of JSON
-        listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString}
-        posts.append(listview_book)
-    
+    if books:
+        for book in books:
+            image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
+            imageString = encodestring(image) #encode image data as string for port of JSON
+            listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+            posts.append(listview_book)
+            
     #Datelocations
-    for DL in DLs:
-        image = open(str(DL.image1),'rb').read()
-        imageString = encodestring(image) #encode image data as string for port of JSON
-        listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString}
-        posts.append(listview_DL)
-    
+    if DLs:
+        for DL in DLs:
+            image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
+            imageString = encodestring(image) #encode image data as string for port of JSON
+            listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+            posts.append(listview_DL)
+           
     #Rideshares
-    for RS in RSs:
-        image = open(str(RS.image1),'rb').read()
-        imageString = encodestring(image) #encode image data as string for port of JSON
-        listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString}
-        posts.append(listview_RS)
+    if RSs:
+        for RS in RSs:
+            image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
+            imageString = encodestring(image) #encode image data as string for port of JSON
+            listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+            posts.append(listview_RS)
+                  
+                                 
+                 
+    def datetime_key(datetime_string):
+        """
+        Post sorting helper function to provide a sortable attribute
+        datetime_string: datetime in formatted string (see global variable date_time_format)
+        """
+        datetime_obj = datetime.datetime.strptime(datetime_string,'%m/%d/%Y %H:%M:%S')
+        return datetime_obj
+
+     
+    #sort the list of posts on their post_date_time attribute
+    posts.sort(key=lambda x: datetime_key(x['post_date_time']))
         
-    #now posts is a list of all posts that made the cut in listview format    
+        
+       
     
     return posts
+
 
 @api_view(['POST'])
 def filter_post_list(request):
@@ -96,29 +119,41 @@ def filter_post_list(request):
         free: Free items only flag. Sets min_price,max_price = 0
     route: /postquery/
     '''
+    
     json_data = {}
+    
     try:
         #get filter parameters from request
         request_data = ast.literal_eval(request.body)
-        keyword = request_data['keyword']
-        _category = request_data['category']
-        max_price = float(request_data['max_price'])
-        min_price = float(request_data['min_price'])
-        free = bool(request_data['free'])
+        keyword = request_data['keywordSearch']
+        print "keyword: " + keyword
+        category = request_data['category']
+        print "category: " + category
+        max_price = request_data['max_price'] #in case of nothing specified max_price will be null
+        print "max_price: " + max_price
+        min_price = request_data['min_price'] #in case of nothing specified min_price will be null
+        print "min_price: " + min_price
+        free = request_data['free']
+        print "free: " + free
+        
         
         #clean keyword input
         keyword.strip() #removing leading or trailing whitespace        
         
         #min_price and max_price not specified
         if not max_price:
-            max_price = 10000.
-        if not min_price:
-            min_price = 0.
+            max_price = 10000.0
+        else:
+            max_price = float(max_price)
+        if not min_price:           
+            min_price = 0.0
+        else:
+            min_price = float(max_price)
         
         #react to free flag
-        if free:
-            max_price = 0.
-            min_price = 0.        
+        if free == "1":
+            max_price = 0.0
+            min_price = 0.0       
         
         #set active categories---------------
         
@@ -129,42 +164,42 @@ def filter_post_list(request):
         RS_rs = None
         
         #if no chosen category apply all
-        if not _category:
-            item_rs = get_item_result_set()
-            book_rs = get_book_resul_set()
-            DL_rs = get_DL_result_set()
-            RS_rs = get_RS_result_set()
-            
+        if not category:
+            item_rs = ItemPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
+            book_rs = BookPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
+            DL_rs = DL_rs = DateLocationPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
+            RS_rs = RideSharePost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
+        
         #category is of item type
         elif category in item_categories:
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(category__iexact=_category, Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword), price__gte=min_price, price_lte=max_price)
+            item_rs = ItemPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
             
         #category is of book type
         elif category in book_categories:
-            #keyword applied to display_value, title, description, isbn            
-            book_rs = BookPost.objects.filter(category__iexact=_category,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) |Q(isbn__icontains=keyword), price__gte=min_price, price_lte=max_price)
+            #keyword applied to display_value, title, description, isbn
+            book_rs = BookPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
             
         #category is of book type
         elif category in datelocation_categories:
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(category__iexact=_category,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword), price__gte=min_price, price_lte=max_price)
+            DL_rs = DL_rs = DateLocationPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
             
         #category is of book type
         elif category in rideshare_categories:
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(category__iexact=_category,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword), price__gte=min_price, price_lte=max_price)
+            RS_rs = RideSharePost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
             
         #populate the response with listview formatted results (grabs and encodes image data)
-        json_data['posts'] = prepare_results(items, books, DLs,RSs)                    
+        json_data['posts'] = prepare_results(item_rs, book_rs, DL_rs, RS_rs)
+        
         
         #hi five
         json_data['message'] = 'Successfully filtered and returned posts'
-        
-        print json_data
-        
+               
         #respond with json and 200 OK
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        
         return response
     
     #catch all unhandled exceptions
@@ -172,6 +207,7 @@ def filter_post_list(request):
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
+        
 
 @api_view(['POST'])
 def view_detailed_post(request):
@@ -190,11 +226,11 @@ def view_detailed_post(request):
         post_id = request_data['post_id']
         if category in item_categories:
             post_info = ItemPost.objects.get(id=post_id)
-        elif category in book_category:
+        elif category in book_categories:
             post_info = BookPost.objects.get(id=post_id)
         elif category in datelocation_categories:
             post_info = DateLocationPost.objects.get(id=post_id)
-        elif category in rideshare_category:
+        elif category in rideshare_categories:
             post_info = RideSharePost.objects.get(id=post_id)
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
@@ -236,11 +272,11 @@ def view_detailed_post(request):
    
         if category in item_categories:
             return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
-        elif category in book_category:
+        elif category in book_categories:
             return view_book_post(request_data,json_data,post_info)
         elif category in datelocation_categories:
             return view_datelocation_post(request_data,json_data,post_info)
-        elif category in rideshare_category:
+        elif category in rideshare_categories:
             return view_rideshare_post(request_data,json_data,post_info)
         else:
             json_data = {'message': 'Error in viewing post: Invalid category'}
@@ -299,11 +335,11 @@ def create_post(request):
         category = request_data['category'] #switch on category
         if category in item_categories: 
             return create_item_post(request_data,json_data)
-        elif category in book_category:
+        elif category in book_categories:
             return create_book_post(request_data,json_data)
         elif category in datelocation_categories:
             return create_datelocation_post(request_data,json_data)
-        elif category in rideshare_category:
+        elif category in rideshare_categories:
             return create_rideshare_post(request_data,json_data)
         else:
             json_data = {'message': 'Error in creating post: Invalid category'}
@@ -361,7 +397,8 @@ def create_book_post(request_data,json_data):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
         
-def create_datelocation_post(request_data,json_data): 
+def create_datelocation_post(request_data,json_data):
+    print "inside create datelocation"
     split_date = request_data['date_time'].split(",")
     date_part_1 = split_date[0][0:-2]
     date_part_2 = split_date[0][-2:]
