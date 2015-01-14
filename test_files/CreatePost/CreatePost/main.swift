@@ -27,10 +27,10 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "tmiller12"
-let description = "g"
-let price = "99.0"
-let title = "Heading Home"
-let category = "Furniture"
+let description = "good looking shoes equipped with self defense weaponry"
+let price = "9.0"
+let title = "Girl's pointy shoes"
+let category = "Clothing"
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
