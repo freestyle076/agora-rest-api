@@ -2,16 +2,17 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisguy.png")!,NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisotherguy.png")!]
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 //formulate imageBase64 array
 var imagesBase64:[String] = []
@@ -31,21 +32,22 @@ let description = "good looking shoes equipped with self defense weaponry"
 let price = "9.0"
 let title = "Girl's pointy shoes"
 let category = "Clothing"
+
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
 let text = "1" //boolean contact option
 
 //rideshare specific
-var departure_date_time = "01 04 2011 16"
+var departure_date_time = "01/04/15, 5:30 AM"
 var start_location = "Spokane"
 var end_location = "Yakima"
 var round_trip = "1"
-var return_date_time = "01 04 2011 10"
+var return_date_time = "01/04/15, 10:30 PM"
 
 //datelocation specific
-var date_time = "01 04 2033 20"
-var location = "Spocompton"
+var date_time = "01/20/15, 9:30 PM"
+var location = "My House"
 
 //textbook specific
 var isbn = "1234213412"
