@@ -4,8 +4,11 @@ import Foundation
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
 
-//trenton
+//Trenton
 var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+
+//Server
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
@@ -28,10 +31,10 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "tmiller12"
-let description = "good looking shoes equipped with self defense weaponry"
-let price = "9.0"
-let title = "Girl's pointy shoes"
-let category = "Clothing"
+let description = "Don't read this"
+let price = ".50"
+let title = "Hunger Games"
+let category = "Books"
 
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
@@ -88,6 +91,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     
     //read the message from the response
     var message = ""
+    var id = 0
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -97,6 +101,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
             message = parseJSON["message"] as String
+            id = parseJSON["id"] as Int
         }
     }
     
@@ -109,6 +114,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         //200 = OK: user created, carry on!
         if(status_code == 200){
             println(message)
+            println(id)
         }
             
         //400 = BAD_REQUEST: error in creating user, display error!
