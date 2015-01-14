@@ -5,6 +5,7 @@ from user_service import views
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'agora_rest_api.views.home', name='home'),
@@ -16,5 +17,6 @@ urlpatterns = patterns('',
     (r'^edituser/','agora_rest_api.user_service.views.edit_user'),
     (r'^createpost/','agora_rest_api.post_service.views.create_post'),
     (r'^uploadimage/','agora_rest_api.post_service.views.upload_image'),
+    (r'^viewpost/','agora_rest_api.post_service.views.view_detailed_post'),
 )
 

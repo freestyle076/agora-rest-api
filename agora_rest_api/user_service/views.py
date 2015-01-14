@@ -176,7 +176,6 @@ def ldap_authenticate(request):
     user = info['username']
     info['username'] = info['username'] + '@zagmail.gonzaga.edu'
     json_data = {}
-    
     #check for empty password; LDAP passes requests with empty passwords, we don't
     if(info['password'] == ""):
         json_data['message'] = 'Empty Password'
@@ -190,10 +189,8 @@ def ldap_authenticate(request):
         #attempt bind on user provided credentials with email @zagmail.gonzaga.edu
         try:
             handle.simple_bind_s(info['username'], info['password'])
-            
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
-            
             #checks if user is already in our database, assigns variable yes if so
             if User.objects.filter(username=user).exists():
                 json_data['exists'] ='yes'
