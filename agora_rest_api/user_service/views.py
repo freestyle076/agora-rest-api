@@ -1,11 +1,14 @@
-from models import User
 from rest_framework import viewsets
 from rest_framework import status
-from serializers import UserSerializer
+from rest_framework.decorators import api_view
+
 from django.http import HttpResponse
 from django.db import utils
 from django.core import validators,serializers
-from rest_framework.decorators import api_view
+
+from serializers import UserSerializer
+from models import User
+
 import ldap
 import json
 import ast

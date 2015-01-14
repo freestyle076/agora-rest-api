@@ -11,12 +11,16 @@ urlpatterns = patterns('',
     # url(r'^$', 'agora_rest_api.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^', include(router.urls)),
+
+    #user service
     (r'^ldapauth/','agora_rest_api.user_service.views.ldap_authenticate'),
     (r'^createuser/','agora_rest_api.user_service.views.create_user'),
     (r'^userprofile/','agora_rest_api.user_service.views.view_user'),
     (r'^edituser/','agora_rest_api.user_service.views.edit_user'),
+
+    #post service
     (r'^createpost/','agora_rest_api.post_service.views.create_post'),
-    (r'^uploadimage/','agora_rest_api.post_service.views.upload_image'),
     (r'^viewpost/','agora_rest_api.post_service.views.view_detailed_post'),
+    (r'^postquery/','agora_rest_api.post_service.views.filter_post_list'),
 )
 
