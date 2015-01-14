@@ -1,11 +1,9 @@
-<<<<<<< HEAD
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import status
 import datetime
-=======
+
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
->>>>>>> 06a8f44ffc557158d3677fd308f89ba0701ef47b
 from agora_rest_api.user_service.models import User
 from agora_rest_api.post_service.models import ItemPost, BookPost, DateLocationPost, RideSharePost
 from agora_rest_api import settings
@@ -26,15 +24,12 @@ import datetime
 import json
 import ast
 import sys
-<<<<<<< HEAD
 from base64 import decodestring, encodestring
 import pytz
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
-# Create your views here.
-=======
+
 import pytz
->>>>>>> 06a8f44ffc557158d3677fd308f89ba0701ef47b
 
 item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
 book_category = ['Books']
@@ -43,9 +38,7 @@ datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
-<<<<<<< HEAD
-=======
-
+# Create your views here.
 def prepare_results(items, books, DLs, RSs):
     '''
     Prepares a list a filter request results, each in listview post format.
@@ -180,7 +173,6 @@ def filter_post_list(request):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
 
->>>>>>> 06a8f44ffc557158d3677fd308f89ba0701ef47b
 @api_view(['POST'])
 def view_detailed_post(request):
     '''
@@ -253,7 +245,6 @@ def view_detailed_post(request):
         else:
             json_data = {'message': 'Error in viewing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-<<<<<<< HEAD
     except Exception,e:
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
@@ -298,17 +289,9 @@ def view_datelocation_post(request_data,json_data,Post):
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
-        
-        
-=======
-    except:
-        print "ahahahahahaha"
 
-
->>>>>>> 06a8f44ffc557158d3677fd308f89ba0701ef47b
 @api_view(['POST'])
 def create_post(request):
-    print "inside create_post"
     #json dictionary to pass back data
     json_data = {}
     try:
