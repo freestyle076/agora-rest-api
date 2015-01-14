@@ -219,7 +219,7 @@ def view_detailed_post(request):
           
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
-        pre_image_string = 'agora_rest_api/media/images/'
+        pre_image_string = settings.IMAGES_ROOT
         image_URLs_array[0] = pre_image_string + post_info.image1
         image_URLs_array[1] = pre_image_string + post_info.image2
         image_URLs_array[2] = pre_image_string + post_info.image3
