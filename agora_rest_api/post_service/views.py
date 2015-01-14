@@ -28,10 +28,6 @@ import pytz
 import pytz
 
 
-
-
-
-
 item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
 book_categories = ['Books']
 rideshare_categories = ['Ride Shares']
@@ -329,8 +325,6 @@ def view_datelocation_post(request_data,json_data,Post):
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
-        
-        
 
 @api_view(['POST'])
 def create_post(request):

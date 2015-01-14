@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 
 from django.http import HttpResponse
 from django.db import utils
-from django.core import validators,serializers
+from django.core import validators
 
 from serializers import UserSerializer
 from models import User
