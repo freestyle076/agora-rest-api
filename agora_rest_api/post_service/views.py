@@ -455,11 +455,8 @@ def create_datelocation_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
-<<<<<<< HEAD
+
         json_data['id'] = ID
-=======
-        json_data['id'] = created_post.id
->>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -527,11 +524,7 @@ def create_rideshare_post(request_data,json_data):
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
-<<<<<<< HEAD
         json_data['id'] = ID
-=======
-        json_data['id'] = created_post.id
->>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
