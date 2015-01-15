@@ -22,5 +22,6 @@ urlpatterns = patterns('',
     (r'^createpost/','agora_rest_api.post_service.views.create_post'),
     (r'^viewpost/','agora_rest_api.post_service.views.view_detailed_post'),
     (r'^postquery/','agora_rest_api.post_service.views.filter_post_list'),
+    (r'^userposts/','agora_rest_api.post_service.views.user_posts'),
 )
 

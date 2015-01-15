@@ -21,6 +21,39 @@ datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
+@api_view(['POST'])
+def user_posts(request):
+    json_data = {}
+    print "inside user posts"
+    try:
+        #parse data
+        request_data = ast.literal_eval(request.body)
+        
+        #retrieve username parameter
+        username = request_data['username']
+        
+        #collect posts belonging to the user
+        item_rs = ItemPost.objects.filter(Q(username_id__exact=username))
+        book_rs = BookPost.objects.filter(Q(username_id__exact=username))
+        DL_rs = DateLocationPost.objects.filter(Q(username_id__exact=username))
+        RS_rs = RideSharePost.objects.filter(Q(username_id__exact=username))
+        
+        #prepare the results: listview format in order of post date        
+        json_data['posts'] = prepare_results(item_rs,book_rs,DL_rs,RS_rs)
+        
+        #hi five
+        json_data['message'] = 'Successfully filtered and returned posts'
+               
+        #respond with json and 200 OK
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+    
+    #general exception handling
+    except Exception, e:
+        print str(e)
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
+        
 
 def prepare_results(items, books, DLs, RSs):
     '''
@@ -34,7 +67,7 @@ def prepare_results(items, books, DLs, RSs):
     print "inside prepare_results"     
     
     posts = []
-
+    
     #items
     if items:  
         for item in items:
@@ -158,7 +191,7 @@ def filter_post_list(request):
         if not category:
             item_rs = ItemPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
             book_rs = BookPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
-            DL_rs = DL_rs = DateLocationPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
+            DL_rs = DateLocationPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
             RS_rs = RideSharePost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
         
         #category is of item type
@@ -174,7 +207,7 @@ def filter_post_list(request):
         #category is of book type
         elif category in datelocation_categories:
             #keyword applied to display_value, title, description, location
-            DL_rs = DL_rs = DateLocationPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
+            DL_rs = DateLocationPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
             
         #category is of book type
         elif category in rideshare_categories:
@@ -195,6 +228,7 @@ def filter_post_list(request):
     
     #catch all unhandled exceptions
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -273,6 +307,7 @@ def view_detailed_post(request):
             json_data = {'message': 'Error in viewing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -287,7 +322,7 @@ def view_book_post(request_data,json_data,Post):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
-        print e
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -308,7 +343,7 @@ def view_rideshare_post(request_data,json_data,Post):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
-        print e
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -324,7 +359,7 @@ def view_datelocation_post(request_data,json_data,Post):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
-        print e
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -366,6 +401,7 @@ def create_post(request):
     
     #catch all unhandled exceptions
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -418,6 +454,7 @@ def create_book_post(request_data,json_data):
     
     #catch all unhandled exceptions
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -478,6 +515,7 @@ def create_datelocation_post(request_data,json_data):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response  
@@ -546,6 +584,7 @@ def create_rideshare_post(request_data,json_data):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response  
@@ -593,6 +632,7 @@ def create_item_post(request_data,json_data):
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
     except Exception,e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
