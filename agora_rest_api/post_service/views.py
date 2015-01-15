@@ -1,14 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import status
-import datetime
+
 
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
 from agora_rest_api import settings
 
-from rest_framework import viewsets
-from rest_framework import status
+
 from rest_framework.decorators import api_view
 
 from django.shortcuts import render
@@ -23,12 +22,11 @@ from base64 import encodestring
 import datetime
 import json
 import ast
-import sys
-import pytz
 import pytz
 
 
-item_categories = ['Electronics','Furniture','Appliances & Kitchen','Recreation','Clothing']
+
+item_categories = ['Electronics','Household','Recreation','Clothing']
 book_categories = ['Books']
 rideshare_categories = ['Ride Shares']
 datelocation_categories = ['Services','Events']
@@ -56,8 +54,11 @@ def prepare_results(items, books, DLs, RSs):
     #items
     if items:  
         for item in items:
-            image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
-            imageString = encodestring(image) #encode image data as string for port of JSON
+            if item.image1:
+                image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
+                imageString = encodestring(image) #encode image data as string for port of JSON
+            else:
+                imageString = ''
             listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
             posts.append(listview_item)
 
@@ -65,24 +66,33 @@ def prepare_results(items, books, DLs, RSs):
     #books
     if books:
         for book in books:
-            image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
-            imageString = encodestring(image) #encode image data as string for port of JSON
+            if book.image1:
+                image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
+                imageString = encodestring(image) #encode image data as string for port of JSON
+            else:
+                imageString = ''
             listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
             posts.append(listview_book)
             
     #Datelocations
     if DLs:
         for DL in DLs:
-            image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
-            imageString = encodestring(image) #encode image data as string for port of JSON
+            if DL.image1:
+                image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
+                imageString = encodestring(image) #encode image data as string for port of JSON
+            else:
+                imageString = ''
             listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
             posts.append(listview_DL)
            
     #Rideshares
     if RSs:
         for RS in RSs:
-            image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
-            imageString = encodestring(image) #encode image data as string for port of JSON
+            if RS.image1:
+                image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
+                imageString = encodestring(image) #encode image data as string for port of JSON
+            else:
+                imageString = ''
             listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
             posts.append(listview_RS)
                   
@@ -371,6 +381,7 @@ def create_book_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+        json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -425,6 +436,7 @@ def create_datelocation_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+        json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -484,6 +496,7 @@ def create_rideshare_post(request_data,json_data):
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+        json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -527,6 +540,7 @@ def create_item_post(request_data,json_data):
             post_date_time = now)
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+        json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
