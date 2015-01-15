@@ -1,24 +1,12 @@
-from django.shortcuts import render
-from rest_framework import viewsets
 from rest_framework import status
-
-
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User
 from agora_rest_api import settings
-
-
 from rest_framework.decorators import api_view
-
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q
-from django.core.context_processors import csrf
-from django.shortcuts import render_to_response
-
 from base64 import decodestring
 from base64 import encodestring
-
 import datetime
 import json
 import ast
@@ -265,7 +253,7 @@ def view_detailed_post(request):
           
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
-        pre_image_string = 'agora_rest_api/media/images/'
+        pre_image_string = settings.IMAGES_ROOT
         image_URLs_array[0] = pre_image_string + post_info.image1
         image_URLs_array[1] = pre_image_string + post_info.image2
         image_URLs_array[2] = pre_image_string + post_info.image3
@@ -297,6 +285,10 @@ def view_detailed_post(request):
         return response
         
 def view_book_post(request_data,json_data,Post):
+    '''
+    POST method for retrieving detailed Post data for book posts 
+    (isbn)
+    '''
     try:
         json_data["isbn"] = Post.isbn
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -308,6 +300,10 @@ def view_book_post(request_data,json_data,Post):
         return response
 
 def view_rideshare_post(request_data,json_data,Post):
+    '''
+    POST method for retrieving detailed Post data for rideshare posts
+    (roundtrip,trip,departure_date_time,return_date_time)
+    '''
     try:
         json_data["trip"] = Post.trip
         json_data["departure_date_time"] = str(Post.departure_date_time)
@@ -325,6 +321,10 @@ def view_rideshare_post(request_data,json_data,Post):
         return response
 
 def view_datelocation_post(request_data,json_data,Post):
+    '''
+    POST method for retrieving detailed Post data for rideshare posts
+    (date_time,location)
+    '''
     try:
         json_data["date_time"] = str(Post.date_time)
         json_data["location"] = Post.location
@@ -338,6 +338,22 @@ def view_datelocation_post(request_data,json_data,Post):
 
 @api_view(['POST'])
 def create_post(request):
+    '''
+    POST method for creating any post
+    Request body must contain the following data in JSON format:
+        title: title for particular post
+        category: category of post being created
+        username_id: ID for user that created post
+        description: String describing the object to be sold
+        price: float value signifying the desired price of object
+        gonzaga_email: Boolean whether the poster desires to be contacted through gonzaga_email
+        pref_email: Boolean whether the poster desires to be contacted through preferred email
+        call: Boolean whether the poster desires to be contacted by a call
+        text: Boolean whether the poster desires to be contacted by a text
+        image1: Default image
+        image2: Second image
+        image3: Third image
+    '''
     #json dictionary to pass back data
     json_data = {}
     try:
@@ -362,6 +378,11 @@ def create_post(request):
         return response
         
 def create_book_post(request_data,json_data):
+    '''
+    POST method for creating a book  post
+    Request body must contain the following data in JSON format:
+        isbn: isbn of book to be sold
+    '''
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
     try:
         '''partially create post, hold for images'''
@@ -381,7 +402,11 @@ def create_book_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+<<<<<<< HEAD
         json_data['id'] = ID
+=======
+        json_data['id'] = created_post.id
+>>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -409,7 +434,12 @@ def create_book_post(request_data,json_data):
         return response
         
 def create_datelocation_post(request_data,json_data):
-    print "inside create datelocation"
+    '''
+    POST method for creating any post
+    Request body must contain the following data in JSON format:
+        date_time: Date and Time of event or service desired
+        location: Location of event or service
+    '''
     split_date = request_data['date_time'].split(",")
     date_part_1 = split_date[0][0:-2]
     date_part_2 = split_date[0][-2:]
@@ -436,7 +466,11 @@ def create_datelocation_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+<<<<<<< HEAD
         json_data['id'] = ID
+=======
+        json_data['id'] = created_post.id
+>>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -462,8 +496,16 @@ def create_datelocation_post(request_data,json_data):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response  
         
-def create_rideshare_post(request_data,json_data):
-    
+def create_rideshare_post(request_data,json_data): 
+    '''
+    POST method for creating a rideshare post
+    Request body must contain the following data in JSON format:
+        start_location: Beginning place of rideshare
+        end_location: End place of rideshare
+        round_trip: Boolean Value signifying 
+        departure_date_time: date and time of departure
+        return_date_time: date and time of return if it is a round trip
+    '''
     split_date_1 = request_data['departure_date_time'].split(",")
     date_part_1 = split_date_1[0][0:-2]
     date_part_2 = split_date_1[0][-2:]
@@ -496,7 +538,11 @@ def create_rideshare_post(request_data,json_data):
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
+<<<<<<< HEAD
         json_data['id'] = ID
+=======
+        json_data['id'] = created_post.id
+>>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
@@ -523,6 +569,9 @@ def create_rideshare_post(request_data,json_data):
         return response  
         
 def create_item_post(request_data,json_data):
+    '''
+    POST method for creating an item post
+    '''
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
     try:
         '''partially create post, hold for images'''

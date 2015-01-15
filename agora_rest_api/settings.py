@@ -91,6 +91,10 @@ USE_TZ = True
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
+SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
+
+#MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/media/'
+
 MEDIA_ROOT = PROJECT_PATH + '/agora_rest_api/media/'
 
 IMAGES_ROOT = MEDIA_ROOT + 'images/'
