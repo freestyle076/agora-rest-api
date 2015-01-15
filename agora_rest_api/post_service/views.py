@@ -30,10 +30,6 @@ def prepare_results(items, books, DLs, RSs):
     books: BookPost resultset
     DLs: DateLocationPost resultset
     RSs: RidesharePost resultset
-    
-    
-    
-    ****THIS NEEDS SORTING IMPLEMENTED****
     '''
     print "inside prepare_results"     
     
@@ -98,9 +94,6 @@ def prepare_results(items, books, DLs, RSs):
     #sort the list of posts on their post_date_time attribute
     posts.sort(key=lambda x: datetime_key(x['post_date_time']))
         
-        
-       
-    
     return posts
 
 
@@ -402,11 +395,7 @@ def create_book_post(request_data,json_data):
             
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post
-<<<<<<< HEAD
         json_data['id'] = ID
-=======
-        json_data['id'] = created_post.id
->>>>>>> 51f19cf8ffd24f4e63a3ce6733be71cdbd8a7908
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
