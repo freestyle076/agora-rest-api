@@ -58,7 +58,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             //get the status code
             var status_code = httpResponse.statusCode
             
-            //200 = OK: user created, carry on!
+            //200 = OK: carry on!
             if(status_code == 200){
                 println(message)
                 
@@ -73,17 +73,22 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
                         
                         //get the easy ones, title and display_value
+                        //HERE ARE THE TEXTUAL INFORMATION PIECES FOR THE POST
                         let title = post["title"] as String
                         let display_value = post["display_value"]! as String
                         let postID = post["id"]! as Int
                         
+                        println(title)
                         
+                        //THE THUMBNAIL IMAGE IS PROCESSED HERE
                         let imageString = post["image"]! as String
-                        println(imageString)
                         if !imageString.isEmpty {
                             let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
                             
                             //do stuff with the image here
+                        }
+                        else{
+                            //CASE IN WHICH THE POST HAD NO IMAGE
                         }
                         
                     }
@@ -107,10 +112,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             println("Error in casting response, data incomplete")
         }
     }
-    
-    
-    
-    
     
 })
 

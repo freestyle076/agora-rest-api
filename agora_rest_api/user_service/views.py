@@ -8,6 +8,7 @@ from django.core import validators
 
 from serializers import UserSerializer
 from models import User
+from agora_rest_api.post_service import views as post_service_views
 
 import ldap
 import json
@@ -201,6 +202,7 @@ def ldap_authenticate(request):
                 json_data['last_name'] = User.objects.get(username=user).last_name
                 json_data['p_email'] = User.objects.get(username=user).pref_email
                 json_data['phone'] = User.objects.get(username=user).phone 
+                json_data['posts'] = post_service_views.user_posts(user)
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
@@ -249,4 +251,24 @@ def ldap_authenticate(request):
         response.write(error_message)
         return response
         
-    
+@api_view(['POST'])
+def user_posts(request):
+    '''
+    POST method for retrieving a set of posts belonging to a user in listview format
+    the following elements must be included in the request body:
+    username: username of user to have posts collected for
+    '''
+    json_data = {}
+    try:
+        request_data = ast.literal_eval(request.body)
+        username = request_data['username']
+        json_data['posts'] = post_service_views.user_posts(username)
+        
+        json_data['message'] = "successfully retrieved user posts"
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return response
+    except Exception,e:
+        print str(e)
+        json_data["message"] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response

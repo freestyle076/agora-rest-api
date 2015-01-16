@@ -15,8 +15,8 @@ var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
-var username = "tmiller12" //set username value here
-var password =  "Shibby21" //set password value here
+var username = "khandy" //set username value here
+var password =  "Rusty3220" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 
@@ -35,7 +35,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     var g_email = ""
     var p_email = ""
     var phone = ""
-    
     
     var status_code = (response as NSHTTPURLResponse).statusCode
     
@@ -70,6 +69,34 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             }
             if let _phone = parseJSON["phone"] as? String{
                 phone = _phone
+            }
+            if let posts: AnyObject = parseJSON["posts"]{
+                
+                //iterate through each post
+                for i in 0...(posts.count - 1){
+                    let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
+                    
+                    //get the easy ones, title, display_value and post ID
+                    let title = post["title"] as String
+                    let display_value = post["display_value"]! as String
+                    let postID = post["id"]! as Int
+                    
+                    
+                    //read imageString, base64 encoded
+                    let imageString = post["image"]! as String
+                    
+                    //make sure there is an image...
+                    if !imageString.isEmpty {
+                        let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                        
+                        //THIS IS WHERE IMAGES ARE HANDLED, if there are any...
+                    }
+                        
+                        //no image included...
+                    else{
+                        //NO IMAGE WITH POST
+                    }
+                }
             }
             
         }
@@ -111,4 +138,4 @@ task.resume()
 
 
 
-sleep(15)
+sleep(5)

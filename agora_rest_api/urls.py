@@ -17,11 +17,12 @@ urlpatterns = patterns('',
     (r'^createuser/','agora_rest_api.user_service.views.create_user'),
     (r'^userprofile/','agora_rest_api.user_service.views.view_user'),
     (r'^edituser/','agora_rest_api.user_service.views.edit_user'),
+    (r'^userposts/','agora_rest_api.user_service.views.user_posts'),
 
     #post service
     (r'^createpost/','agora_rest_api.post_service.views.create_post'),
     (r'^viewpost/','agora_rest_api.post_service.views.view_detailed_post'),
     (r'^postquery/','agora_rest_api.post_service.views.filter_post_list'),
-    (r'^userposts/','agora_rest_api.post_service.views.user_posts'),
+    
 )
 

@@ -13,7 +13,6 @@ import ast
 import pytz
 
 
-
 item_categories = ['Electronics','Household','Recreation','Clothing']
 book_categories = ['Books']
 rideshare_categories = ['Ride Shares']
@@ -21,17 +20,17 @@ datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
-@api_view(['POST'])
-def user_posts(request):
-    json_data = {}
+
+def user_posts(username):
+    '''
+    Gathers an aggregate list of posts, in listview format, that belong to
+    the user whose username matches parameter username
+    username: user whose posts will be collected
+    '''
     print "inside user posts"
+    
     try:
-        #parse data
-        request_data = ast.literal_eval(request.body)
-        
-        #retrieve username parameter
-        username = request_data['username']
-        
+
         #collect posts belonging to the user
         item_rs = ItemPost.objects.filter(Q(username_id__exact=username))
         book_rs = BookPost.objects.filter(Q(username_id__exact=username))
@@ -39,20 +38,11 @@ def user_posts(request):
         RS_rs = RideSharePost.objects.filter(Q(username_id__exact=username))
         
         #prepare the results: listview format in order of post date        
-        json_data['posts'] = prepare_results(item_rs,book_rs,DL_rs,RS_rs)
-        
-        #hi five
-        json_data['message'] = 'Successfully filtered and returned posts'
-               
-        #respond with json and 200 OK
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return prepare_results(item_rs,book_rs,DL_rs,RS_rs)
     
     #general exception handling
     except Exception, e:
-        print str(e)
-        json_data['message'] = str(e)
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response
+        raise e
         
 
 def prepare_results(items, books, DLs, RSs):
@@ -68,66 +58,70 @@ def prepare_results(items, books, DLs, RSs):
     
     posts = []
     
-    #items
-    if items:  
-        for item in items:
-            if item.image1:
-                image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
-                imageString = encodestring(image) #encode image data as string for port of JSON
-            else:
-                imageString = ''
-            listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
-            posts.append(listview_item)
-
-            
-    #books
-    if books:
-        for book in books:
-            if book.image1:
-                image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
-                imageString = encodestring(image) #encode image data as string for port of JSON
-            else:
-                imageString = ''
-            listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
-            posts.append(listview_book)
-            
-    #Datelocations
-    if DLs:
-        for DL in DLs:
-            if DL.image1:
-                image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
-                imageString = encodestring(image) #encode image data as string for port of JSON
-            else:
-                imageString = ''
-            listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
-            posts.append(listview_DL)
-           
-    #Rideshares
-    if RSs:
-        for RS in RSs:
-            if RS.image1:
-                image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
-                imageString = encodestring(image) #encode image data as string for port of JSON
-            else:
-                imageString = ''
-            listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
-            posts.append(listview_RS)
-                  
-                                 
-                 
-    def datetime_key(datetime_string):
-        """
-        Post sorting helper function to provide a sortable attribute
-        datetime_string: datetime in formatted string (see global variable date_time_format)
-        """
-        datetime_obj = datetime.datetime.strptime(datetime_string,'%m/%d/%Y %H:%M:%S')
-        return datetime_obj
-
-     
-    #sort the list of posts on their post_date_time attribute
-    posts.sort(key=lambda x: datetime_key(x['post_date_time']))
+    try:
+        #items
+        if items:  
+            for item in items:
+                if item.image1:
+                    image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
+                    imageString = encodestring(image) #encode image data as string for port of JSON
+                else:
+                    imageString = ''
+                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                posts.append(listview_item)
+    
+                
+        #books
+        if books:
+            for book in books:
+                if book.image1:
+                    image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
+                    imageString = encodestring(image) #encode image data as string for port of JSON
+                else:
+                    imageString = ''
+                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                posts.append(listview_book)
+                
+        #Datelocations
+        if DLs:
+            for DL in DLs:
+                if DL.image1:
+                    image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
+                    imageString = encodestring(image) #encode image data as string for port of JSON
+                else:
+                    imageString = ''
+                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                posts.append(listview_DL)
+               
+        #Rideshares
+        if RSs:
+            for RS in RSs:
+                if RS.image1:
+                    image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
+                    imageString = encodestring(image) #encode image data as string for port of JSON
+                else:
+                    imageString = ''
+                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                posts.append(listview_RS)
+                                     
+                     
+        def datetime_key(datetime_string):
+            """
+            Post sorting helper function to provide a sortable attribute
+            datetime_string: datetime in formatted string (see global variable date_time_format)
+            """
+            datetime_obj = datetime.datetime.strptime(datetime_string,'%m/%d/%Y %H:%M:%S')
+            return datetime_obj
+    
+         
+        #sort the list of posts on their post_date_time attribute
+        posts.sort(key=lambda x: datetime_key(x['post_date_time']))
         
-    return posts
+        return posts
+        
+    #ensure that exceptions are raised to the point of being included in the http response
+    except Exception, e:
+        raise e
 
 
 @api_view(['POST'])
