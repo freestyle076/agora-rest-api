@@ -251,6 +251,9 @@ def view_detailed_post(request):
             post_info = DateLocationPost.objects.get(id=post_id)
         elif category in rideshare_categories:
             post_info = RideSharePost.objects.get(id=post_id)
+        else:
+            json_data = {'message': 'Error in viewing post: Invalid category'}
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
         json_data['price'] = str(post_info.price)
