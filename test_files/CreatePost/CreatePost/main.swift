@@ -2,10 +2,10 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
 
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -13,7 +13,7 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisguy.png")!,NSURL(fileURLWithPath: "/Users/kylehandy/Desktop/thisotherguy.png")!]
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 //formulate imageBase64 array
 var imagesBase64:[String] = []
@@ -28,11 +28,11 @@ for url in imageUrls{
 
 //parameter values
 //common post information
-let username = "khandy"
-let description = "3 year veteran of the college lifestyle"
+let username = "tmiller12"
+let description = "Road Trip"
 let price = "100.0"
-let title = "Das Boot"
-let category = "Clothing"
+let title = "Brazil"
+let category = "Furniture"
 
 
 let gonzaga_email = "1" //boolean contact option

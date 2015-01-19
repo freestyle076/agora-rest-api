@@ -12,7 +12,7 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 //common post information
-var postid = "14"
+var postid = "16"
 var category = "Books"
 
 //this is the parameters array that will be formulated as JSON.
@@ -47,6 +47,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     var isbn = ""
     var location = ""
     var date_time = ""
+    var imageString: [String] = ["","",""]
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -79,6 +80,34 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 if round_trip{
                     return_date_time = parseJSON["return_date_time"] as String
                 }
+            }
+            //The Three images are processed here
+            imageString[0] = parseJSON["image1"]! as String
+            imageString[1] = parseJSON["image2"]! as String
+            imageString[2] = parseJSON["image3"]! as String
+            if !imageString[0].isEmpty {
+                let imageData1 = NSData(base64EncodedString: imageString[0], options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                    
+                //do stuff with the image here
+            }
+            else{
+                //CASE IN WHICH THE POST HAD NO IMAGE 1
+            }
+            if !imageString[1].isEmpty {
+                let imageData2 = NSData(base64EncodedString: imageString[1], options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                
+                //do stuff with the image here
+            }
+            else{
+                //CASE IN WHICH THE POST HAD NO IMAGE 2
+            }
+            if !imageString[2].isEmpty {
+                let imageData3 = NSData(base64EncodedString: imageString[2], options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                
+                //do stuff with the image here
+            }
+            else{
+                //CASE IN WHICH THE POST HAD NO IMAGE 3
             }
 
         }
