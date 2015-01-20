@@ -84,7 +84,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let imageString = post["image"]! as String
                         if !imageString.isEmpty {
                             let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
-                            
+                                
                             //do stuff with the image here
                         }
                         else{
@@ -92,7 +92,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         }
                         
                     }
-                    
                 }
             }
                 

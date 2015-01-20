@@ -19,8 +19,35 @@ rideshare_categories = ['Ride Shares']
 datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
+'''
+@api_view(['POST'])
+def edit_posts(request):
 
+    POST method for editing Post data
+    route: /editpost/
 
+    json_data = {}
+    try:
+        request_data = ast.literal_eval(request.body)#parse data
+        edit_post = Post.objects.get(id= request_data['id'])
+        if category in item_categories:
+            edit_post = ItemPost.objects.get(id= request_data['id'])
+        elif category in book_categories:
+            edit_post = BookPost.objects.get(id= request_data['id'])
+        elif category in datelocation_categories:
+            edit_post = DateLocationPost.objects.get(id= request_data['id'])
+        elif category in rideshare_categories:
+            edit_post = RideSharePost.objects.get(id= request_data['id'])
+        else:
+            json_data = {'message': 'Error in viewing post: Invalid category'}
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+    #catch all unhandled exceptions
+    except Exception,e:
+        print str(e)
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response   
+'''
 def user_posts(username):
     '''
     Gathers an aggregate list of posts, in listview format, that belong to
@@ -285,7 +312,7 @@ def view_detailed_post(request):
         image_URLs_array[1] = pre_image_string + post_info.image2
         image_URLs_array[2] = pre_image_string + post_info.image3
         for i in range(len(image_URLs_array)):
-            if image_URLs_array[i] != 'agora_rest_api/media/images/':
+            if image_URLs_array[i] != settings.IMAGES_ROOT:
                 image_file = open(image_URLs_array[i],"rb")
                 image_data = image_file.read()
                 images_base64_array[i] = encodestring(image_data)
@@ -354,6 +381,7 @@ def view_datelocation_post(request_data,json_data,Post):
     (date_time,location)
     '''
     try:
+        print "Whoop"
         json_data["date_time"] = str(Post.date_time)
         json_data["location"] = Post.location
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
