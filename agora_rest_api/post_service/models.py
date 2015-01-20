@@ -5,7 +5,7 @@ class ListPost(models.Model):
     Class for storing data on our post and displaying in List Format
     '''
     display_value = models.CharField(max_length=40)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
     image1 = models.CharField(max_length=26,blank=True,default='') #url
