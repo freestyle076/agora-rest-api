@@ -1,8 +1,9 @@
 import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
-//kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+//server
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+
 
 //trenton
 var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
@@ -14,6 +15,8 @@ var session = NSURLSession.sharedSession()
 
 //image urls
 var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+//var imageUrls:[NSURL] = []
+
 
 //formulate imageBase64 array
 var imagesBase64:[String] = []
@@ -31,8 +34,9 @@ for url in imageUrls{
 let username = "tmiller12"
 let description = "Road Trip"
 let price = "100.0"
-let title = "Brazil"
-let category = "Furniture"
+let title = "Moving to Seattle"
+let category = "Ride Shares"
+
 
 
 let gonzaga_email = "1" //boolean contact option
@@ -43,8 +47,8 @@ let text = "1" //boolean contact option
 //rideshare specific
 var departure_date_time = "01/04/15, 5:30 AM"
 var start_location = "Spokane"
-var end_location = "Yakima"
-var round_trip = "1"
+var end_location = "Seattle"
+var round_trip = "0"
 var return_date_time = "01/04/15, 10:30 PM"
 
 //datelocation specific

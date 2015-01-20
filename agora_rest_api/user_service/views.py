@@ -175,6 +175,7 @@ def ldap_authenticate(request):
         password: entered password to authenticate
     route: /ldapauth/
     '''
+    
     #parse request body for incoming login data
     info = ast.literal_eval(request.body)
     user = info['username']
@@ -188,11 +189,13 @@ def ldap_authenticate(request):
     
     #attempt connection to ldap server
     try:
-        handle = ldap.open('dc-ad-gonzaga.gonzaga.edu')
+        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+        handle = ldap.initialize("ldaps://dc-ad-gonzaga.gonzaga.edu")
         
         #attempt bind on user provided credentials with email @zagmail.gonzaga.edu
         try:
             handle.simple_bind_s(info['username'], info['password'])
+            
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
             #checks if user is already in our database, assigns variable yes if so
@@ -229,7 +232,8 @@ def ldap_authenticate(request):
                     json_data['first_name'] = User.objects.get(username=user).first_name
                     json_data['last_name'] = User.objects.get(username=user).last_name
                     json_data['p_email'] = User.objects.get(username=user).pref_email
-                    json_data['phone'] = User.objects.get(username=user).phone  
+                    json_data['phone'] = User.objects.get(username=user).phone
+                    json_data['posts'] = post_service_views.user_posts(user)
                 else:
                     json_data['exists'] ='no'
                 json_data['username'] = user                   
@@ -240,12 +244,14 @@ def ldap_authenticate(request):
             
             #catch exception, neither username+email_suffix+password in ldap database, return bad request
             except ldap.LDAPError, error_message:
+                print error_message
                 json_data['message'] = 'Invalid Credentials'
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 return response
                 
     #failure to connect to ldap server, return internal server error   
     except ldap.LDAPError, error_message:
+        print error_message
         json_data['message'] = 'Error Connecting to Ldap Server'
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_500_INTERNAL_SERVER_ERROR,content_type='application/json')
         response.write(error_message)

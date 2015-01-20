@@ -98,7 +98,7 @@ def prepare_results(items, books, DLs, RSs):
                 listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
     
-                
+    
         #books
         if books:
             for book in books:
@@ -109,7 +109,8 @@ def prepare_results(items, books, DLs, RSs):
                     imageString = ''
                 listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
-                
+
+
         #Datelocations
         if DLs:
             for DL in DLs:
@@ -120,7 +121,8 @@ def prepare_results(items, books, DLs, RSs):
                     imageString = ''
                 listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_DL)
-               
+
+
         #Rideshares
         if RSs:
             for RS in RSs:
@@ -132,7 +134,8 @@ def prepare_results(items, books, DLs, RSs):
                 listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
-                     
+
+
         def datetime_key(datetime_string):
             """
             Post sorting helper function to provide a sortable attribute
@@ -556,17 +559,18 @@ def create_rideshare_post(request_data,json_data):
         departure_date_time: date and time of departure
         return_date_time: date and time of return if it is a round trip
     '''
+    
     split_date_1 = request_data['departure_date_time'].split(",")
     date_part_1 = split_date_1[0][0:-2]
-    date_part_2 = split_date_1[0][-2:]
+    date_part_2 = split_date_1[0][-2:]  
     full_departure_date = date_part_1 + "20" + date_part_2 + split_date_1[1]
+    return_date_time = None
     if request_data["round_trip"]:
         split_date_2 = request_data['return_date_time'].split(",")
         date_part_3 = split_date_2[0][0:-2]
         date_part_4 = split_date_2[0][-2:]
         full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
         return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
-
     departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
@@ -589,6 +593,7 @@ def create_rideshare_post(request_data,json_data):
             display_value = trip_details,
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
+ 
         ID = created_post.id #id of the partially created post
         json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
@@ -605,6 +610,8 @@ def create_rideshare_post(request_data,json_data):
         created_post.image1 = imageURLsArray[0]            
         created_post.image2 = imageURLsArray[1]
         created_post.image3 = imageURLsArray[2]              
+        
+        
         
         '''save and respond with success'''
         created_post.save()
