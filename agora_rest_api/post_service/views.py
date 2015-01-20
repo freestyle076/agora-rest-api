@@ -22,12 +22,13 @@ date_time_format = "%m\/%d\/%Y %I:%M %p"
 '''
 @api_view(['POST'])
 def edit_posts(request):
-
+    
     POST method for editing Post data
     route: /editpost/
-
+    
     json_data = {}
     try:
+        
         request_data = ast.literal_eval(request.body)#parse data
         edit_post = Post.objects.get(id= request_data['id'])
         if category in item_categories:
@@ -39,7 +40,7 @@ def edit_posts(request):
         elif category in rideshare_categories:
             edit_post = RideSharePost.objects.get(id= request_data['id'])
         else:
-            json_data = {'message': 'Error in viewing post: Invalid category'}
+            json_data = {'message': 'Error in Editing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
     #catch all unhandled exceptions
     except Exception,e:
@@ -559,12 +560,14 @@ def create_rideshare_post(request_data,json_data):
     date_part_1 = split_date_1[0][0:-2]
     date_part_2 = split_date_1[0][-2:]
     full_departure_date = date_part_1 + "20" + date_part_2 + split_date_1[1]
-    split_date_2 = request_data['return_date_time'].split(",")
-    date_part_3 = split_date_2[0][0:-2]
-    date_part_4 = split_date_2[0][-2:]
-    full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
+    if request_data["round_trip"]:
+        split_date_2 = request_data['return_date_time'].split(",")
+        date_part_3 = split_date_2[0][0:-2]
+        date_part_4 = split_date_2[0][-2:]
+        full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
+        return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
+
     departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
-    return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     now = datetime.datetime.now(pytz.timezone('US/Pacific'))
     try:
