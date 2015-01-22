@@ -10,9 +10,9 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //server IP address
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/refreshpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/refreshpost/")!)
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/refreshpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/refreshpost/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/refreshpost/")!)
 request.HTTPMethod = "POST"

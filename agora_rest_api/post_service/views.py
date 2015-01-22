@@ -160,7 +160,7 @@ def prepare_results(items, books, DLs, RSs):
 @api_view(['POST'])
 def filter_post_list(request):
     '''
-    GET method for retrieving list of List View Post data to be viewed. 
+    POST method for retrieving list of List View Post data to be viewed. 
     Request body must contain the following data in JSON format:
         category: Category filter, member of collection of lowest level categories
         keyword: Keyword search string. To be applied to any attributes that make sense
@@ -676,15 +676,26 @@ def create_item_post(request_data,json_data):
         
 @api_view(["post"])
 def refresh_post(request):
+    '''
+    POST method for refreshing an existing post by bringing post_date_time to
+    time of refresh. This represents the post bumping mechanism.
+    Request body must contain the following data in JSON format:
+        category: Category filter, member of collection of lowest level categories
+        post_id: ID of a post in given category
+    route: /refreshpost/
+    '''
     response_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse request body
+        
+        #post keys
         post_id = request_data['post_id']
         post_category = request_data['category']
 
         #initially post is of type None, should remain None if not found
         post = None        
 
+        #search the appropriate table, determined by category
         if post_category in item_categories:
             post = ItemPost.objects.get(id=post_id)
         elif post_category in book_categories:
@@ -718,7 +729,9 @@ def refresh_post(request):
         post.save()
 
         #respond with HTTP 200 OK
-        response_data['message'] = "Successfuly refreshed " + post_category + " post with ID " + str(post_id)
+        message = "Successfully refreshed " + post_category + " post with ID " + str(post_id)
+        print message
+        response_data['message'] = message
         response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        
         
