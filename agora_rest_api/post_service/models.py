@@ -8,7 +8,7 @@ class ListPost(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
-    image1 = models.CharField(max_length=26,blank=True,default='') #url
+    image1 = models.CharField(max_length=50,blank=True,default='') #url
     
     class Meta:
         abstract = True
@@ -25,8 +25,8 @@ class ItemPost(ListPost):
     pref_email = models.BooleanField(default=False)
     call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True,default='') #url
-    image3 = models.CharField(max_length=26,blank=True,default='') #url
+    image2 = models.CharField(max_length=50,blank=True,default='') #url
+    image3 = models.CharField(max_length=50,blank=True,default='') #url
     
 class BookPost(ListPost):
     '''
@@ -40,8 +40,8 @@ class BookPost(ListPost):
     pref_email = models.BooleanField(default=False)
     call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True,default='') #url
-    image3 = models.CharField(max_length=26,blank=True,default='') #url
+    image2 = models.CharField(max_length=50,blank=True,default='') #url
+    image3 = models.CharField(max_length=50,blank=True,default='') #url
 
     
 class DateLocationPost(ListPost):
@@ -58,8 +58,8 @@ class DateLocationPost(ListPost):
     pref_email = models.BooleanField(default=False)
     call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True,default='') #url
-    image3 = models.CharField(max_length=26,blank=True,default='') #url
+    image2 = models.CharField(max_length=50,blank=True,default='') #url
+    image3 = models.CharField(max_length=50,blank=True,default='') #url
 
     
 class RideSharePost(ListPost):
@@ -79,6 +79,6 @@ class RideSharePost(ListPost):
     pref_email = models.BooleanField(default=False)
     call = models.BooleanField(default=False)
     text = models.BooleanField(default=False)
-    image2 = models.CharField(max_length=26,blank=True,default='') #url
-    image3 = models.CharField(max_length=26,blank=True,default='') #url    
+    image2 = models.CharField(max_length=50,blank=True,default='') #url
+    image3 = models.CharField(max_length=50,blank=True,default='') #url    
     
