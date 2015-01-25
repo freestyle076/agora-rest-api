@@ -8,6 +8,7 @@ class ListPost(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
+    report_count = models.PositiveSmallIntegerField(default=0)
     image1 = models.CharField(max_length=50,blank=True,default='') #url
     
     class Meta:
