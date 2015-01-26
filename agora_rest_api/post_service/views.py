@@ -32,7 +32,35 @@ def delete_imagefile(filename):
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response 
-        
+@api_view(['POST'])
+def delete_post(request):
+    '''  
+    POST method for deleting a Post and its images
+    route: /deletepost/
+    '''
+    json_data = {}
+    try:
+        request_data = ast.literal_eval(request.body)#parse data
+        category = request_data["category"]
+        if category in item_categories:
+            delete_post = ItemPost.objects.get(id=request_data['id'])
+        elif category in book_categories:
+            delete_post = BookPost.objects.get(id=request_data['id'])
+        elif category in datelocation_categories:
+            delete_post = DateLocationPost.objects.get(id=request_data['id'])
+        elif category in rideshare_categories:
+            delete_post = RideSharePost.objects.get(id=request_data['id'])
+        else:
+            json_data = {'message': 'Error in Editing post: Invalid category'}
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
+        imageURLsArray = [delete_post.image1,delete_post.image2,delete_post.image3] #placeholders for image URLs
+
+    #catch all unhandled exceptions
+    except Exception,e:
+        print str(e)
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response     
 @api_view(['POST'])
 def edit_post(request):
     '''  
@@ -68,18 +96,17 @@ def edit_post(request):
         now = datetime.datetime.now(pytz.timezone('US/Pacific'))
         edit_post.post_date_time = now
         
-        image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = [edit_post.image1,edit_post.image2,edit_post.image3] #placeholders for image URLs
         for i in range(len(imagesBase64Array)-1):  
             if imagesBase64Array[i] == "deleted":
                 #Delete Image
-                delete_imagefile(image_root + imageURLsArray[i])
+                delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
                 imageURLsArray[i] = ""
             elif imagesBase64Array[i] != "": #Image has been overwritten
                 imageData = decodestring(imagesBase64Array[i]) #convert back to binary
                 imageURLsArray[i] = category + "_" + request_data['id'] + "_" + str(i) + ".png" #unique filename
-                imagePath = image_root + imageURLsArray[i] #full filepath
+                imagePath = settings.IMAGES_ROOT + imageURLsArray[i] #full filepath
                 imagefile = open(imagePath,"wb") #open
                 imagefile.write(imageData) #write
             
