@@ -192,7 +192,8 @@ def prepare_results(items, books, DLs, RSs):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':item.display_value,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                decorated_price = "${:.2f}".format(float(item.price))
+                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':decorated_price,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
     
     
@@ -204,7 +205,8 @@ def prepare_results(items, books, DLs, RSs):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':book.display_value,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                decorated_price = "${:.2f}".format(float(book.price))
+                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':decorated_price,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
 
 
@@ -255,7 +257,7 @@ def prepare_results(items, books, DLs, RSs):
 @api_view(['POST'])
 def filter_post_list(request):
     '''
-    GET method for retrieving list of List View Post data to be viewed. 
+    POST method for retrieving list of List View Post data to be viewed. 
     Request body must contain the following data in JSON format:
         category: Category filter, member of collection of lowest level categories
         keyword: Keyword search string. To be applied to any attributes that make sense
@@ -271,20 +273,29 @@ def filter_post_list(request):
     try:
         #get filter parameters from request
         request_data = ast.literal_eval(request.body)
+        
+        
+        
         keyword = request_data['keywordSearch']
+        #clean keyword input
+        keyword.strip() #removing leading or trailing whitespace
+        keyword.replace("  "," ") #remove accidental double spaces
         print "keyword: " + keyword
+        
         category = request_data['category']
         print "category: " + category
+        
         max_price = request_data['max_price'] #in case of nothing specified max_price will be null
         print "max_price: " + max_price
+        
         min_price = request_data['min_price'] #in case of nothing specified min_price will be null
         print "min_price: " + min_price
+        
         free = request_data['free']
         print "free: " + free
         
         
-        #clean keyword input
-        keyword.strip() #removing leading or trailing whitespace        
+              
         
         #min_price and max_price not specified
         if not max_price:
@@ -766,4 +777,143 @@ def create_item_post(request_data,json_data):
         print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
+        
+@api_view(["post"])
+def refresh_post(request):
+    '''
+    POST method for refreshing an existing post by bringing post_date_time to
+    time of refresh. This represents the post bumping mechanism.
+    Request body must contain the following data in JSON format:
+        category: Category filter, member of collection of lowest level categories
+        post_id: ID of a post in given category
+    route: /refreshpost/
+    '''
+    response_data = {}
+    try:
+        request_data = ast.literal_eval(request.body) #parse request body
+        
+        #post keys
+        post_id = request_data['post_id']
+        post_category = request_data['category']
+
+        #initially post is of type None, should remain None if not found
+        post = None        
+
+        #search the appropriate table, determined by category
+        if post_category in item_categories:
+            post = ItemPost.objects.get(id=post_id)
+        elif post_category in book_categories:
+            post = BookPost.objects.get(id=post_id)
+        elif post_category in rideshare_categories:
+            post = RideSharePost.objects.get(id=post_id)
+        elif post_category in datelocation_categories:
+            post = DateLocationPost.objects.get(id=post_id)
+        
+        #category doesn't exist, respond with 400 BAD REQUEST
+        else:
+            error_message = "Non existent category: " + post_category
+            print error_message
+            response_data['message'] = error_message
+            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response
+
+        #post not found by ID, respond with 400 BAD REQUEST          
+        if not post:
+            error_message = "Post with post_id " + str(post_id) + "could not be found"
+            print error_message
+            response_data['message'] = error_message
+            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response
+        
+        #perform the refresh: set post_date_time to now
+        now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+        post.post_date_time = now
+        
+        #save changes
+        post.save()
+
+        #respond with HTTP 200 OK
+        message = "Successfully refreshed " + post_category + " post with ID " + str(post_id)
+        print message
+        response_data['message'] = message
+        response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+        return response        
+        
+    #general exception handling
+    except Exception, e:
+        print str(e)
+        response_data["message"] = str(e)
+        response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
+        
+@api_view(['POST'])
+def report_post(request):
+    '''
+    POST method for reporting an existing post by incrementing its report_count.
+    Request body must contain the following data in JSON format:
+        category: Category filter, member of collection of lowest level categories
+        post_id: ID of a post in given category
+    route: /reportpost/
+    '''
+    response_data = {}
+    try:
+        request_data = ast.literal_eval(request.body) #parse request body
+        
+        #post keys
+        post_id = request_data['post_id']
+        post_category = request_data['category']
+
+        #initially post is of type None, should remain None if not found
+        post = None        
+
+        #search the appropriate table, determined by category
+        if post_category in item_categories:
+            post = ItemPost.objects.get(id=post_id)
+        elif post_category in book_categories:
+            post = BookPost.objects.get(id=post_id)
+        elif post_category in rideshare_categories:
+            post = RideSharePost.objects.get(id=post_id)
+        elif post_category in datelocation_categories:
+            post = DateLocationPost.objects.get(id=post_id)
+        
+        #category doesn't exist, respond with 400 BAD REQUEST
+        else:
+            error_message = "Non existent category: " + post_category
+            print error_message
+            response_data['message'] = error_message
+            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response
+        
+        #post not found by ID, respond with 400 BAD REQUEST          
+        if not post:
+            error_message = "Post with post_id " + str(post_id) + "could not be found"
+            print error_message
+            response_data['message'] = error_message
+            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            return response        
+        
+        #perform the report: increment post's report count
+        current_count = post.report_count
+        post.report_count = current_count + 1
+        
+        #HERE'S THE QUESTION-----------------------------------------------*********************************
+        #DARE WE AUTOMATICALLY DELETE THE POST AFTER THE THRESHOLD IS REACHED?        
+        
+        
+        #save changes
+        post.save()
+
+        #respond with HTTP 200 OK
+        message = "Successfully reported " + post_category + " post with ID " + str(post_id)
+        print message
+        response_data['message'] = message
+        response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+        return response        
+        
+    #general exception handling
+    except Exception, e:
+        print str(e)
+        response_data["message"] = str(e)
+        response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response

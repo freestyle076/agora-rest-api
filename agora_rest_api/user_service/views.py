@@ -100,12 +100,13 @@ def create_user(request):
     try:
         validators.validate_email(new_user_info['gonzaga_email'])
     except validators.ValidationError as e:
+        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response    
     
     #validate the preferred email field if provided
-    if new_user_info['pref_email']: #test!
+    if new_user_info['pref_email']:
         pref_email = new_user_info['pref_email']
         #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
         if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
@@ -117,6 +118,7 @@ def create_user(request):
         try:
             validators.validate_email(new_user_info['pref_email'])
         except validators.ValidationError as e:
+            print str(e)
             json_data['message'] = str(e)
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
@@ -140,12 +142,14 @@ def create_user(request):
     #bad foreign key or duplicate primary key, in this case
     #gonzaga_email or username
     except utils.IntegrityError as e:
+        print str(e)
         json_data['message'] = str(e) + " - broken uniqueness or foreign key constraint in create"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
     #general exception catching
-    except:
-        json_data['message'] = sys.exc_info()[0]
+    except Exception, e:
+        print str(e)
+        json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
 

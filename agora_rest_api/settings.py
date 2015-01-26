@@ -106,3 +106,5 @@ IMAGES_ROOT = MEDIA_ROOT + 'images/'
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REPORT_THRESHOLD = 3
