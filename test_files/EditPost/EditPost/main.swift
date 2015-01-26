@@ -1,12 +1,12 @@
 import Foundation
 
-//create a mutable request with api view path /createupost/, set method to POST
+//create a mutable request with api view path /editpost/, set method to POST
 //server
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/editpost/")!)
 
 
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/editpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -27,18 +27,25 @@ for url in imageUrls{
     imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
     imagesBase64.append(imageBase64)
 }
+imagesBase64.append("")
+// Category must match previous category, thus, it cannot change
+let category = "Services"
+let id = "1"
 
 
 //parameter values
 //common post information
-let username = "tmiller12"
-let description = "Computer Algorithms"
-let price = "100"
-let title = "Tutoring"
-let category = "Services"
+let description = "AI"
+let price = ".10"
+let title = "Coming North"
 
+//Image values
+//Empty String signifies non alteration of Image, "delete" signifies the image was deleted
+//Image data signifies a change in the image.
+imagesBase64[0] = "deleted"
+imagesBase64[1] = ""
 
-
+//contact options
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
@@ -46,9 +53,9 @@ let text = "1" //boolean contact option
 
 //rideshare specific
 var departure_date_time = "01/04/15, 5:30 AM"
-var start_location = "Spokane"
-var end_location = "LA"
-var round_trip = "1"
+var start_location = "LA"
+var end_location = "Spokane"
+var round_trip = "0"
 var return_date_time = "01/04/15, 10:30 PM"
 
 //datelocation specific
@@ -61,24 +68,24 @@ var isbn = "1234213412"
 //this is the parameters array that will be formulated as JSON.
 //it has space for EVERY attribute of EVERY category.
 //only fill attributes that pertain to the category
-let params = ["username":username,          //common post information
-            "description":description,      // |
-            "price":price,                  // |
-            "title":title,                  // |
-            "category":category,            // |
-            "gonzaga_email":gonzaga_email,  // |
-            "pref_email":pref_email,        // |
-            "call":phone,                  // |
-            "text":text,                    // <
-            "departure_date_time":departure_date_time,  //rideshare specific
-            "start_location":start_location,            // |
-            "end_location":end_location,                // |
-            "round_trip":round_trip,                    // |
-            "return_date_time":return_date_time,        // <
-            "date_time":date_time,  //datelocation specific
-            "location":location,    // <
-            "isbn":isbn,        //book specific
-            "images":imagesBase64]  //images array
+let params = ["id":id,                        // |
+    "description":description,      // |
+    "price":price,                  // |
+    "title":title,                  // |
+    "category":category,            // |
+    "gonzaga_email":gonzaga_email,  // |
+    "pref_email":pref_email,        // |
+    "call":phone,                  // |
+    "text":text,                    // <
+    "departure_date_time":departure_date_time,  //rideshare specific
+    "start_location":start_location,            // |
+    "end_location":end_location,                // |
+    "round_trip":round_trip,                    // |
+    "return_date_time":return_date_time,        // <
+    "date_time":date_time,  //datelocation specific
+    "location":location,    // <
+    "isbn":isbn,        //book specific
+    "images":imagesBase64]  //images array
     as Dictionary<String,AnyObject>
 
 
@@ -94,7 +101,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     
     //read the message from the response
     var message = ""
-    var id = 0
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -104,7 +110,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
             message = parseJSON["message"] as String
-            id = parseJSON["id"] as Int
         }
     }
     
@@ -120,12 +125,12 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             println(id)
         }
             
-        //400 = BAD_REQUEST: error in creating user, display error!
+            //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
             println(message)
         }
             
-        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
             println("The server is down! Call the fire department!")
         }
@@ -134,7 +139,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     } else {
         println("Error in casting response, data incomplete")
     }
-
+    
     
     
 })
