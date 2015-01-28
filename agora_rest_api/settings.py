@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = (
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -108,3 +109,7 @@ IMAGES_ROOT = MEDIA_ROOT + 'images/'
 STATIC_URL = '/static/'
 
 REPORT_THRESHOLD = 3
+
+APPLE_USERNAME = 'adm!n'
+
+APPLE_PASS = 'passw0rd'
