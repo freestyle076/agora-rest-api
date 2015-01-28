@@ -9,6 +9,7 @@ from django.core import validators
 from serializers import UserSerializer
 from models import User
 from agora_rest_api.post_service import views as post_service_views
+from agora_rest_api import settings
 
 import ldap
 import json
@@ -50,11 +51,19 @@ def edit_user(request):
     try:
         info = ast.literal_eval(request.body) #parse data
         #changes to pref_email must be validatad as email (pass empty string)
-        if(info['pref_email'] != ""):
+        pref_email = info['pref_email']
+        if(pref_email != ""):
+            if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
+                #return bad_request 400 code
+                json_data['message'] = "Invalid email"
+                print json_data["message"]
+                response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                return response
             try:
                 validators.validate_email(info['pref_email'])
             except validators.ValidationError as e:
-                json_data['message'] = str(e)
+                json_data['message'] = "Invalid email"
+                print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 return response     
 
@@ -182,9 +191,33 @@ def ldap_authenticate(request):
     
     #parse request body for incoming login data
     info = ast.literal_eval(request.body)
-    user = info['username']
-    info['username'] = info['username'] + '@zagmail.gonzaga.edu'
     json_data = {}
+    
+    #get user entered credentials
+    user = info['username']
+    password = info['password']
+
+    #allow admin to enter application without LDAP Auth   
+    if user == settings.APPLE_USERNAME and password == settings.APPLE_PASS:
+        #if successful return OK, username+pwd is in the ldap database!
+        json_data['message'] = 'Authentication succesful!'
+        #checks if user is already in our database, assigns variable yes if so
+        if User.objects.filter(username=user).exists():
+            json_data['exists'] ='yes'
+            json_data['first_name'] = User.objects.get(username=user).first_name
+            json_data['last_name'] = User.objects.get(username=user).last_name
+            json_data['p_email'] = User.objects.get(username=user).pref_email
+            json_data['phone'] = User.objects.get(username=user).phone 
+            json_data['posts'] = post_service_views.user_posts(user)
+        else:
+            json_data['exists'] ='no'
+        json_data['username'] = user
+        json_data['g_email'] = 'adm!n@zagmail.gonzaga.edu'
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return response
+        
+    info['username'] = info['username'] + '@zagmail.gonzaga.edu'
+    
     #check for empty password; LDAP passes requests with empty passwords, we don't
     if(info['password'] == ""):
         json_data['message'] = 'Empty Password'
