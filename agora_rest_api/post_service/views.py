@@ -457,25 +457,43 @@ def filter_post_list(request):
         return response
         
 def run_clean_up():
-    '''
-    reported_posts = DateLocationPost.objects.filter(report_count<2)
+    reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=2))
     for post in reported_posts:
         remove_post(post)
-    reported_posts = ItemPost.objects.filter(report_count<2)
+        
+    reported_posts = ItemPost.objects.filter(Q(report_count__gt=2))
     for post in reported_posts:
         remove_post(post)
-    reported_posts = RideSharePost.objects.filter(report_count<2)
+   
+    reported_posts = RideSharePost.objects.filter(Q(report_count__gt=2))
     for post in reported_posts:
         remove_post(post)  
-    reported_posts = BookPost.objects.filter(report_count<2)
+    
+    reported_posts = BookPost.objects.filter(Q(report_count__gt=2))
     for post in reported_posts:
-        remove_post(post)
-        '''
-    d1 = datetime.date.today()
+        remove_post(post)  
+        
+    d1 = datetime.datetime.now(pytz.timezone('US/Pacific'))
     d2 = d1 - datetime.timedelta(days=14)
-    old_posts = DateLocationPost.objects.filter(post_date_time.day > d2)
+    
+    old_posts = DateLocationPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
         remove_post(post)
+        
+    old_posts = RideSharePost.objects.filter(Q(post_date_time__lt=d2))
+    for post in old_posts:
+        remove_post(post)
+        
+    old_posts = ItemPost.objects.filter(Q(post_date_time__lt=d2))
+    for post in old_posts:
+        remove_post(post)
+        
+    old_posts = BookPost.objects.filter(Q(post_date_time__lt=d2))
+    for post in old_posts:
+        remove_post(post)
+        
+    settings.MOST_RECENT_CLEANUP = datetime.date.today()
+    
         
 @api_view(['POST'])
 def view_detailed_post(request):
@@ -486,10 +504,10 @@ def view_detailed_post(request):
         category: Category to signify which table to search through. 
     route: /viewpost/
     '''
-    '''
+
     if settings.MOST_RECENT_CLEANUP != datetime.date.today():
         run_clean_up()
-        '''
+     
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data

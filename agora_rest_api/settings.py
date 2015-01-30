@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 import ldap
-from datetime import date
+import datetime 
+import pytz
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -96,7 +97,7 @@ USE_TZ = True
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
-MOST_RECENT_CLEANUP = date(2015, 1, 20)
+MOST_RECENT_CLEANUP = datetime.date.today() 
 
 SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
 

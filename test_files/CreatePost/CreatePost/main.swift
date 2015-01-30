@@ -5,7 +5,7 @@ import Foundation
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 
 //trenton
@@ -40,11 +40,11 @@ let username = "tmiller12"
 let description = "Computer Algorithms"
 let price = "100"
 let title = "Tutoring"
-let category = "Books"
+let category = "Services"
 
 
 
-let gonzaga_email = "0" //boolean contact option
+let gonzaga_email = "1" //boolean contact option
 let pref_email = "0" //boolean contact option
 let phone = "0" //boolean contact option
 let text = "0" //boolean contact option
