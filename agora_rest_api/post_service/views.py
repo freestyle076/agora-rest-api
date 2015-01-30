@@ -426,6 +426,7 @@ def filter_post_list(request):
         return response
         
 def run_clean_up():
+    '''
     reported_posts = DateLocationPost.objects.filter(report_count<2)
     for post in reported_posts:
         remove_post(post)
@@ -437,6 +438,12 @@ def run_clean_up():
         remove_post(post)  
     reported_posts = BookPost.objects.filter(report_count<2)
     for post in reported_posts:
+        remove_post(post)
+        '''
+    d1 = datetime.date.today()
+    d2 = d1 - datetime.timedelta(days=14)
+    old_posts = DateLocationPost.objects.filter(post_date_time.day > d2)
+    for post in old_posts:
         remove_post(post)
         
 @api_view(['POST'])
@@ -451,7 +458,7 @@ def view_detailed_post(request):
     '''
     if settings.MOST_RECENT_CLEANUP != datetime.date.today():
         run_clean_up()
-    '''
+        '''
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data
@@ -545,8 +552,20 @@ def view_rideshare_post(request_data,json_data,Post):
     '''
     try:
         json_data["trip"] = Post.trip
+        hour = str((Post.departure_date_time.hour) % 12) #hour without leading zero
+        if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+            hour = "12"
+        minute_ampm = Post.departure_date_time.strftime(":%M%p") #minute and am/pm component
+        json_data["departure_date_time"] = str(Post.departure_date_time.month) + "/" + str(Post.departure_date_time.day) + "/" + str(Post.departure_date_time.year)
+        json_data["departure_date_time"] = json_data["departure_date_time"] + " " + hour + minute_ampm
         json_data["departure_date_time"] = str(Post.departure_date_time)
         if Post.round_trip:
+            hour = str((Post.return_date_time.hour) % 12) #hour without leading zero
+            if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+                hour = "12"
+            minute_ampm = Post.return_date_time.strftime(":%M%p") #minute and am/pm component
+            json_data["return_date_time"] = str(Post.return_date_time.month) + "/" + str(Post.return_date_time.day) + "/" + str(Post.return_date_time.year)
+            json_data["return_date_time"] = json_data["return_date_time"] + " " + hour + minute_ampm
             json_data["return_date_time"] = str(Post.return_date_time)
             json_data["round_trip"] = 1
         else:
@@ -565,7 +584,12 @@ def view_datelocation_post(request_data,json_data,Post):
     (date_time,location)
     '''
     try:
-        json_data["date_time"] = str(Post.date_time)
+        hour = str((Post.date_time.hour) % 12) #hour without leading zero
+        if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+            hour = "12"
+        minute_ampm = Post.date_time.strftime(":%M%p") #minute and am/pm component
+        json_data["date_time"] = str(Post.date_time.month) + "/" + str(Post.date_time.day) + "/" + str(Post.date_time.year)
+        json_data["date_time"] = json_data["date_time"] + " " + hour + minute_ampm
         json_data["location"] = Post.location
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
@@ -633,10 +657,10 @@ def create_book_post(request_data,json_data):
             category=request_data['category'],
             description=request_data['description'],
             isbn=request_data['isbn'],
-            gonzaga_email= request_data['gonzaga_email'],
-            pref_email=request_data['pref_email'],
-            call=request_data['call'],
-            text=request_data['text'],
+            gonzaga_email= int(request_data['gonzaga_email']),
+            pref_email=int(request_data['pref_email']),
+            call=int(request_data['call']),
+            text=int(request_data['text']),
             display_value = request_data['price'],
             post_date_time = now)
             
@@ -694,10 +718,10 @@ def create_datelocation_post(request_data,json_data):
             description=request_data['description'],
             date_time=input_date_time,
             location=request_data['location'],
-            gonzaga_email= request_data['gonzaga_email'],
-            pref_email=request_data['pref_email'],
-            call=request_data['call'],
-            text=request_data['text'],
+            gonzaga_email= int(request_data['gonzaga_email']),
+            pref_email=int(request_data['pref_email']),
+            call=int(request_data['call']),
+            text=int(request_data['text']),
             display_value = input_date_time,
             post_date_time = now)
             
@@ -768,10 +792,10 @@ def create_rideshare_post(request_data,json_data):
             trip=trip_details,
             return_date_time = return_date_time,
             round_trip = int(request_data['round_trip']),
-            gonzaga_email= request_data['gonzaga_email'],
-            pref_email=request_data['pref_email'],
-            call=request_data['call'],
-            text=request_data['text'],
+            gonzaga_email= int(request_data['gonzaga_email']),
+            pref_email=int(request_data['pref_email']),
+            call=int(request_data['call']),
+            text=int(request_data['text']),
             display_value = trip_details,
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
@@ -819,10 +843,10 @@ def create_item_post(request_data,json_data):
             price=request_data['price'],
             category=request_data['category'],
             description=request_data['description'],
-            gonzaga_email= request_data['gonzaga_email'],
-            pref_email=request_data['pref_email'],
-            call=request_data['call'],
-            text=request_data['text'],
+            gonzaga_email= int(request_data['gonzaga_email']),
+            pref_email=int(request_data['pref_email']),
+            call=int(request_data['call']),
+            text=int(request_data['text']),
             display_value = request_data['price'],
             post_date_time = now)
         '''read images from request, format URLs and save images on disc'''

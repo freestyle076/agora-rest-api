@@ -39,10 +39,10 @@ let category = "Books"
 
 
 
-let gonzaga_email = "1" //boolean contact option
-let pref_email = "1" //boolean contact option
-let phone = "1" //boolean contact option
-let text = "1" //boolean contact option
+let gonzaga_email = "0" //boolean contact option
+let pref_email = "0" //boolean contact option
+let phone = "0" //boolean contact option
+let text = "0" //boolean contact option
 
 //rideshare specific
 var departure_date_time = "01/04/15, 5:30 AM"

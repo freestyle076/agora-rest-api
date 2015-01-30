@@ -6,7 +6,6 @@ import ast
 
 
 class TestUserFunctions(unittest.TestCase):
-
     def test1_create_post(self):
         print "Testing Create Post Function"
         TestUserFunctions.category = "Electronics"
