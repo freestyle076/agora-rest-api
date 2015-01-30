@@ -14,7 +14,7 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 //var imageUrls:[NSURL] = []
 
 
@@ -35,7 +35,7 @@ let username = "tmiller12"
 let description = "Computer Algorithms"
 let price = "100"
 let title = "Tutoring"
-let category = "Services"
+let category = "Books"
 
 
 

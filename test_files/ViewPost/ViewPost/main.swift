@@ -12,8 +12,8 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 //common post information
-var postid = "16"
-var category = "Books"
+var postid = "67"
+var category = "Clothing"
 
 //this is the parameters array that will be formulated as JSON.
 // We need both postid and category
