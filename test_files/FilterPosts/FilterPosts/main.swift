@@ -10,7 +10,7 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/postquery/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/postquery/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/postquery/")!)
 request.HTTPMethod = "POST"
@@ -19,17 +19,23 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //set filter parameters
-let category:String = "Clothing" //empty string means all categories
+let categories:[String] = ["Electronics","Clothing","Household"] //empty string means all categories
 let keywordSearch:String = "" //empty string means no keyword search
 let min_price = "" //"" means no min_price
 let max_price = "" //"" means no max_price
 let free = "0" //false means not free only, true means is free only
+//let divider_date_time = ""
+let divider_date_time = "01/19/2015 22:19:33"
+let older = "0"
 
-let params = ["category":category,
+
+let params = ["categories":categories,
                 "keywordSearch":keywordSearch,
                 "min_price":min_price,
                 "max_price":max_price,
-                "free":free,]  //images array
+                "free":free,
+                "divider_date_time":divider_date_time,
+                "older":older]
     as Dictionary<String,AnyObject>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
@@ -68,7 +74,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                     message = parseJSON["message"] as String
                     
                     let posts: AnyObject = parseJSON["posts"]!
-                    
+                    println(posts.count)
                     for i in 0...(posts.count - 1){
                         let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
                         
@@ -77,8 +83,9 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let title = post["title"] as String
                         let display_value = post["display_value"]! as String
                         let postID = post["id"]! as Int
-                        
-                        println(title)
+                        let category = post["category"]! as String
+                        let post_date_time = post["post_date_time"]! as String
+                        println(post_date_time + " " + title + " - " + category)
                         
                         //THE THUMBNAIL IMAGE IS PROCESSED HERE
                         let imageString = post["image"]! as String

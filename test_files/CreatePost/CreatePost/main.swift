@@ -4,9 +4,12 @@ import Foundation
 //server
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
+//kyle
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+
 
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -14,8 +17,10 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
-//var imageUrls:[NSURL] = []
+
+var imageUrls:[NSURL] = []
+//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+
 
 
 //formulate imageBase64 array

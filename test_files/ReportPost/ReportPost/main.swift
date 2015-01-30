@@ -21,11 +21,12 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var post_id = "78"
-var category = "Clothing"
+var post_id = "9"
+var category = "Events"
+var reporter = "khandy"
 
 //prepare parameters for json serialization
-var params = ["post_id":post_id, "category":category] as Dictionary<String, String>
+var params = ["post_id":post_id, "category":category, "reporter":reporter] as Dictionary<String, String>
 
 //Load body with JSON serialized parameters, set headers for JSON! (Star trek?)
 var err: NSError?

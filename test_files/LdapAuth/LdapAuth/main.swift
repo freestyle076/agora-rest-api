@@ -10,13 +10,13 @@ import Foundation
 
 
 
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/ldapauth/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/ldapauth/")!)
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/ldapauth/")!)
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
-var username = "khandy" //set username value here
-var password =  "Rusty3220" //set password value here
+var username = "adm!n" //set username value here
+var password =  "passw0rd" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 
@@ -73,30 +73,33 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             if let posts: AnyObject = parseJSON["posts"]{
                 
                 //iterate through each post
-                for i in 0...(posts.count - 1){
-                    let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
-                    
-                    //get the easy ones, title, display_value and post ID
-                    let title = post["title"] as String
-                    let display_value = post["display_value"]! as String
-                    let postID = post["id"]! as Int
-                    
-                    
-                    //read imageString, base64 encoded
-                    let imageString = post["image"]! as String
-                    
-                    //make sure there is an image...
-                    if !imageString.isEmpty {
-                        let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                if(posts.count > 0){
+                    for i in 0...(posts.count - 1){
+                        let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
                         
-                        //THIS IS WHERE IMAGES ARE HANDLED, if there are any...
-                    }
+                        //get the easy ones, title, display_value and post ID
+                        let title = post["title"] as String
+                        let display_value = post["display_value"]! as String
+                        let postID = post["id"]! as Int
                         
-                        //no image included...
-                    else{
-                        //NO IMAGE WITH POST
+                        
+                        //read imageString, base64 encoded
+                        let imageString = post["image"]! as String
+                        
+                        //make sure there is an image...
+                        if !imageString.isEmpty {
+                            let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                            
+                            //THIS IS WHERE IMAGES ARE HANDLED, if there are any...
+                        }
+                            
+                            //no image included...
+                        else{
+                            //NO IMAGE WITH POST
+                        }
                     }
                 }
+                
             }
             
         }
@@ -128,8 +131,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         }
     }
     
-    var test = NSUserDefaults.standardUserDefaults().objectForKey("username") as String
-    println("test \(test)")
     
     
 })
@@ -138,4 +139,5 @@ task.resume()
 
 
 
-sleep(25)
+sleep(10)
+

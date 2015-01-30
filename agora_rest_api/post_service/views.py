@@ -211,7 +211,7 @@ def user_posts(username):
         raise e
         
 
-def prepare_results(items, books, DLs, RSs):
+def prepare_results(items, books, DLs, RSs, limit=0):
     '''
     Prepares a list a filter request results, each in listview post format.
     Returns a list of objects, ready to be included in a JSON object.
@@ -297,7 +297,11 @@ def prepare_results(items, books, DLs, RSs):
     
          
         #sort the list of posts on their post_date_time attribute
-        posts.sort(key=lambda x: datetime_key(x['post_date_time']))
+        posts.sort(key=lambda x: datetime_key(x['post_date_time']),reverse=True)
+        
+        
+        if limit > 0:
+            posts = posts[:limit]
         
         print "Number of posts: " + str(len(posts))        
         
@@ -325,16 +329,30 @@ def filter_post_list(request):
     json_data = {}
     
     try:
-        #get filter parameters from request
+        #parse request
         request_data = ast.literal_eval(request.body)
         
-        
+        #get filter parameters from request
         keyword = request_data['keywordSearch']
         categories = request_data['categories']
         max_price = request_data['max_price'] #in case of nothing specified max_price will be empty string
         min_price = request_data['min_price'] #in case of nothing specified min_price will be empty string
         free = request_data['free']
+        older = request_data['older']
+        divider = request_data['divider_date_time']
+        divider = divider.replace("\/","/")
         
+        
+        #get oldest post as datetime object
+        #if none provided (base case) then set oldest_date to now plus two hours (just to be safe...)
+        if not divider:
+            divider_post_datetime = datetime.datetime.now(pytz.timezone('US/Pacific')) + datetime.timedelta(hours=2)
+        
+        #else use provided datetime
+        else:
+            divider_post_datetime = datetime.datetime.strptime(divider,'%m/%d/%Y %H:%M:%S')
+        
+                
         
         #clean keyword input
         keyword.strip() #removing leading or trailing whitespace
@@ -360,6 +378,9 @@ def filter_post_list(request):
         print "max_price: " + str(max_price)
         print "min_price: " + str(min_price)
         print "free: " + str(free)
+        print "divider_post_datetime: " + str(divider_post_datetime)
+        print "older: " + str(older)
+        
         
         
         def category_intersect(super_category,categories):
@@ -379,35 +400,45 @@ def filter_post_list(request):
         DL_rs = None
         RS_rs = None
         
+        
+        if older == "1":
+            datetime_Q = Q(post_date_time__lt=divider_post_datetime)
+            order_by_string = "-post_date_time"
+            
+        else:
+            datetime_Q = Q(post_date_time__gt=divider_post_datetime)
+            order_by_string = "post_date_time"
+        
+        
         #if no chosen category apply all
         if not categories:
-            item_rs = ItemPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
-            book_rs = BookPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
-            DL_rs = DateLocationPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
-            RS_rs = RideSharePost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
+            item_rs = ItemPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            book_rs = BookPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
         
         #category is of item type
         if category_intersect(item_categories,categories):
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
+            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if category_intersect(book_categories,categories):
             #keyword applied to display_value, title, description, isbn
-            book_rs = BookPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
+            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if category_intersect(datelocation_categories,categories):
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
+            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if category_intersect(rideshare_categories,categories):
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
+            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #populate the response with listview formatted results (grabs and encodes image data)
-        json_data['posts'] = prepare_results(item_rs, book_rs, DL_rs, RS_rs)
+        json_data['posts'] = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)
         
         
         #hi five
