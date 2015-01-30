@@ -17,9 +17,10 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
+
 var imageUrls:[NSURL] = []
 //var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
-//var imageUrls:[NSURL] = []
+
 
 
 //formulate imageBase64 array
@@ -36,10 +37,10 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "tmiller12"
-let description = "I'm talking boats baby"
-let price = "10.0"
-let title = "Nintendo 64!!!"
-let category = "Electronics"
+let description = "Computer Algorithms"
+let price = "100"
+let title = "Tutoring"
+let category = "Books"
 
 
 

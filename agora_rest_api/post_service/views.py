@@ -13,6 +13,8 @@ import ast
 import pytz
 import os
 
+
+
 item_categories = ['Electronics','Household','Recreation','Clothing']
 book_categories = ['Books']
 rideshare_categories = ['Ride Shares']
@@ -32,6 +34,16 @@ def delete_imagefile(filename):
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response 
+        
+def remove_post(delete_post):
+    imageURLsArray = [delete_post.image1,delete_post.image2,delete_post.image3] #placeholders for image URLs
+    for i in range(len(imageURLsArray)):  
+        if imageURLsArray[i] != "":
+            #Delete Image
+            delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
+            imageURLsArray[i] = ""                
+    delete_post.delete()    
+        
 @api_view(['POST'])
 def delete_post(request):
     '''  
@@ -53,14 +65,16 @@ def delete_post(request):
         else:
             json_data = {'message': 'Error in Editing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
-        imageURLsArray = [delete_post.image1,delete_post.image2,delete_post.image3] #placeholders for image URLs
-
+        remove_post(delete_post) 
+        json_data['message'] = "Succesfully Deleted Post"   
+        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #catch all unhandled exceptions
     except Exception,e:
         print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response     
+        return response    
+        
 @api_view(['POST'])
 def edit_post(request):
     '''  
@@ -442,7 +456,20 @@ def filter_post_list(request):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
         
-
+def run_clean_up():
+    reported_posts = DateLocationPost.objects.filter(report_count<2)
+    for post in reported_posts:
+        remove_post(post)
+    reported_posts = ItemPost.objects.filter(report_count<2)
+    for post in reported_posts:
+        remove_post(post)
+    reported_posts = RideSharePost.objects.filter(report_count<2)
+    for post in reported_posts:
+        remove_post(post)  
+    reported_posts = BookPost.objects.filter(report_count<2)
+    for post in reported_posts:
+        remove_post(post)
+        
 @api_view(['POST'])
 def view_detailed_post(request):
     '''
@@ -452,8 +479,11 @@ def view_detailed_post(request):
         category: Category to signify which table to search through. 
     route: /viewpost/
     '''
+    '''
+    if settings.MOST_RECENT_CLEANUP != datetime.date.today():
+        run_clean_up()
+    '''
     json_data = {}
-
     try:
         request_data = ast.literal_eval(request.body) #parse data
         category = request_data['category'] #switch on category
