@@ -4,9 +4,12 @@ import Foundation
 //server
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
+//kyle
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+
 
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -14,7 +17,8 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+var imageUrls:[NSURL] = []
+//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 //var imageUrls:[NSURL] = []
 
 
@@ -32,10 +36,10 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "tmiller12"
-let description = "Computer Algorithms"
-let price = "100"
-let title = "Tutoring"
-let category = "Services"
+let description = "I'm talking boats baby"
+let price = "10.0"
+let title = "Nintendo 64!!!"
+let category = "Electronics"
 
 
 

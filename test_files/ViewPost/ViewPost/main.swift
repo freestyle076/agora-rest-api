@@ -4,7 +4,7 @@ import Foundation
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/viewpost")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/viewpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/viewpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
@@ -12,7 +12,7 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 //common post information
-var postid = "16"
+var postid = "22"
 var category = "Books"
 
 //this is the parameters array that will be formulated as JSON.
