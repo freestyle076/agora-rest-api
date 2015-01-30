@@ -1,5 +1,5 @@
 from rest_framework import status
-from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
+from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
 from agora_rest_api.user_service.models import User
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
@@ -259,7 +259,18 @@ def prepare_results(items, books, DLs, RSs):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':DL.display_value,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                month = str(DL.date_time.month) #month without leading zero
+                hour = str((DL.date_time.hour) % 12) #hour without leading zero
+                day = str(DL.date_time.day)
+                if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+                    hour = "12"
+                year = DL.date_time.strftime("/%y") #day and year component
+                minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
+                
+                #pretty_date = DL.date_time.strftime("%m/%d/%y %I:%M%p") #modify the datetime to be a bit prettier
+                pretty_date = month + "/" + day + "/" + year + " " + hour + minute_ampm                 
+                
+                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':pretty_date,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_DL)
 
 
@@ -287,6 +298,8 @@ def prepare_results(items, books, DLs, RSs):
          
         #sort the list of posts on their post_date_time attribute
         posts.sort(key=lambda x: datetime_key(x['post_date_time']))
+        
+        print "Number of posts: " + str(len(posts))        
         
         return posts
         
@@ -316,27 +329,16 @@ def filter_post_list(request):
         request_data = ast.literal_eval(request.body)
         
         
-        
         keyword = request_data['keywordSearch']
+        categories = request_data['categories']
+        max_price = request_data['max_price'] #in case of nothing specified max_price will be empty string
+        min_price = request_data['min_price'] #in case of nothing specified min_price will be empty string
+        free = request_data['free']
+        
+        
         #clean keyword input
         keyword.strip() #removing leading or trailing whitespace
         keyword.replace("  "," ") #remove accidental double spaces
-        print "keyword: " + keyword
-        
-        category = request_data['category']
-        print "category: " + category
-        
-        max_price = request_data['max_price'] #in case of nothing specified max_price will be null
-        print "max_price: " + max_price
-        
-        min_price = request_data['min_price'] #in case of nothing specified min_price will be null
-        print "min_price: " + min_price
-        
-        free = request_data['free']
-        print "free: " + free
-        
-        
-              
         
         #min_price and max_price not specified
         if not max_price:
@@ -346,12 +348,28 @@ def filter_post_list(request):
         if not min_price:           
             min_price = 0.0
         else:
-            min_price = float(max_price)
+            min_price = float(min_price)
         
         #react to free flag
         if free == "1":
             max_price = 0.0
-            min_price = 0.0       
+            min_price = 0.0 
+        
+        print "keyword: " + str(keyword)
+        print "categories: " + str(categories)
+        print "max_price: " + str(max_price)
+        print "min_price: " + str(min_price)
+        print "free: " + str(free)
+        
+        
+        def category_intersect(super_category,categories):
+            '''
+            Returns true if super_category and categories share an element
+            '''
+            for category1 in super_category:
+                for category2 in categories:
+                    if category1 == category2:
+                        return True
         
         #set active categories---------------
         
@@ -362,31 +380,31 @@ def filter_post_list(request):
         RS_rs = None
         
         #if no chosen category apply all
-        if not category:
+        if not categories:
             item_rs = ItemPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
             book_rs = BookPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
             DL_rs = DateLocationPost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
             RS_rs = RideSharePost.objects.filter(Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
         
         #category is of item type
-        elif category in item_categories:
+        if category_intersect(item_categories,categories):
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
+            item_rs = ItemPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword))           
             
         #category is of book type
-        elif category in book_categories:
+        if category_intersect(book_categories,categories):
             #keyword applied to display_value, title, description, isbn
-            book_rs = BookPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
+            book_rs = BookPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword))
             
         #category is of book type
-        elif category in datelocation_categories:
+        if category_intersect(datelocation_categories,categories):
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
+            DL_rs = DateLocationPost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword))
             
         #category is of book type
-        elif category in rideshare_categories:
+        if category_intersect(rideshare_categories,categories):
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(Q(category__iexact=category),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
+            RS_rs = RideSharePost.objects.filter(Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword))
             
         #populate the response with listview formatted results (grabs and encodes image data)
         json_data['posts'] = prepare_results(item_rs, book_rs, DL_rs, RS_rs)
@@ -920,6 +938,22 @@ def report_post(request):
         #post keys
         post_id = request_data['post_id']
         post_category = request_data['category']
+        reporter = request_data['reporter']
+
+        #check to see that the reporter hasn't already reported this post
+        existing_report = PostReport.objects.filter(post_id=post_id,category=post_category,username_id=reporter)
+
+        #if reporter has already hit this post, respond 200 with notification
+        if existing_report:
+            #respond with HTTP 200 OK
+            message = "User " + reporter + " has already reported post " + str(post_id) + " in " + post_category
+            print message
+            response_data['message'] = message
+            response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+            return response
+        
+        #if this report has yet to be made (existing_report == None) then create the report
+        PostReport.objects.create(post_id=post_id,category=post_category,username_id=reporter)
 
         #initially post is of type None, should remain None if not found
         post = None        
@@ -953,10 +987,6 @@ def report_post(request):
         #perform the report: increment post's report count
         current_count = post.report_count
         post.report_count = current_count + 1
-        
-        #HERE'S THE QUESTION-----------------------------------------------*********************************
-        #DARE WE AUTOMATICALLY DELETE THE POST AFTER THE THRESHOLD IS REACHED?        
-        
         
         #save changes
         post.save()

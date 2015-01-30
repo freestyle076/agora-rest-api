@@ -83,3 +83,7 @@ class RideSharePost(ListPost):
     image2 = models.CharField(max_length=50,blank=True,default='') #url
     image3 = models.CharField(max_length=50,blank=True,default='') #url    
     
+class PostReport(models.Model):
+    post_id = models.IntegerField()
+    category = models.CharField(max_length=50)
+    username = models.ForeignKey('user_service.User')
