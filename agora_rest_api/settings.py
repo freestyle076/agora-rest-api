@@ -99,6 +99,10 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
 MOST_RECENT_CLEANUP = datetime.date.today() 
 
+OLD_POST_CUTTOFF_LENGTH = 21 # Number of days Before a Post is Deleted
+
+MAX_REPORT_THRESHOLD = 3 # Number of reports that a post will get deleted for
+
 SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
 
 #MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/media/'

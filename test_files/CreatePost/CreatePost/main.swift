@@ -38,7 +38,7 @@ for url in imageUrls{
 //common post information
 let username = "tmiller12"
 let description = "Computer Algorithms"
-let price = "100"
+let price = ""
 let title = "Tutoring"
 let category = "Services"
 

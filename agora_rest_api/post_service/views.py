@@ -42,6 +42,9 @@ def remove_post(delete_post):
             #Delete Image
             delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
             imageURLsArray[i] = ""                
+    post_reports = PostReport.objects.filter(post_id=delete_post.id)
+    for post in post_reports:
+        post.delete()
     delete_post.delete()    
         
 @api_view(['POST'])
@@ -325,7 +328,8 @@ def filter_post_list(request):
         free: Free items only flag. Sets min_price,max_price = 0
     route: /postquery/
     '''
-    
+    if settings.MOST_RECENT_CLEANUP != datetime.date.today():
+        run_clean_up()
     json_data = {}
     
     try:
@@ -457,24 +461,24 @@ def filter_post_list(request):
         return response
         
 def run_clean_up():
-    reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=2))
+    reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         remove_post(post)
         
-    reported_posts = ItemPost.objects.filter(Q(report_count__gt=2))
+    reported_posts = ItemPost.objects.filter(Q(report_count__gt=MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         remove_post(post)
    
-    reported_posts = RideSharePost.objects.filter(Q(report_count__gt=2))
+    reported_posts = RideSharePost.objects.filter(Q(report_count__gt=MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         remove_post(post)  
     
-    reported_posts = BookPost.objects.filter(Q(report_count__gt=2))
+    reported_posts = BookPost.objects.filter(Q(report_count__gt=MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         remove_post(post)  
         
     d1 = datetime.datetime.now(pytz.timezone('US/Pacific'))
-    d2 = d1 - datetime.timedelta(days=14)
+    d2 = d1 - datetime.timedelta(days=OLD_POST_CUTTOFF_LENGTH)
     
     old_posts = DateLocationPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
@@ -505,8 +509,7 @@ def view_detailed_post(request):
     route: /viewpost/
     '''
 
-    if settings.MOST_RECENT_CLEANUP != datetime.date.today():
-        run_clean_up()
+
      
     json_data = {}
     try:
@@ -670,6 +673,8 @@ def create_post(request):
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data
+        if request_data["price"] == '':
+            request_data["price"] = 0
         category = request_data['category'] #switch on category
         if category in item_categories: 
             return create_item_post(request_data,json_data)
