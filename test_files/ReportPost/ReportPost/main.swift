@@ -12,7 +12,7 @@ import Foundation
 //server IP address
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/reportpost/")!)
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/reportpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/reportpost/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/reportpost/")!)
 request.HTTPMethod = "POST"
@@ -21,8 +21,8 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var post_id = "9"
-var category = "Events"
+var post_id = "16"
+var category = "Services"
 var reporter = "khandy"
 
 //prepare parameters for json serialization

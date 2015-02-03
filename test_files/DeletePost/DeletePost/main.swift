@@ -14,8 +14,8 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 // Category and id necessary to identify post to be deleted
-let category = "Electronics"
-let id = "96"
+let category = "Services"
+let id = "16"
 
 
 //this is the parameters array that will be formulated as JSON.
