@@ -19,14 +19,14 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //set filter parameters
-let categories:[String] = ["Electronics","Clothing","Household"] //empty string means all categories
-let keywordSearch:String = "" //empty string means no keyword search
+let categories:[String] = [] //empty string means all categories
+let keywordSearch:String = "boot" //empty string means no keyword search
 let min_price = "" //"" means no min_price
 let max_price = "" //"" means no max_price
 let free = "0" //false means not free only, true means is free only
-//let divider_date_time = ""
-let divider_date_time = "01/19/2015 22:19:33"
-let older = "0"
+let divider_date_time = ""
+//let divider_date_time = "01/30/2015 23:36:32"
+let older = "1"
 
 
 let params = ["categories":categories,
