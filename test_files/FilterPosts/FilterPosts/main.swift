@@ -48,33 +48,32 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    //read the message from the response
-    var message = ""
-    var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
-    if(err != nil) {
-        println(err!.localizedDescription)
-        let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
-        println("Error could not parse JSON: '\(jsonStr)'")
-    }
-    else{
+    //downcast NSURLResponse object to NSHTTPURLResponse
+    if let httpResponse = response as? NSHTTPURLResponse {
         
-        //downcast NSURLResponse object to NSHTTPURLResponse
-        if let httpResponse = response as? NSHTTPURLResponse {
+        //get the status code
+        var status_code = httpResponse.statusCode
+        
+        //200 = OK: carry on!
+        if(status_code == 200){
             
-            //get the status code
-            var status_code = httpResponse.statusCode
-            
-            //200 = OK: carry on!
-            if(status_code == 200){
-                println(message)
+            var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+            if(err != nil) {
+                println(err!.localizedDescription)
+                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+                println("Error could not parse JSON: '\(jsonStr)'")
+            }
+                
+            else {
                 
                 //response code is OK, continue with parsing JSON and reading response data
                 //THIS IS WHERE RESPONSE HANDLING CODE SHOULD GO
-                if let parseJSON = json as? Dictionary<String,AnyObject>{
-                    message = parseJSON["message"] as String
-                    
-                    let posts: AnyObject = parseJSON["posts"]!
-                    println(posts.count)
+                
+                var message = parseJSON!["message"] as String
+                
+                let posts: AnyObject = parseJSON!["posts"]!
+                println(posts.count)
+                if posts.count > 0{
                     for i in 0...(posts.count - 1){
                         let post: AnyObject! = posts[i] //just so we don't keep re-resolving this reference
                         
@@ -91,33 +90,44 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let imageString = post["image"]! as String
                         if !imageString.isEmpty {
                             let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
-                                
+                            
                             //do stuff with the image here
                         }
                         else{
                             //CASE IN WHICH THE POST HAD NO IMAGE
                         }
-                        
                     }
                 }
             }
-                
-                //400 = BAD_REQUEST: error in creating user, display error!
-            else if(status_code == 400){
+        }
+            
+        //400 = BAD_REQUEST: error in creating user, display error!
+        else if(status_code == 400){
+            var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+            if(err != nil) {
+                println(err!.localizedDescription)
+                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+                println("Error could not parse JSON: '\(jsonStr)'")
+            }
+            else{
+                var message = parseJSON!["message"] as String
                 println(message)
             }
-                
-                //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
-            else if(status_code == 500){
-                println("The server is down! I blame Schnagl")
-            }
-            
-            
         }
-        else {
-            println("Error in casting response, data incomplete")
+            
+        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        else if(status_code == 500){
+            println("The server is down! I blame Schnagl")
         }
+        
+        
     }
+    else {
+        println("Error in casting response, data incomplete")
+    }
+
+    
+    
     
 })
 
