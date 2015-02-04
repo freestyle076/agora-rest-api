@@ -21,6 +21,8 @@ rideshare_categories = ['Ride Shares']
 datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
+time_zone_loc = pytz.timezone(settings.TIME_ZONE)
+time_zone_utc = pytz.timezone('UTC')
 
 def category_intersect(super_category,categories):
     '''
@@ -119,7 +121,10 @@ def edit_post(request):
         edit_post.text = request_data['text']
         edit_post.pref_email = request_data['pref_email']
         edit_post.gonzaga_email = request_data['gonzaga_email']
-        now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+
+        utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
+        now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+
         edit_post.post_date_time = now
         
         imagesBase64Array = request_data['images'] #images array, each as base64 string
@@ -362,6 +367,7 @@ def filter_post_list(request):
         #if none provided (base case) then set oldest_date to now plus two hours (just to be safe...)
         if not divider:
             divider_post_datetime = datetime.datetime.now(pytz.timezone('US/Pacific')) + datetime.timedelta(hours=2)
+
         
         #else use provided datetime
         else:
@@ -572,12 +578,13 @@ def view_detailed_post(request):
         category: Category to signify which table to search through. 
     route: /viewpost/
     '''
-
-
      
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data
+
+        print request_data        
+        
         category = request_data['category'] #switch on category
         post_id = request_data['post_id']
         if category in item_categories:
@@ -614,6 +621,7 @@ def view_detailed_post(request):
           
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
+        
         pre_image_string = settings.IMAGES_ROOT
         image_URLs_array[0] = pre_image_string + post_info.image1
         image_URLs_array[1] = pre_image_string + post_info.image2
@@ -630,6 +638,7 @@ def view_detailed_post(request):
         json_data["image3"] = images_base64_array[2]  
    
         if category in item_categories:
+            print str(json_data)
             return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         elif category in book_categories:
             return view_book_post(request_data,json_data,post_info)
@@ -766,7 +775,11 @@ def create_book_post(request_data,json_data):
     Request body must contain the following data in JSON format:
         isbn: isbn of book to be sold
     '''
-    now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    
+    utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC  
+    now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+    print "Book now: " + str(now)
+    
     try:
         '''partially create post, hold for images'''
         created_post = BookPost.objects.create(
@@ -825,7 +838,12 @@ def create_datelocation_post(request_data,json_data):
     date_part_2 = split_date[0][-2:]
     full_date = date_part_1 + "20" + date_part_2 + split_date[1]
     input_date_time = datetime.datetime.strptime(full_date,date_time_format)
-    now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    
+    
+    utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
+    now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+    
+    print "DL now: " + str(now)
 
     try:
         '''partially create post, hold for images'''
@@ -898,7 +916,12 @@ def create_rideshare_post(request_data,json_data):
         return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
     departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
-    now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    
+    utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
+    now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+    
+    print "RS now: " + str(now)
+    
     try:
         '''partially create post, hold for images'''
         created_post = RideSharePost.objects.create(
@@ -953,7 +976,13 @@ def create_item_post(request_data,json_data):
     '''
     POST method for creating an item post
     '''
-    now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    #now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+    utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
+    print "item UTC now: " + str(utc_now)
+    
+    now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+    print "item now: " + str(now)
+    
     try:
         '''partially create post, hold for images'''
         created_post = ItemPost.objects.create(
@@ -1044,8 +1073,10 @@ def refresh_post(request):
             response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
         
-        #perform the refresh: set post_date_time to now
-        now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+        utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
+        now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+        
+        #refresh the post's datetime        
         post.post_date_time = now
         
         #save changes
