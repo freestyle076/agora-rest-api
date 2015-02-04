@@ -49,39 +49,43 @@ def edit_user(request):
 
     #attempting edit on provided json data
     try:
-        info = ast.literal_eval(request.body) #parse data
+        request_data = ast.literal_eval(request.body) #parse data
         #changes to pref_email must be validatad as email (pass empty string)
-        pref_email = info['pref_email']
+        pref_email = request_data['pref_email']
         if(pref_email != ""):
             if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
                 #return bad_request 400 code
                 json_data['message'] = "Invalid email"
                 print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                request_data = None #clear traces of user information after done using
                 return response
             try:
-                validators.validate_email(info['pref_email'])
-            except validators.ValidationError as e:
+                validators.validate_email(request_data['pref_email'])
+            except validators.ValidationError:
                 json_data['message'] = "Invalid email"
                 print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                request_data = None #clear traces of user information after done using
                 return response     
 
         #make edits
-        edit_user = User.objects.get(username=info['username'])
-        edit_user.first_name = info['first_name']
-        edit_user.last_name = info['last_name']
-        edit_user.pref_email = info['pref_email']
-        edit_user.phone = info['phone']
+        edit_user = User.objects.get(username=request_data['username'])
+        edit_user.first_name = request_data['first_name']
+        edit_user.last_name = request_data['last_name']
+        edit_user.pref_email = request_data['pref_email']
+        edit_user.phone = request_data['phone']
         edit_user.save() #save edits
         
         #respond with success and HTTP 200 OK 
-        json_data['message'] = "Successfully edited user " + info['username']
+        json_data['message'] = "Successfully edited user " + request_data['username']
+        request_data = None #clear traces of user information after done using
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     except:
         #error occured in parsing data or assigning edits
         json_data['message'] = sys.exc_info()[0]
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
 
 @api_view(['POST'])
@@ -103,20 +107,21 @@ def create_user(request):
     json_data = {}    
     
     #parse request body for user information
-    new_user_info = ast.literal_eval(request.body)
+    request_data = ast.literal_eval(request.body)
     
     #validate gonzaga email using email validator 
     try:
-        validators.validate_email(new_user_info['gonzaga_email'])
+        validators.validate_email(request_data['gonzaga_email'])
     except validators.ValidationError as e:
         print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response    
     
     #validate the preferred email field if provided
-    if new_user_info['pref_email']:
-        pref_email = new_user_info['pref_email']
+    if request_data['pref_email']:
+        pref_email = request_data['pref_email']
         #ensure the preferred email isn't a zagmail.gonzaga.edu or gonzaga.edu domain
         if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
             #return bad_request 400 code
@@ -125,26 +130,27 @@ def create_user(request):
             return response
         #while we are here we will validate the preferred email as an email address
         try:
-            validators.validate_email(new_user_info['pref_email'])
+            validators.validate_email(request_data['pref_email'])
         except validators.ValidationError as e:
             print str(e)
             json_data['message'] = str(e)
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            request_data = None #clear traces of user information after done using
             return response
-    
     #try to create and save the user
     try:
         created_user = User.objects.create(
-            username=new_user_info['username'],
-            first_name=new_user_info['first_name'],
-            last_name=new_user_info['last_name'],
-            gonzaga_email=new_user_info['gonzaga_email'],
-            pref_email=new_user_info['pref_email'],
-            phone=new_user_info['phone'])
+            username=request_data['username'],
+            first_name=request_data['first_name'],
+            last_name=request_data['last_name'],
+            gonzaga_email=request_data['gonzaga_email'],
+            pref_email=request_data['pref_email'],
+            phone=request_data['phone'])
         created_user.save()
         
         #if no exception thrown return success
         json_data['message'] = "Successfully created user!"
+        request_data = None #clear traces of user information after done using
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         
     #IntegrityError indicates create user failed from 
@@ -154,12 +160,14 @@ def create_user(request):
         print str(e)
         json_data['message'] = str(e) + " - broken uniqueness or foreign key constraint in create"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
     #general exception catching
     except Exception, e:
         print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
 
 @api_view(['POST'])
@@ -170,14 +178,23 @@ def view_user(request):
         username: username of the user to authenticate
     route: /userprofile/
     '''
+    try:
         #parse request body for incoming login data
-    info = ast.literal_eval(request.body)
-    user = info['username']
-    json_data = {}
-    json_data['firstname'] = User.objects.get(username=user).first_name
-    json_data['lastname'] = User.objects.get(username=user).last_name
-    response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
-    return response
+        request_data = ast.literal_eval(request.body)
+        user = request_data['username']
+        json_data = {}
+        json_data['firstname'] = User.objects.get(username=user).first_name
+        json_data['lastname'] = User.objects.get(username=user).last_name
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        request_data = None #clear traces of user information after done using
+        return response
+    
+    except Exception, e:
+        print str(e)
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
+        return response
     
 @api_view(['POST'])
 def ldap_authenticate(request):
@@ -190,12 +207,12 @@ def ldap_authenticate(request):
     '''
     
     #parse request body for incoming login data
-    info = ast.literal_eval(request.body)
+    request_data = ast.literal_eval(request.body)
     json_data = {}
     
     #get user entered credentials
-    user = info['username']
-    password = info['password']
+    user = request_data['username']
+    password = request_data['password']
 
     #allow admin to enter application without LDAP Auth   
     if user == settings.APPLE_USERNAME and password == settings.APPLE_PASS:
@@ -214,14 +231,16 @@ def ldap_authenticate(request):
         json_data['username'] = user
         json_data['g_email'] = 'adm!n@zagmail.gonzaga.edu'
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
         
-    info['username'] = info['username'] + '@zagmail.gonzaga.edu'
+    request_data['username'] = request_data['username'] + '@zagmail.gonzaga.edu'
     
     #check for empty password; LDAP passes requests with empty passwords, we don't
-    if(info['password'] == ""):
+    if(request_data['password'] == ""):
         json_data['message'] = 'Empty Password'
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
     
     #attempt connection to ldap server
@@ -231,7 +250,7 @@ def ldap_authenticate(request):
         
         #attempt bind on user provided credentials with email @zagmail.gonzaga.edu
         try:
-            handle.simple_bind_s(info['username'], info['password'])
+            handle.simple_bind_s(request_data['username'], request_data['password'])
             
             #if successful return OK, username+pwd is in the ldap database!
             json_data['message'] = 'Authentication succesful!'
@@ -246,19 +265,20 @@ def ldap_authenticate(request):
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
-            json_data['g_email'] = info['username']
-            info = None #clear traces of user information after done using
+            json_data['g_email'] = request_data['username']
+            request_data = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+            request_data = None #clear traces of user information after done using
             return response
         #catch exception, the zagmail suffix didn't work
         except ldap.LDAPError, error_message:
             #attempt bind on user provided credentials with email @gonzaga.edu
             try:
                 #replace email suffix
-                info['username'] = info['username'].replace('@zagmail.gonzaga.edu','@gonzaga.edu')
+                request_data['username'] = request_data['username'].replace('@zagmail.gonzaga.edu','@gonzaga.edu')
                 
                 #attempt bind with username and password gonzaga.edu
-                handle.simple_bind_s(info['username'],info['password'])
+                handle.simple_bind_s(request_data['username'],request_data['password'])
                 
                 #if successful return OK, username+pwd is in the ldap database!
                 json_data['message'] = 'Authentication succesful!'
@@ -274,9 +294,9 @@ def ldap_authenticate(request):
                 else:
                     json_data['exists'] ='no'
                 json_data['username'] = user                   
-                json_data['g_email'] = info['username']
+                json_data['g_email'] = request_data['username']
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
-                info = None #clear traces of user information after done using
+                request_data = None #clear traces of user information after done using
                 return response
             
             #catch exception, neither username+email_suffix+password in ldap database, return bad request
@@ -284,6 +304,7 @@ def ldap_authenticate(request):
                 print error_message
                 json_data['message'] = 'Invalid Credentials'
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+                request_data = None #clear traces of user information after done using
                 return response
                 
     #failure to connect to ldap server, return internal server error   
@@ -292,6 +313,7 @@ def ldap_authenticate(request):
         json_data['message'] = 'Error Connecting to Ldap Server'
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_500_INTERNAL_SERVER_ERROR,content_type='application/json')
         response.write(error_message)
+        request_data = None #clear traces of user information after done using
         return response
         
 @api_view(['POST'])
@@ -309,9 +331,11 @@ def user_posts(request):
         
         json_data['message'] = "successfully retrieved user posts"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response
     except Exception,e:
         print str(e)
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
         return response

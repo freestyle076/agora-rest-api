@@ -13,8 +13,6 @@ import ast
 import pytz
 import os
 
-
-
 item_categories = ['Electronics','Household','Recreation','Clothing']
 book_categories = ['Books']
 rideshare_categories = ['Ride Shares']
@@ -39,24 +37,34 @@ def delete_imagefile(filename):
         if os.path.isfile(filename):
             os.remove(filename)
         else:
-            print("Error: %s file  not found" % filename)
+            json_data["message"] = ("Error: %s file  not found" % filename)
+            return json_data["message"]
     except Exception,e:
         print str(e)
-        json_data["message"] = str(e)
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response 
+        json_data["message"] = str(e)   
+        return json_data["message"]
+        
         
 def remove_post(delete_post):
-    imageURLsArray = [delete_post.image1,delete_post.image2,delete_post.image3] #placeholders for image URLs
-    for i in range(len(imageURLsArray)):  
-        if imageURLsArray[i] != "":
-            #Delete Image
-            delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
-            imageURLsArray[i] = ""                
-    post_reports = PostReport.objects.filter(post_id=delete_post.id)
-    for post in post_reports:
-        post.delete()
-    delete_post.delete()    
+    json_data = {}
+    json_data["message"] = ""
+    try:
+        imageURLsArray = [delete_post.image1,delete_post.image2,delete_post.image3] #placeholders for image URLs
+        for i in range(len(imageURLsArray)):  
+            if imageURLsArray[i] != "":
+                #Delete Image
+                json_data["message"] = delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
+                imageURLsArray[i] = ""                
+        post_reports = PostReport.objects.filter(post_id=delete_post.id)
+        for post in post_reports:
+            post.delete()
+        delete_post.delete()
+        return json_data["message"]
+    except Exception,e:
+        print str(e)
+        json_data["message"] = str(e) 
+        return json_data["message"]
+        
         
 @api_view(['POST'])
 def delete_post(request):
@@ -79,9 +87,11 @@ def delete_post(request):
         else:
             json_data = {'message': 'Error in Editing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
-        remove_post(delete_post) 
-        json_data['message'] = "Succesfully Deleted Post"   
+        json_data["message"] = remove_post(delete_post)
+        if json_data["message"] == "":
+            json_data['message'] = "Succesfully Deleted Post"   
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+    
     #catch all unhandled exceptions
     except Exception,e:
         print str(e)
@@ -96,6 +106,7 @@ def edit_post(request):
     route: /editpost/
     '''    
     json_data = {}
+    json_data["message"] = ""
     try:
         request_data = ast.literal_eval(request.body)#parse data
         category = request_data["category"]
@@ -112,8 +123,9 @@ def edit_post(request):
             edit_post = RideSharePost.objects.get(id=request_data['id'])
             edit_post = edit_rideshare_post(request_data,edit_post)
         else:
-            json_data = {'message': 'Error in Editing post: Invalid category'}
+            json_data["message"] = 'Error in Editing post: Invalid category'
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
+        
         edit_post.title = request_data['title']
         edit_post.price = request_data['price']
         edit_post.description = request_data['description']
@@ -132,7 +144,7 @@ def edit_post(request):
         for i in range(len(imagesBase64Array)-1):  
             if imagesBase64Array[i] == "deleted":
                 #Delete Image
-                delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
+                json_data["message"] = delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
                 imageURLsArray[i] = ""
             elif imagesBase64Array[i] != "": #Image has been overwritten
                 imageData = decodestring(imagesBase64Array[i]) #convert back to binary
@@ -146,7 +158,8 @@ def edit_post(request):
         edit_post.image2 = imageURLsArray[1]
         edit_post.image3 = imageURLsArray[2]   
         edit_post.save()
-        json_data["message"] = "Successfully Edited Post!"
+        if json_data["message"] == "":
+            json_data["message"] = "Successfully Edited Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
 
     #catch all unhandled exceptions
@@ -254,8 +267,8 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                 decorated_price = "${:.2f}".format(float(item.price))
                 listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':decorated_price,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
-    
-    
+                
+                
         #books
         if books:
             for book in books:
@@ -578,7 +591,7 @@ def view_detailed_post(request):
         category: Category to signify which table to search through. 
     route: /viewpost/
     '''
-     
+
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data
@@ -588,15 +601,18 @@ def view_detailed_post(request):
         category = request_data['category'] #switch on category
         post_id = request_data['post_id']
         if category in item_categories:
-            post_info = ItemPost.objects.get(id=post_id)
+            post_info = ItemPost.objects.get(id=post_id)    
         elif category in book_categories:
             post_info = BookPost.objects.get(id=post_id)
+            json_data = view_book_post(request_data,json_data,post_info)
         elif category in datelocation_categories:
             post_info = DateLocationPost.objects.get(id=post_id)
+            json_data = view_datelocation_post(request_data,json_data,post_info)
         elif category in rideshare_categories:
             post_info = RideSharePost.objects.get(id=post_id)
+            json_data = view_rideshare_post(request_data,json_data,post_info)
         else:
-            json_data = {'message': 'Error in viewing post: Invalid category'}
+            json_data['message'] =  'Error in viewing post: Invalid category'
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
@@ -636,19 +652,10 @@ def view_detailed_post(request):
         json_data["image1"] = images_base64_array[0]    
         json_data["image2"] = images_base64_array[1]    
         json_data["image3"] = images_base64_array[2]  
-   
-        if category in item_categories:
-            print str(json_data)
-            return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
-        elif category in book_categories:
-            return view_book_post(request_data,json_data,post_info)
-        elif category in datelocation_categories:
-            return view_datelocation_post(request_data,json_data,post_info)
-        elif category in rideshare_categories:
-            return view_rideshare_post(request_data,json_data,post_info)
-        else:
-            json_data = {'message': 'Error in viewing post: Invalid category'}
-            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+
+        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        
+
     except Exception,e:
         print str(e)
         json_data['message'] = str(e)
@@ -662,13 +669,12 @@ def view_book_post(request_data,json_data,Post):
     '''
     try:
         json_data["isbn"] = Post.isbn
-        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return json_data
     #general exception catching
     except Exception,e:
         print str(e)
         json_data['message'] = str(e)
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response
+        return json_data
 
 def view_rideshare_post(request_data,json_data,Post):
     '''
@@ -695,13 +701,12 @@ def view_rideshare_post(request_data,json_data,Post):
             json_data["round_trip"] = 1
         else:
             json_data["round_trip"] = 0
-        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return json_data
     #general exception catching
     except Exception,e:
         print str(e)
         json_data['message'] = str(e)
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response
+        return json_data
 
 def view_datelocation_post(request_data,json_data,Post):
     '''
@@ -716,13 +721,12 @@ def view_datelocation_post(request_data,json_data,Post):
         json_data["date_time"] = str(Post.date_time.month) + "/" + str(Post.date_time.day) + "/" + str(Post.date_time.year)
         json_data["date_time"] = json_data["date_time"] + " " + hour + minute_ampm
         json_data["location"] = Post.location
-        return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        return json_data
     #general exception catching
     except Exception,e:
         print str(e)
         json_data['message'] = str(e)
-        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        return response
+        return json_data
 
 @api_view(['POST'])
 def create_post(request):
@@ -1036,7 +1040,7 @@ def refresh_post(request):
         post_id: ID of a post in given category
     route: /refreshpost/
     '''
-    response_data = {}
+    json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse request body
         
@@ -1059,18 +1063,16 @@ def refresh_post(request):
         
         #category doesn't exist, respond with 400 BAD REQUEST
         else:
-            error_message = "Non existent category: " + post_category
-            print error_message
-            response_data['message'] = error_message
-            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            json_data["message"] = 'Error in Refreshing post: Invalid category'
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
 
         #post not found by ID, respond with 400 BAD REQUEST          
         if not post:
             error_message = "Post with post_id " + str(post_id) + "could not be found"
             print error_message
-            response_data['message'] = error_message
-            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            json_data['message'] = error_message
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
         
         utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
@@ -1085,16 +1087,16 @@ def refresh_post(request):
         #respond with HTTP 200 OK
         message = "Successfully refreshed " + post_category + " post with ID " + str(post_id)
         print message
-        response_data['message'] = message
-        response_data['post_date_time'] = post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
-        response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+        json_data['message'] = message
+        json_data['post_date_time'] = post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        
         
     #general exception handling
     except Exception, e:
         print str(e)
-        response_data["message"] = str(e)
-        response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        json_data["message"] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
         
 @api_view(['POST'])
@@ -1106,7 +1108,7 @@ def report_post(request):
         post_id: ID of a post in given category
     route: /reportpost/
     '''
-    response_data = {}
+    json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse request body
         
@@ -1123,8 +1125,8 @@ def report_post(request):
             #respond with HTTP 200 OK
             message = "User " + reporter + " has already reported post " + str(post_id) + " in " + post_category
             print message
-            response_data['message'] = message
-            response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+            json_data['message'] = message
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
             return response
         
         #if this report has yet to be made (existing_report == None) then create the report
@@ -1147,16 +1149,16 @@ def report_post(request):
         else:
             error_message = "Non existent category: " + post_category
             print error_message
-            response_data['message'] = error_message
-            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            json_data['message'] = error_message
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
         
         #post not found by ID, respond with 400 BAD REQUEST          
         if not post:
             error_message = "Post with post_id " + str(post_id) + "could not be found"
             print error_message
-            response_data['message'] = error_message
-            response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+            json_data['message'] = error_message
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response        
         
         #perform the report: increment post's report count
@@ -1169,13 +1171,13 @@ def report_post(request):
         #respond with HTTP 200 OK
         message = "Successfully reported " + post_category + " post with ID " + str(post_id)
         print message
-        response_data['message'] = message
-        response = HttpResponse(json.dumps(response_data),status=status.HTTP_200_OK,content_type='application/json')
+        json_data['message'] = message
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        
         
     #general exception handling
     except Exception, e:
         print str(e)
-        response_data["message"] = str(e)
-        response = HttpResponse(json.dumps(response_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        json_data["message"] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
