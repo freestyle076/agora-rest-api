@@ -20,6 +20,15 @@ datelocation_categories = ['Services','Events']
 
 date_time_format = "%m\/%d\/%Y %I:%M %p"
 
+def category_intersect(super_category,categories):
+    '''
+    Returns true if super_category and categories share an element
+    '''
+    for category1 in super_category:
+        for category2 in categories:
+            if category1 == category2:
+                return True
+
 def delete_imagefile(filename):
     json_data = {}
     try:
@@ -235,10 +244,11 @@ def prepare_results(items, books, DLs, RSs, limit=0):
     books: BookPost resultset
     DLs: DateLocationPost resultset
     RSs: RidesharePost resultset
-    '''
-    print "inside prepare_results"     
+    '''    
     
     posts = []
+    
+    print "inside prepare results"    
     
     try:
         #items
@@ -280,7 +290,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                 day = str(DL.date_time.day)
                 if hour == "0": #weird attribute of time-keeping, 0 is actually 12
                     hour = "12"
-                year = DL.date_time.strftime("/%y") #day and year component
+                year = DL.date_time.strftime("%y") #day and year component
                 minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
                 
                 #pretty_date = DL.date_time.strftime("%m/%d/%y %I:%M%p") #modify the datetime to be a bit prettier
@@ -326,8 +336,8 @@ def prepare_results(items, books, DLs, RSs, limit=0):
     #ensure that exceptions are raised to the point of being included in the http response
     except Exception, e:
         raise e
-
-
+    
+    
 @api_view(['POST'])
 def filter_post_list(request):
     '''
@@ -348,6 +358,7 @@ def filter_post_list(request):
     try:
         #parse request
         request_data = ast.literal_eval(request.body)
+        
         
         #get filter parameters from request
         keyword = request_data['keywordSearch']
@@ -390,6 +401,7 @@ def filter_post_list(request):
             max_price = 0.0
             min_price = 0.0 
         
+        #display the incoming filter keywords for sanity's sake
         print "keyword: " + str(keyword)
         print "categories: " + str(categories)
         print "max_price: " + str(max_price)
@@ -399,16 +411,6 @@ def filter_post_list(request):
         print "older: " + str(older)
         
         
-        
-        def category_intersect(super_category,categories):
-            '''
-            Returns true if super_category and categories share an element
-            '''
-            for category1 in super_category:
-                for category2 in categories:
-                    if category1 == category2:
-                        return True
-        
         #set active categories---------------
         
         #in a populate as necessary sort of way...
@@ -417,22 +419,22 @@ def filter_post_list(request):
         DL_rs = None
         RS_rs = None
         
-        
+        #alter database queries according 
+        #older means post_date_time less than divider in descending order
         if older == "1":
             datetime_Q = Q(post_date_time__lt=divider_post_datetime)
             order_by_string = "-post_date_time"
-            
+            edge_index = -1
+        #newer (not older) means post_date_time greater than divider in ascending order
         else:
             datetime_Q = Q(post_date_time__gt=divider_post_datetime)
             order_by_string = "post_date_time"
+            edge_index = 0
         
         
         #if no chosen category apply all
         if not categories:
-            item_rs = ItemPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
-            book_rs = BookPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
-            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
-            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            categories = item_categories + book_categories + datelocation_categories + rideshare_categories
         
         #category is of item type
         if category_intersect(item_categories,categories):
@@ -455,8 +457,70 @@ def filter_post_list(request):
             RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #populate the response with listview formatted results (grabs and encodes image data)
-        json_data['posts'] = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)
+        results = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)
+        json_data['posts'] = results
         
+        
+        def more_to_gather(older,edge_post):
+            '''
+            Checks if there are more posts in the older or newer direction as specified 
+            by the older variable. Returns true if there are more, false if there are not.
+            '''
+            
+            #form edge date_time string into date_time object
+            edge_date_time = datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S')
+            print ""
+            print "edge_date_time: " + edge_post['post_date_time']    
+            
+            #assign query parameter according to function parameter 'older'
+            if older == "1":
+                date_time_compare_Q = Q(post_date_time__lt=edge_date_time)
+            else:
+                date_time_compare_Q = Q(post_date_time__gt=edge_date_time)
+
+            #default exist variables to False for each table
+            items_exist = False
+            books_exist = False           
+            RSs_exist = False           
+            DLs_exist = False           
+
+            
+            #more item posts?
+            if category_intersect(item_categories,categories):
+                items_exist = ItemPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).exists()
+                print "items_exist: " + str(int(items_exist))
+            
+            #more book posts?
+            if category_intersect(book_categories,categories):
+                books_exist = BookPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).exists()
+                print "books_exist: " + str(int(books_exist))
+            
+            #more RS posts?
+            if category_intersect(rideshare_categories,categories):
+                RSs_exist = RideSharePost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).exists()
+                print "RSs_exist: " + str(int(RSs_exist))
+                
+            #more DL posts?
+            if category_intersect(datelocation_categories,categories):
+                DLs_exist = DateLocationPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).exists()
+                print "DLs_exist: " + str(int(DLs_exist))
+            
+            #check if any more posts in ANY TABLE exist in the direction specified by 'older'
+            more_exist =  items_exist or books_exist or RSs_exist or DLs_exist
+            
+            
+            print "more_exist: " + str(int(more_exist))   
+            return more_exist
+            
+        #first check if there were results. If there weren't any then there
+        #couldn't be any more...
+        if results:
+            #if there are results then check to see if there are more results
+            more_exist = str(int(more_to_gather(older,results[edge_index])))
+        else:
+            more_exist = "0"
+            
+        json_data['more_exist'] = more_exist
         
         #hi five
         json_data['message'] = 'Successfully filtered and returned posts'
@@ -674,6 +738,7 @@ def create_post(request):
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body) #parse data
+
         if request_data["price"] == '':
             request_data["price"] = 0
         category = request_data['category'] #switch on category
@@ -933,7 +998,7 @@ def create_item_post(request_data,json_data):
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
         
-@api_view(["post"])
+@api_view(['POST'])
 def refresh_post(request):
     '''
     POST method for refreshing an existing post by bringing post_date_time to
@@ -989,6 +1054,7 @@ def refresh_post(request):
         message = "Successfully refreshed " + post_category + " post with ID " + str(post_id)
         print message
         json_data['message'] = message
+        json_data['post_date_time'] = post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        
         
