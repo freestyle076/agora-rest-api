@@ -1,5 +1,5 @@
 from django.db import models
-
+import datetime
 class ListPost(models.Model):
     '''
     Class for storing data on our post and displaying in List Format
@@ -9,6 +9,7 @@ class ListPost(models.Model):
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
     report_count = models.PositiveSmallIntegerField(default=0)
+    last_refresh_date = models.DateField(default=datetime.date.today)
     image1 = models.CharField(max_length=50,blank=True,default='') #url
     
     class Meta:
@@ -53,7 +54,7 @@ class DateLocationPost(ListPost):
     description = models.CharField(max_length=1000,blank=True,default='')
     price = models.DecimalField(max_digits=6,decimal_places=2)
     date_time = models.DateTimeField()
-    location = models.CharField(max_length=20)
+    location = models.CharField(max_length=70)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
