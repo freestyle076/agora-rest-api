@@ -8,7 +8,7 @@ from django.core import validators
 
 from serializers import UserSerializer
 from models import User
-from agora_rest_api.post_service import views as post_service_views
+from agora_rest_api.post_service import post_list_views
 from agora_rest_api import settings
 
 import ldap
@@ -21,15 +21,6 @@ Views for the user_service API application. The following views expose user
 API methods for authenticating a user login, creating a user and editing a user
 account.
 '''
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    '''
-    Django standard ViewSet for User objects.
-    route: /users/
-    '''
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
 
 @api_view(['PUT'])
@@ -225,7 +216,7 @@ def ldap_authenticate(request):
             json_data['last_name'] = User.objects.get(username=user).last_name
             json_data['p_email'] = User.objects.get(username=user).pref_email
             json_data['phone'] = User.objects.get(username=user).phone 
-            json_data['posts'] = post_service_views.user_posts(user)
+            json_data['posts'] = post_list_views.user_posts(user)
         else:
             json_data['exists'] ='no'
         json_data['username'] = user
@@ -261,7 +252,7 @@ def ldap_authenticate(request):
                 json_data['last_name'] = User.objects.get(username=user).last_name
                 json_data['p_email'] = User.objects.get(username=user).pref_email
                 json_data['phone'] = User.objects.get(username=user).phone 
-                json_data['posts'] = post_service_views.user_posts(user)
+                json_data['posts'] = post_list_views.user_posts(user)
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
@@ -290,7 +281,7 @@ def ldap_authenticate(request):
                     json_data['last_name'] = User.objects.get(username=user).last_name
                     json_data['p_email'] = User.objects.get(username=user).pref_email
                     json_data['phone'] = User.objects.get(username=user).phone
-                    json_data['posts'] = post_service_views.user_posts(user)
+                    json_data['posts'] = post_list_views.user_posts(user)
                 else:
                     json_data['exists'] ='no'
                 json_data['username'] = user                   
@@ -327,7 +318,7 @@ def user_posts(request):
     try:
         request_data = ast.literal_eval(request.body)
         username = request_data['username']
-        json_data['posts'] = post_service_views.user_posts(username)
+        json_data['posts'] = post_list_views.user_posts(username)
         
         json_data['message'] = "successfully retrieved user posts"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')

@@ -20,11 +20,11 @@ urlpatterns = patterns('',
     (r'^userposts/','agora_rest_api.user_service.views.user_posts'),
 
     #post service
-    (r'^createpost/','agora_rest_api.post_service.views.create_post'),
+    (r'^createpost/','agora_rest_api.post_service.create_post_views.create_post'),
     (r'^viewpost/','agora_rest_api.post_service.views.view_detailed_post'),
-    (r'^editpost/','agora_rest_api.post_service.views.edit_post'),
+    (r'^editpost/','agora_rest_api.post_service.edit_post_views.edit_post'),
     (r'^deletepost/','agora_rest_api.post_service.views.delete_post'),
-    (r'^postquery/','agora_rest_api.post_service.views.filter_post_list'),
+    (r'^postquery/','agora_rest_api.post_service.post_list_views.filter_post_list'),
     (r'^refreshpost/','agora_rest_api.post_service.views.refresh_post'),
     (r'^reportpost/','agora_rest_api.post_service.views.report_post')
     

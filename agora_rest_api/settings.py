@@ -75,7 +75,7 @@ DATABASES = {
         'NAME': 'sustainability_app',
         'USER': 'sustainability',
         'PASSWORD' : 'Dh4Pks7.6',
-        'HOST': '147.222.165.3',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -124,3 +124,8 @@ APPLE_PASS = 'passw0rd'
 PAGING_COUNT = 20
 
 TIME_ZONE = 'US/Pacific'
+
+item_categories = ['Electronics','Household','Recreation','Clothing']
+book_categories = ['Books']
+rideshare_categories = ['Ride Shares']
+datelocation_categories = ['Services','Events']
