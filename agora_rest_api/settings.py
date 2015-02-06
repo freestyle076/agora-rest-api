@@ -120,7 +120,6 @@ APPLE_USERNAME = 'adm!n'
 
 APPLE_PASS = 'passw0rd'
 
-
 PAGING_COUNT = 20
 
 TIME_ZONE = 'US/Pacific'
