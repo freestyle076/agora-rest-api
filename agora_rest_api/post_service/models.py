@@ -4,7 +4,7 @@ class ListPost(models.Model):
     '''
     Class for storing data on our post and displaying in List Format
     '''
-    display_value = models.CharField(max_length=40)
+    display_value = models.CharField(max_length=150)
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
@@ -21,7 +21,7 @@ class ItemPost(ListPost):
     Electronics, furniture, appliances/kitchen, and recreation
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.DecimalField(max_digits=6,decimal_places=2)
+    price = models.DecimalField(max_digits=7,decimal_places=2)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
@@ -35,8 +35,8 @@ class BookPost(ListPost):
     Class for Books, additional Attribute is ISBN
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.DecimalField(max_digits=6,decimal_places=2)
-    isbn = models.CharField(max_length=12)
+    price = models.DecimalField(max_digits=7,decimal_places=2)
+    isbn = models.CharField(max_length=13)
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
     pref_email = models.BooleanField(default=False)
@@ -52,7 +52,7 @@ class DateLocationPost(ListPost):
     Events, Services
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.DecimalField(max_digits=6,decimal_places=2)
+    price = models.DecimalField(max_digits=7,decimal_places=2)
     date_time = models.DateTimeField()
     location = models.CharField(max_length=70)
     username = models.ForeignKey('user_service.User')
@@ -71,10 +71,10 @@ class RideSharePost(ListPost):
     return_date_time only needed if it is a round trip
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
-    price = models.DecimalField(max_digits=6,decimal_places=2)
+    price = models.DecimalField(max_digits=7,decimal_places=2)
     departure_date_time = models.DateTimeField()
     return_date_time = models.DateTimeField(null=True)
-    trip = models.CharField(max_length=50)
+    trip = models.CharField(max_length=150)
     round_trip = models.BooleanField(default=False) 
     username = models.ForeignKey('user_service.User')
     gonzaga_email = models.BooleanField(default=False)
