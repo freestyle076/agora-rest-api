@@ -75,7 +75,7 @@ DATABASES = {
         'NAME': 'sustainability_app',
         'USER': 'sustainability',
         'PASSWORD' : 'Dh4Pks7.6',
-        'HOST': '147.222.165.3',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }

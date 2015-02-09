@@ -22,6 +22,9 @@ Table of Contents:
     filter_post_list(request)
 """
 
+time_zone_loc = pytz.timezone(settings.TIME_ZONE)
+time_zone_utc = pytz.timezone('UTC')
+
 def user_posts(username):
     '''
     Gathers an aggregate list of posts, in listview format, that belong to
@@ -69,12 +72,8 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                if item.last_refresh_date == datetime.date.today():
-                    refreshable = '0'
-                else:
-                    refreshable = '1'
                 decorated_price = "${:.2f}".format(float(item.price))
-                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':decorated_price,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),'refreshable':refreshable}
+                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':decorated_price,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
                 
                 
@@ -86,12 +85,8 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                if book.last_refresh_date == datetime.date.today():
-                    refreshable = '0'
-                else:
-                    refreshable = '1'
                 decorated_price = "${:.2f}".format(float(book.price))
-                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':decorated_price,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),'refreshable':refreshable}
+                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':decorated_price,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
 
 
@@ -103,10 +98,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                if DL.last_refresh_date == datetime.date.today():
-                    refreshable = '0'
-                else:
-                    refreshable = '1'
                 month = str(DL.date_time.month) #month without leading zero
                 hour = str((DL.date_time.hour) % 12) #hour without leading zero
                 day = str(DL.date_time.day)
@@ -118,7 +109,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                 #pretty_date = DL.date_time.strftime("%m/%d/%y %I:%M%p") #modify the datetime to be a bit prettier
                 pretty_date = month + "/" + day + "/" + year + " " + hour + minute_ampm                 
                 
-                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':pretty_date,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),'refreshable':refreshable}
+                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':pretty_date,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
 
@@ -130,11 +121,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                if RS.last_refresh_date == datetime.date.today():
-                    refreshable = '0'
-                else:
-                    refreshable = '1'
-                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),'refreshable':refreshable}
+                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
 
@@ -200,12 +187,12 @@ def filter_post_list(request):
         #get oldest post as datetime object
         #if none provided (base case) then set oldest_date to now plus two hours (just to be safe...)
         if not divider:
-            divider_post_datetime = datetime.datetime.now(pytz.timezone('US/Pacific')) + datetime.timedelta(hours=2)
+            divider_post_datetime = datetime.datetime.now(pytz.timezone('UTC')) + datetime.timedelta(hours=2)
 
         
         #else use provided datetime
         else:
-            divider_post_datetime = datetime.datetime.strptime(divider,'%m/%d/%Y %H:%M:%S')
+            divider_post_datetime = time_zone_utc.localize(datetime.datetime.strptime(divider,'%m/%d/%Y %H:%M:%S'))
         
                 
         
@@ -229,12 +216,14 @@ def filter_post_list(request):
             min_price = 0.0 
         
         #display the incoming filter keywords for sanity's sake
+        '''        
         print "keyword: " + str(keyword)
         print "categories: " + str(categories)
         print "max_price: " + str(max_price)
         print "min_price: " + str(min_price)
         print "free: " + str(free)
-        print "divider_post_datetime: " + str(divider_post_datetime)
+        '''
+        print "divider: " + str(divider_post_datetime)
         print "older: " + str(older)
         
         
@@ -295,8 +284,7 @@ def filter_post_list(request):
             '''
             
             #form edge date_time string into date_time object
-            edge_date_time = datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S')
-            print ""
+            edge_date_time = time_zone_utc.localize(datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S'))
             print "edge_date_time: " + edge_post['post_date_time']    
             
             #assign query parameter according to function parameter 'older'
@@ -315,22 +303,18 @@ def filter_post_list(request):
             #more item posts?
             if helpers.category_intersect(settings.item_categories,categories):
                 items_exist = ItemPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).exists()
-                print "items_exist: " + str(int(items_exist))
             
             #more book posts?
             if helpers.category_intersect(settings.book_categories,categories):
                 books_exist = BookPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).exists()
-                print "books_exist: " + str(int(books_exist))
             
             #more RS posts?
             if helpers.category_intersect(settings.rideshare_categories,categories):
                 RSs_exist = RideSharePost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).exists()
-                print "RSs_exist: " + str(int(RSs_exist))
                 
             #more DL posts?
             if helpers.category_intersect(settings.datelocation_categories,categories):
                 DLs_exist = DateLocationPost.objects.filter(date_time_compare_Q,Q(category__in=categories),Q(price__lte=max_price),Q(price__gte=min_price),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).exists()
-                print "DLs_exist: " + str(int(DLs_exist))
             
             #check if any more posts in ANY TABLE exist in the direction specified by 'older'
             more_exist =  items_exist or books_exist or RSs_exist or DLs_exist
