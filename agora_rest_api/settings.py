@@ -95,7 +95,7 @@ USE_TZ = True
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
-MOST_RECENT_CLEANUP = datetime.date.today() 
+MOST_RECENT_CLEANUP = datetime.date.today() - datetime.timedelta(days=1)
 
 OLD_POST_CUTTOFF_LENGTH = 21 # Number of days Before a Post is Deleted
 
