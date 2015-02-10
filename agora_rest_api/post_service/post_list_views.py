@@ -106,7 +106,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                 year = DL.date_time.strftime("%y") #day and year component
                 minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
                 
-                #pretty_date = DL.date_time.strftime("%m/%d/%y %I:%M%p") #modify the datetime to be a bit prettier
                 pretty_date = month + "/" + day + "/" + year + " " + hour + minute_ampm                 
                 
                 listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':pretty_date,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
