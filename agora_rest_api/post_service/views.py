@@ -222,6 +222,7 @@ def refresh_post(request):
     route: /refreshpost/
     '''
     json_data = {}
+    print "inside refresh_post"
     try:
         request_data = ast.literal_eval(request.body) #parse request body
         
@@ -256,6 +257,16 @@ def refresh_post(request):
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
         
+        #users can only refresh once a day, as tracked by post.last_refresh_date
+        if post.last_refresh_date == datetime.date.today():
+            message = post_category + " post with ID " + str(post_id) + " has already been refreshed today"
+            print message
+            json_data['message'] = message
+            json_data['refreshed'] = '0'
+            json_data['post_date_time'] = post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
+            response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+            return response
+        
         utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
         now = time_zone_loc.normalize(utc_now) #normalize to local timezone
         
@@ -263,7 +274,7 @@ def refresh_post(request):
         post.post_date_time = now
         
         #update the post's last_refresh_date
-        post.last_refresh_date = datetime.date.today        
+        post.last_refresh_date = datetime.date.today()
         
         #save changes
         post.save()
@@ -272,6 +283,7 @@ def refresh_post(request):
         message = "Successfully refreshed " + post_category + " post with ID " + str(post_id)
         print message
         json_data['message'] = message
+        json_data['refreshed'] = '1'
         json_data['post_date_time'] = post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        

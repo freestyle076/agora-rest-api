@@ -22,7 +22,7 @@ Table of Contents:
 
 time_zone_loc = pytz.timezone(settings.TIME_ZONE)
 time_zone_utc = pytz.timezone('UTC')
-date_time_format = "%m\/%d\/%Y %I:%M %p"
+date_time_format = "%m/%d/%y, %I:%M %p"
 
 
 @api_view(['POST'])
@@ -134,13 +134,11 @@ def create_datelocation_post(request_data,json_data):
         date_time: Date and Time of event or service desired
         location: Location of event or service
     '''
-    split_date = request_data['date_time'].split(",")
-    date_part_1 = split_date[0][0:-2]
-    date_part_2 = split_date[0][-2:]
-    full_date = date_part_1 + "20" + date_part_2 + split_date[1]
-    input_date_time = datetime.datetime.strptime(full_date,date_time_format)
     
+    #inputted date_time for answer to event/service when?
+    input_date_time = time_zone_utc.localize(datetime.datetime.strptime(request_data["date_time"],date_time_format))
     
+    #for post_date_time (time created)
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
     
@@ -204,24 +202,45 @@ def create_rideshare_post(request_data,json_data):
         return_date_time: date and time of return if it is a round trip
     '''
     
-    split_date_1 = request_data['departure_date_time'].split(",")
-    date_part_1 = split_date_1[0][0:-2]
-    date_part_2 = split_date_1[0][-2:]  
-    full_departure_date = date_part_1 + "20" + date_part_2 + split_date_1[1]
+    '''
+    return_date_time = None
+    '''
+    
+    #preprocess incoming departure date time string
+    departure_dt_string = request_data["departure_date_time"]
+    departure_dt_string = departure_dt_string.replace("\\","") #remove unnecessary escapes
+    
+    #departure datetime object
+    departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_dt_string,date_time_format))
+    
+    #handle return date time if round_trip is set    
     return_date_time = None
     if int(request_data["round_trip"]):
-        split_date_2 = request_data['return_date_time'].split(",")
-        date_part_3 = split_date_2[0][0:-2]
-        date_part_4 = split_date_2[0][-2:]
-        full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
-        return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
-    departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
+
+        #preprocess incoming return date time string
+        return_dt_string = request_data["return_date_time"]
+        return_dt_string = return_dt_string.replace("\\","") #remove unnecessary escapes
+      
+        
+        #departure datetime object
+        return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_dt_string,date_time_format))
+    
+    #trip details field
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     
+    #default display value to trip details
+    display_value_temp = trip_details
+    
+
+    #if start or end not set display value becomes price
+    if not request_data["start_location"] or not request_data["end_location"]:
+        display_value_temp = request_data["price"]
+    
+    #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
     
-    print "RS now: " + str(now)
+    print "Created RS now: " + str(now)
     
     try:
         '''partially create post, hold for images'''
@@ -239,7 +258,7 @@ def create_rideshare_post(request_data,json_data):
             pref_email=int(request_data['pref_email']),
             call=int(request_data['call']),
             text=int(request_data['text']),
-            display_value = trip_details,
+            display_value = display_value_temp,
             post_date_time = now)   
         '''read images from request, format URLs and save images on disc'''
  
@@ -260,8 +279,6 @@ def create_rideshare_post(request_data,json_data):
         created_post.image2 = imageURLsArray[1]
         created_post.image3 = imageURLsArray[2]              
         
-        
-        
         '''save and respond with success'''
         created_post.save()
         json_data['message'] = "Succesfully created RideShare Post!"
@@ -277,11 +294,11 @@ def create_item_post(request_data,json_data):
     '''
     POST method for creating an item post
     '''
-    #now = datetime.datetime.now(pytz.timezone('US/Pacific'))
+
+    #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
-    print "item UTC now: " + str(utc_now)
-    
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
+    
     print "item now: " + str(now)
     
     try:

@@ -103,11 +103,12 @@ MAX_REPORT_THRESHOLD = 3 # Number of reports that a post will get deleted for
 
 SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
 
-#MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/media/'
+#MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/resources/'
 
-MEDIA_ROOT = PROJECT_PATH + '/agora_rest_api/media/'
+RESOURCE_ROOT = PROJECT_PATH + '/agora_rest_api/resources/'
 
-IMAGES_ROOT = MEDIA_ROOT + 'images/'
+IMAGES_ROOT = RESOURCE_ROOT + 'images/'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
