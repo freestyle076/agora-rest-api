@@ -163,21 +163,27 @@ def view_rideshare_post(request_data,json_data,Post):
     '''
     try:
         json_data["trip"] = Post.trip
-        hour = str((Post.departure_date_time.hour) % 12) #hour without leading zero
-        if hour == "0": #weird attribute of time-keeping, 0 is actually 12
-            hour = "12"
-        minute_ampm = Post.departure_date_time.strftime(":%M %p") #minute and am/pm component
-        year_short = Post.departure_date_time.strftime("%y") #short version of year (without century)
-        json_data["departure_date_time"] = str(Post.departure_date_time.month) + "/" + str(Post.departure_date_time.day) + "/" + year_short + ","
-        json_data["departure_date_time"] = json_data["departure_date_time"] + " " + hour + minute_ampm
-        if Post.round_trip:
-            hour = str((Post.return_date_time.hour) % 12) #hour without leading zero
+        if Post.departure_date_time:
+            hour = str((Post.departure_date_time.hour) % 12) #hour without leading zero
             if hour == "0": #weird attribute of time-keeping, 0 is actually 12
                 hour = "12"
-            minute_ampm = Post.return_date_time.strftime(":%M %p") #minute and am/pm component
-            year_short = Post.return_date_time.strftime("%y") #short version of year (without century)
-            json_data["return_date_time"] = str(Post.return_date_time.month) + "/" + str(Post.return_date_time.day) + "/" + year_short + ","
-            json_data["return_date_time"] = json_data["return_date_time"] + " " + hour + minute_ampm
+            minute_ampm = Post.departure_date_time.strftime(":%M %p") #minute and am/pm component
+            year_short = Post.departure_date_time.strftime("%y") #short version of year (without century)
+            json_data["departure_date_time"] = str(Post.departure_date_time.month) + "/" + str(Post.departure_date_time.day) + "/" + year_short + ","
+            json_data["departure_date_time"] = json_data["departure_date_time"] + " " + hour + minute_ampm
+        else:
+            json_data["departure_date_time"] = None
+        if Post.round_trip:
+            if Post.return_date_time:
+                hour = str((Post.return_date_time.hour) % 12) #hour without leading zero
+                if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+                    hour = "12"
+                minute_ampm = Post.return_date_time.strftime(":%M %p") #minute and am/pm component
+                year_short = Post.return_date_time.strftime("%y") #short version of year (without century)
+                json_data["return_date_time"] = str(Post.return_date_time.month) + "/" + str(Post.return_date_time.day) + "/" + year_short + ","
+                json_data["return_date_time"] = json_data["return_date_time"] + " " + hour + minute_ampm
+            else:
+                json_data["return_date_time"] = None
             json_data["round_trip"] = 1
         else:
             json_data["round_trip"] = 0

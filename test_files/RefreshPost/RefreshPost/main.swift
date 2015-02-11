@@ -17,8 +17,8 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var post_id = "67"
-var category = "Clothing"
+var post_id = "43"
+var category = "Books"
 
 //prepare parameters for json serialization
 var params = ["post_id":post_id, "category":category] as Dictionary<String, String>
@@ -50,7 +50,10 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             else{
                 if let parseJSON = json as? Dictionary<String,AnyObject>{
                     let message = parseJSON["message"] as String
+                    let refreshed = parseJSON["refreshed"] as String
                     let new_post_date_time = parseJSON["post_date_time"] as String
+                    println(refreshed)
+                    println(message)
                     println(new_post_date_time)
                     
                 }

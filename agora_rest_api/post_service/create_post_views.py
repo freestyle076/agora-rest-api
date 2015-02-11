@@ -202,16 +202,14 @@ def create_rideshare_post(request_data,json_data):
         return_date_time: date and time of return if it is a round trip
     '''
     
-    '''
-    return_date_time = None
-    '''
-    
     #preprocess incoming departure date time string
     departure_dt_string = request_data["departure_date_time"]
     departure_dt_string = departure_dt_string.replace("\\","") #remove unnecessary escapes
     
     #departure datetime object
-    departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_dt_string,date_time_format))
+    departure_date_time = None
+    if departure_dt_string:
+        departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_dt_string,date_time_format))
     
     #handle return date time if round_trip is set    
     return_date_time = None
@@ -220,21 +218,21 @@ def create_rideshare_post(request_data,json_data):
         #preprocess incoming return date time string
         return_dt_string = request_data["return_date_time"]
         return_dt_string = return_dt_string.replace("\\","") #remove unnecessary escapes
-      
         
-        #departure datetime object
-        return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_dt_string,date_time_format))
+        #return datetime object
+        if return_dt_string:
+            return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_dt_string,date_time_format))
     
     #trip details field
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     
-    #default display value to trip details
-    display_value_temp = trip_details
+    display_value_temp = '' #default to no display_value
     
-
-    #if start or end not set display value becomes price
-    if not request_data["start_location"] or not request_data["end_location"]:
-        display_value_temp = request_data["price"]
+    #display value is price if one provided
+    if request_data['price']:
+        if int(float(request_data['price'])) != 0:
+            display_value_temp = request_data['price']
+        
     
     #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC

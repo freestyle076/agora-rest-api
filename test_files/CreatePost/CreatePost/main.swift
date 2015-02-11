@@ -37,24 +37,25 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "khandy"
-let description = "Big Books No Whammy's"
-let price = ""
-let title = "Gameshows 101"
-let category = "Books"
+let description = "I'm driving back home for the break. Got four seats."
+let price = "0.00"
+let title = "Kyle's friendly rideshares"
+let category = "Ride Shares"
 
 
 
 let gonzaga_email = "1" //boolean contact option
-let pref_email = "0" //boolean contact option
-let phone = "0" //boolean contact option
-let text = "0" //boolean contact option
+let pref_email = "1" //boolean contact option
+let phone = "1" //boolean contact option
+let text = "1" //boolean contact option
 
 //rideshare specific
-var departure_date_time = "01/04/15, 5:30 AM"
-var start_location = "Spokane"
-var end_location = "LA"
+var departure_date_time = ""
+var start_location = ""
+var end_location = ""
 var round_trip = "1"
-var return_date_time = "01/04/15, 10:30 PM"
+var return_date_time = ""
+
 
 //datelocation specific
 var date_time = "01/20/15, 9:30 PM"
@@ -97,46 +98,56 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    //read the message from the response
-    var message = ""
-    var id = 0
-    var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
-    if(err != nil) {
-        println(err!.localizedDescription)
-        let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
-        println("Error could not parse JSON: '\(jsonStr)'")
-    }
-    else{
-        if let parseJSON = json as? Dictionary<String,AnyObject>{
-            message = parseJSON["message"] as String
-            id = parseJSON["id"] as Int
-        }
-    }
-    
     //downcast NSURLResponse object to NSHTTPURLResponse
     if let httpResponse = response as? NSHTTPURLResponse {
         
         //get the status code
         var status_code = httpResponse.statusCode
         
-        //200 = OK: user created, carry on!
+        //200 = OK: carry on!
         if(status_code == 200){
-            println(message)
-            println(id)
+            
+            var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+            if(err != nil) {
+                println(err!.localizedDescription)
+                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+                println("Error could not parse JSON: '\(jsonStr)'")
+            }
+                
+            else {
+                
+                //response code is OK, continue with parsing JSON and reading response data
+                //THIS IS WHERE RESPONSE HANDLING CODE SHOULD GO
+                
+                var message = parseJSON!["message"] as String
+                var id = parseJSON!["id"] as Int
+                println(message)
+                
+            }
         }
             
-        //400 = BAD_REQUEST: error in creating user, display error!
+            //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
-            println(message)
+            var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+            if(err != nil) {
+                println(err!.localizedDescription)
+                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+                println("Error could not parse JSON: '\(jsonStr)'")
+            }
+            else{
+                var message = parseJSON!["message"] as String
+                println(message)
+            }
         }
             
-        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
-            println("The server is down! Call the fire department!")
+            println("The server is down! I blame Schnagl")
         }
         
         
-    } else {
+    }
+    else {
         println("Error in casting response, data incomplete")
     }
 

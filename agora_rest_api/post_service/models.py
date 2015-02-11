@@ -72,7 +72,7 @@ class RideSharePost(ListPost):
     '''
     description = models.CharField(max_length=1000,blank=True,default='')
     price = models.DecimalField(max_digits=7,decimal_places=2)
-    departure_date_time = models.DateTimeField()
+    departure_date_time = models.DateTimeField(null=True)
     return_date_time = models.DateTimeField(null=True)
     trip = models.CharField(max_length=150)
     round_trip = models.BooleanField(default=False) 

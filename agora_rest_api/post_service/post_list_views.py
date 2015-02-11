@@ -120,7 +120,13 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':RS.display_value,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                
+                #assign the RS display_value
+                display_value_temp = ''
+                if RS.display_value:
+                    display_value_temp = "${:.2f}".format(float(RS.display_value))
+                    
+                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
 
