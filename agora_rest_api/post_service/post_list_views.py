@@ -170,9 +170,8 @@ def filter_post_list(request):
     route: /postquery/
     '''
     if settings.MOST_RECENT_CLEANUP != datetime.date.today():
-        post_service_views.run_clean_up()
+        helpers.run_clean_up()
     json_data = {}
-    
     try:
         #parse request
         request_data = ast.literal_eval(request.body)

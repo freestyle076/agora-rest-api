@@ -3,7 +3,6 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 
-
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'agora_rest_api.views.home', name='home'),

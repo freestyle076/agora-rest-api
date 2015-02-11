@@ -73,8 +73,7 @@ def run_clean_up():
     
     reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
-        remove_post(post)  
-        
+        remove_post(post)   
     d1 = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
     d2 = d1 - datetime.timedelta(days=settings.OLD_POST_CUTTOFF_LENGTH)
     

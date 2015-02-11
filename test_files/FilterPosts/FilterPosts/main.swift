@@ -10,7 +10,7 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/postquery/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/postquery/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/postquery/")!)
 request.HTTPMethod = "POST"
@@ -76,8 +76,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 
                 //response code is OK, continue with parsing JSON and reading response data
                 //THIS IS WHERE RESPONSE HANDLING CODE SHOULD GO
-                
-                var message = parseJSON!["message"] as String
+
                 
                 let posts: AnyObject = parseJSON!["posts"]!
                 println(posts.count)
@@ -118,8 +117,6 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 println("Error could not parse JSON: '\(jsonStr)'")
             }
             else{
-                var message = parseJSON!["message"] as String
-                println(message)
             }
         }
             
