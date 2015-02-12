@@ -96,7 +96,18 @@ def view_detailed_post(request):
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
-        json_data['price'] = str(post_info.price)
+        
+        if post_info.price == None:
+            price_temp = ''
+        elif float(post_info.price) == 0.:
+            price_temp = 'Free'
+        else:
+            price_temp = "${:.2f}".format(float(post_info.price))
+        
+        print "price_temp " + price_temp         
+        
+        json_data['price'] = price_temp        
+        
         json_data['description'] = post_info.description
         if post_info.call == 1:
             json_data["call"] = post_user.phone
@@ -114,7 +125,7 @@ def view_detailed_post(request):
             json_data["pref_email"] = post_user.pref_email
         else:
             json_data["pref_email"] = ''
-          
+        
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
         
@@ -172,7 +183,7 @@ def view_rideshare_post(request_data,json_data,Post):
             json_data["departure_date_time"] = str(Post.departure_date_time.month) + "/" + str(Post.departure_date_time.day) + "/" + year_short + ","
             json_data["departure_date_time"] = json_data["departure_date_time"] + " " + hour + minute_ampm
         else:
-            json_data["departure_date_time"] = None
+            json_data["departure_date_time"] = ''
         if Post.round_trip:
             if Post.return_date_time:
                 hour = str((Post.return_date_time.hour) % 12) #hour without leading zero
@@ -183,7 +194,7 @@ def view_rideshare_post(request_data,json_data,Post):
                 json_data["return_date_time"] = str(Post.return_date_time.month) + "/" + str(Post.return_date_time.day) + "/" + year_short + ","
                 json_data["return_date_time"] = json_data["return_date_time"] + " " + hour + minute_ampm
             else:
-                json_data["return_date_time"] = None
+                json_data["return_date_time"] = ''
             json_data["round_trip"] = 1
         else:
             json_data["round_trip"] = 0
