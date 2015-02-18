@@ -23,7 +23,7 @@ account.
 '''
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 def edit_user(request):
     '''
     PUT method for creating a user. Request body must contain the following
@@ -54,7 +54,7 @@ def edit_user(request):
             try:
                 validators.validate_email(request_data['pref_email'])
             except validators.ValidationError:
-                json_data['message'] = "Invalid email"
+                json_data['message'] = "Enter a valid email address."
                 print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 request_data = None #clear traces of user information after done using
@@ -124,7 +124,7 @@ def create_user(request):
             validators.validate_email(request_data['pref_email'])
         except validators.ValidationError as e:
             print str(e)
-            json_data['message'] = str(e)
+            json_data['message'] = "Enter a valid email address."
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             request_data = None #clear traces of user information after done using
             return response

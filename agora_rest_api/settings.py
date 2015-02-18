@@ -117,9 +117,9 @@ STATIC_URL = '/static/'
 
 REPORT_THRESHOLD = 3
 
-APPLE_USERNAME = 'adm!n'
+APPLE_USERNAME = 'apple_adm!n'
 
-APPLE_PASS = 'passw0rd'
+APPLE_PASS = 'apple_passw0rd'
 
 PAGING_COUNT = 20
 

@@ -46,10 +46,10 @@ def create_post(request):
     #json dictionary to pass back data
     json_data = {}
     try:
+        #evaulte request body
         request_data = ast.literal_eval(request.body) #parse data
-
-        if request_data["price"] == '':
-            request_data["price"] = 0
+        
+        #switch functions on category
         category = request_data['category'] #switch on category
         if category in settings.item_categories: 
             return create_item_post(request_data,json_data)
@@ -59,6 +59,7 @@ def create_post(request):
             return create_datelocation_post(request_data,json_data)
         elif category in settings.rideshare_categories:
             return create_rideshare_post(request_data,json_data)
+        #non existent category
         else:
             json_data = {'message': 'Error in creating post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
@@ -82,11 +83,23 @@ def create_book_post(request_data,json_data):
     print "Book now: " + str(now)
     
     try:
+        
+        #the form of an incoming price has ramifications on price and display_value
+        price_temp = request_data['price']
+        display_value_temp = price_temp
+        #price is NULL 
+        if request_data['price']  == '':
+            price_temp = None
+            display_value_temp = ''
+        elif float(request_data['price']) == 0.:
+            price_temp = 0.
+            display_value_temp = 'Free'
+        
         '''partially create post, hold for images'''
         created_post = BookPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
-            price=request_data['price'],
+            price=price_temp,
             category=request_data['category'],
             description=request_data['description'],
             isbn=request_data['isbn'],
@@ -94,7 +107,7 @@ def create_book_post(request_data,json_data):
             pref_email=int(request_data['pref_email']),
             call=int(request_data['call']),
             text=int(request_data['text']),
-            display_value = request_data['price'],
+            display_value = display_value_temp,
             post_date_time = now)
             
         '''read images from request, format URLs and save images on disc'''
@@ -138,8 +151,7 @@ def create_datelocation_post(request_data,json_data):
         location: Location of event or service
     '''
     
-    #inputted date_time for answer to event/service when?
-    input_date_time = time_zone_utc.localize(datetime.datetime.strptime(request_data["date_time"],date_time_format))
+    
     
     #for post_date_time (time created)
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
@@ -148,11 +160,23 @@ def create_datelocation_post(request_data,json_data):
     print "DL now: " + str(now)
 
     try:
+        
+        #inputted date_time, the event/services 'when' info
+        input_date_time = time_zone_utc.localize(datetime.datetime.strptime(request_data["date_time"],date_time_format))        
+        
+        #the form of an incoming price has ramifications on price and display_value
+        price_temp = request_data['price']
+        #price is NULL 
+        if request_data['price']  == '':
+            price_temp = None
+        elif float(request_data['price']) == 0.:
+            price_temp = 0.       
+        
         '''partially create post, hold for images'''
         created_post = DateLocationPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
-            price=request_data['price'],
+            price=price_temp,
             category=request_data['category'],
             description=request_data['description'],
             date_time=input_date_time,
@@ -204,40 +228,7 @@ def create_rideshare_post(request_data,json_data):
         departure_date_time: date and time of departure
         return_date_time: date and time of return if it is a round trip
     '''
-    
-    '''
-    return_date_time = None
-    '''
-    
-    #preprocess incoming departure date time string
-    departure_dt_string = request_data["departure_date_time"]
-    departure_dt_string = departure_dt_string.replace("\\","") #remove unnecessary escapes
-    
-    #departure datetime object
-    departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_dt_string,date_time_format))
-    
-    #handle return date time if round_trip is set    
-    return_date_time = None
-    if int(request_data["round_trip"]):
-
-        #preprocess incoming return date time string
-        return_dt_string = request_data["return_date_time"]
-        return_dt_string = return_dt_string.replace("\\","") #remove unnecessary escapes
-      
         
-        #departure datetime object
-        return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_dt_string,date_time_format))
-    
-    #trip details field
-    trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
-    
-    #default display value to trip details
-    display_value_temp = trip_details
-    
-
-    #if start or end not set display value becomes price
-    if not request_data["start_location"] or not request_data["end_location"]:
-        display_value_temp = request_data["price"]
     
     #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
@@ -246,11 +237,48 @@ def create_rideshare_post(request_data,json_data):
     print "Created RS now: " + str(now)
     
     try:
+        
+        #preprocess incoming departure date time string
+        departure_dt_string = request_data["departure_date_time"]
+        departure_dt_string = departure_dt_string.replace("\\","") #remove unnecessary escapes
+        
+        #departure datetime object
+        departure_date_time = None
+        if departure_dt_string:
+            departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_dt_string,date_time_format))
+        
+        #handle return date time if round_trip is set    
+        return_date_time = None
+        if int(request_data["round_trip"]):
+    
+            #preprocess incoming return date time string
+            return_dt_string = request_data["return_date_time"]
+            return_dt_string = return_dt_string.replace("\\","") #remove unnecessary escapes
+            
+            #return datetime object
+            if return_dt_string:
+                return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_dt_string,date_time_format))
+        
+        #trip details field
+        trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
+        
+        
+        #the form of an incoming price has ramifications on price and display_value
+        price_temp = request_data['price']
+        display_value_temp = price_temp
+        #price is NULL 
+        if request_data['price']  == '':
+            price_temp = None
+            display_value_temp = ''
+        elif float(request_data['price']) == 0.:
+            price_temp = 0.
+            display_value_temp = 'Free'        
+        
         '''partially create post, hold for images'''
         created_post = RideSharePost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
-            price=request_data['price'],
+            price=price_temp,
             category=request_data['category'],
             description=request_data['description'],
             departure_date_time=departure_date_time,
@@ -305,18 +333,30 @@ def create_item_post(request_data,json_data):
     print "item now: " + str(now)
     
     try:
+        
+        #the form of an incoming price has ramifications on price and display_value
+        price_temp = request_data['price']
+        display_value_temp = price_temp
+        #price is NULL 
+        if request_data['price']  == '':
+            price_temp = None
+            display_value_temp = ''
+        elif float(request_data['price']) == 0.:
+            price_temp = 0.
+            display_value_temp = 'Free'
+        
         '''partially create post, hold for images'''
         created_post = ItemPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
-            price=request_data['price'],
+            price=price_temp,
             category=request_data['category'],
             description=request_data['description'],
             gonzaga_email= int(request_data['gonzaga_email']),
             pref_email=int(request_data['pref_email']),
             call=int(request_data['call']),
             text=int(request_data['text']),
-            display_value = request_data['price'],
+            display_value = display_value_temp,
             post_date_time = now)
         '''read images from request, format URLs and save images on disc'''
         ID = created_post.id #id of the partially created post

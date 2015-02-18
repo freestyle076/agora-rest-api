@@ -18,14 +18,15 @@ request.HTTPMethod = "POST"
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
+
 //set filter parameters
-let categories:[String] = [] //empty string means all categories
-let keywordSearch:String = "boot" //empty string means no keyword search
+let categories:[String] = ["Ride Shares"] //empty list means all categories
+let keywordSearch:String = "" //empty string means no keyword search
 let min_price = "" //"" means no min_price
 let max_price = "" //"" means no max_price
 let free = "0" //false means not free only, true means is free only
 let divider_date_time = ""
-//let divider_date_time = "01/30/2015 23:36:32"
+//let divider_date_time = "01/28/2015 10:26:54"
 let older = "1"
 
 
@@ -44,9 +45,16 @@ request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, 
 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 request.addValue("application/json", forHTTPHeaderField: "Accept")
 
+var response_has_returned = false
 
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
+    
+    println("MADE IT")
+    
+    if error != nil{
+        println("Error!")
+    }
     
     //downcast NSURLResponse object to NSHTTPURLResponse
     if let httpResponse = response as? NSHTTPURLResponse {
@@ -83,7 +91,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let postID = post["id"]! as Int
                         let category = post["category"]! as String
                         let post_date_time = post["post_date_time"]! as String
-                        println(post_date_time + " " + title + " - " + category)
+                        println(post_date_time + " " + title + " - " + display_value)
                         
                         //THE THUMBNAIL IMAGE IS PROCESSED HERE
                         let imageString = post["image"]! as String
@@ -124,14 +132,24 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
 
     
-    
+    response_has_returned = true
     
 })
 
 task.resume()
 
 
-sleep(5)
+var count = 0
+while count < 8 && !response_has_returned{
+    count++
+    sleep(1)
+}
+
+
+if !response_has_returned {
+    session.invalidateAndCancel()
+    //handle no response
+}
 
 
 
