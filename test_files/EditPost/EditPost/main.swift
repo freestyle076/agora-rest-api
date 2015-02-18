@@ -109,7 +109,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            message = parseJSON["message"] as String
+            message = parseJSON["message"]! as String
         }
     }
     

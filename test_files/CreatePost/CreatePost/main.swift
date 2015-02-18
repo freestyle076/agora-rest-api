@@ -2,14 +2,14 @@ import Foundation
 
 //create a mutable request with api view path /createupost/, set method to POST
 //server
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -18,8 +18,8 @@ var session = NSURLSession.sharedSession()
 
 //image urls
 
-var imageUrls:[NSURL] = []
-//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+//var imageUrls:[NSURL] = []
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 
 
@@ -27,6 +27,7 @@ var imageUrls:[NSURL] = []
 var imagesBase64:[String] = []
 var imageData:NSData
 var imageBase64:String
+imagesBase64.append("")
 for url in imageUrls{
     imageData = NSData(contentsOfURL:url)!
     imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
@@ -40,7 +41,7 @@ let username = "khandy"
 let description = "Big Books No Whammy's"
 let price = ""
 let title = "Gameshows 101"
-let category = "Books"
+let category = "Services"
 
 
 
@@ -99,7 +100,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     
     //read the message from the response
     var message = ""
-    var id = 0
+    var id = "0"
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
     if(err != nil) {
         println(err!.localizedDescription)
@@ -108,8 +109,8 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            message = parseJSON["message"] as String
-            id = parseJSON["id"] as Int
+            message = parseJSON["message"]! as String
+            id = parseJSON["id"]! as String
         }
     }
     
