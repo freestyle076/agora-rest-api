@@ -33,18 +33,26 @@ def edit_post(request):
     json_data["message"] = ""
     try:
         request_data = ast.literal_eval(request.body)#parse data
+
+        print request_data        
+        
         category = request_data["category"]
+        post_id = int(request_data['post_id'])
+
+        print 'category: ' + category
+        print 'post_id: ' + str(post_id)       
+        
         if category in settings.item_categories:
-            edit_post = ItemPost.objects.get(id=request_data['id'])
+            edit_post = ItemPost.objects.get(id=post_id)
             edit_post.display_value = request_data['price']
         elif category in settings.book_categories:
-            edit_post = BookPost.objects.get(id=request_data['id'])
+            edit_post = BookPost.objects.get(id=post_id)
             edit_post = edit_book_post(request_data,edit_post)
         elif category in settings.datelocation_categories:
-            edit_post = DateLocationPost.objects.get(id=request_data['id'])
+            edit_post = DateLocationPost.objects.get(id=post_id)
             edit_post = edit_datelocation_post(request_data,edit_post)
         elif category in settings.rideshare_categories:
-            edit_post = RideSharePost.objects.get(id=request_data['id'])
+            edit_post = RideSharePost.objects.get(id=post_id)
             edit_post = edit_rideshare_post(request_data,edit_post)
         else:
             json_data["message"] = 'Error in Editing post: Invalid category'
@@ -57,11 +65,6 @@ def edit_post(request):
         edit_post.text = request_data['text']
         edit_post.pref_email = request_data['pref_email']
         edit_post.gonzaga_email = request_data['gonzaga_email']
-
-        utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
-        now = time_zone_loc.normalize(utc_now) #normalize to local timezone
-
-        edit_post.post_date_time = now
         
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = [edit_post.image1,edit_post.image2,edit_post.image3] #placeholders for image URLs
@@ -72,7 +75,7 @@ def edit_post(request):
                 imageURLsArray[i] = ""
             elif imagesBase64Array[i] != "": #Image has been overwritten
                 imageData = decodestring(imagesBase64Array[i]) #convert back to binary
-                imageURLsArray[i] = category + "_" + request_data['id'] + "_" + str(i) + ".png" #unique filename
+                imageURLsArray[i] = category + "_" + str(post_id) + "_" + str(i) + ".png" #unique filename
                 imagePath = settings.IMAGES_ROOT + imageURLsArray[i] #full filepath
                 imagefile = open(imagePath,"wb") #open
                 imagefile.write(imageData) #write

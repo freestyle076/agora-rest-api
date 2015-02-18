@@ -121,7 +121,7 @@ APPLE_USERNAME = 'apple_adm!n'
 
 APPLE_PASS = 'apple_passw0rd'
 
-PAGING_COUNT = 20
+PAGING_COUNT = 10
 
 TIME_ZONE = 'US/Pacific'
 
