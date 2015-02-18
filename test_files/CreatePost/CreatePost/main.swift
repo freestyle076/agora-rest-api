@@ -43,6 +43,7 @@ let price = ""
 let title = "Gameshows 101"
 let category = "Services"
 
+
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
@@ -57,7 +58,8 @@ var return_date_time = ""
 
 
 //datelocation specific
-var date_time = "01/20/15, 9:30 PM"
+//var date_time = "01/20/15, 9:30 PM"
+var date_time = "01/04/15, 10:30 PM"
 var location = "My House"
 
 //textbook specific
@@ -116,11 +118,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 
                 //response code is OK, continue with parsing JSON and reading response data
                 //THIS IS WHERE RESPONSE HANDLING CODE SHOULD GO
-                
-                var message = parseJSON!["message"] as String
-                var id = parseJSON!["id"] as Int
-                println(message)
-                
+        
             }
         }
             
@@ -133,8 +131,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 println("Error could not parse JSON: '\(jsonStr)'")
             }
             else{
-                var message = parseJSON!["message"] as String
-                println(message)
+
             }
         }
             
