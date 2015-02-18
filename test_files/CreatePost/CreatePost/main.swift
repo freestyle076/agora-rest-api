@@ -37,10 +37,10 @@ for url in imageUrls{
 //parameter values
 //common post information
 let username = "khandy"
-let description = "I'm driving back home for the break. Got four seats."
+let description = "Dress shoes and tux-seed-ohs"
 let price = "0.00"
-let title = "Kyle's friendly rideshares"
-let category = "Ride Shares"
+let title = "My first ball"
+let category = "Household"
 
 
 
@@ -58,7 +58,8 @@ var return_date_time = ""
 
 
 //datelocation specific
-var date_time = "01/20/15, 9:30 PM"
+//var date_time = "01/20/15, 9:30 PM"
+var date_time = ""
 var location = "My House"
 
 //textbook specific
