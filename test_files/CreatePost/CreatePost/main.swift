@@ -19,7 +19,7 @@ var session = NSURLSession.sharedSession()
 //image urls
 
 //var imageUrls:[NSURL] = []
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 
 
@@ -27,7 +27,6 @@ var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Se
 var imagesBase64:[String] = []
 var imageData:NSData
 var imageBase64:String
-imagesBase64.append("")
 for url in imageUrls{
     imageData = NSData(contentsOfURL:url)!
     imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
@@ -37,9 +36,9 @@ for url in imageUrls{
 
 //parameter values
 //common post information
-let username = "khandy"
-let description = "Big Books No Whammy's"
-let price = ""
+let username = "tmiller12"
+let description = "Deleted Pictures"
+let price = "5"
 let title = "Gameshows 101"
 let category = "Services"
 

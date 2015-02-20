@@ -116,15 +116,13 @@ def create_book_post(request_data,json_data):
         image_root = settings.IMAGES_ROOT #images folder path
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = ['','',''] #placeholders for image URLs
-        pictureIndex = 0
         for i in range(len(imagesBase64Array)):
-            if imagesBase64Array[i] != '':
-                pictureIndex = pictureIndex + 1
             imageData = decodestring(imagesBase64Array[i]) #convert back to binary
-            imageURLsArray[pictureIndex] = request_data['category'] + "_" + str(ID) + "_" + str(pictureIndex) + ".png" #unique filename
-            imagePath = image_root + imageURLsArray[pictureIndex] #full filepath
+            imageURLsArray[i] = request_data['category'] + "_" + str(ID) + "_" + str(i) + ".png" #unique filename
+            imagePath = image_root + imageURLsArray[i] #full filepath
             imagefile = open(imagePath,"wb") #open
             imagefile.write(imageData) #write
+
         
         '''set post's image attributes as image URLs'''
         created_post.image1 = imageURLsArray[0]            
@@ -163,7 +161,8 @@ def create_datelocation_post(request_data,json_data):
         
         #inputted date_time, the event/services 'when' info
         if request_data["date_time"]:
-            input_date_time = time_zone_utc.localize(datetime.datetime.strptime(request_data["date_time"],date_time_format))
+            input_date_time = request_data["date_time"].replace("\\","") #
+            input_date_time = time_zone_utc.localize(datetime.datetime.strptime(input_date_time,date_time_format))          
         else:
             input_date_time = ''
         
