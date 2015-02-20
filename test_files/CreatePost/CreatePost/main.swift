@@ -36,11 +36,13 @@ for url in imageUrls{
 
 //parameter values
 //common post information
-let username = "tmiller12"
-let description = "Deleted Pictures"
-let price = "5"
-let title = "Gameshows 101"
-let category = "Services"
+let username = "khandy"
+let description = "Dress shoes and tux-seed-ohs"
+let price = "0.00"
+let title = "My first ball"
+let category = "Events"
+
+
 
 
 let gonzaga_email = "1" //boolean contact option
@@ -57,6 +59,7 @@ var return_date_time = ""
 
 
 //datelocation specific
+
 //var date_time = "01/20/15, 9:30 PM"
 var date_time = "01/04/15, 10:30 PM"
 var location = "My House"

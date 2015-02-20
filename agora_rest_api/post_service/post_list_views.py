@@ -67,6 +67,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #items
         if items:
             for item in items:
+                print item.id
                 if item.image1:
                     image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -87,6 +88,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #books
         if books:
             for book in books:
+                print book.id
                 if book.image1:
                     image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -107,6 +109,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #Datelocations
         if DLs:
             for DL in DLs:
+                print DL.id
                 if DL.image1:
                     image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -129,6 +132,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #Rideshares
         if RSs:
             for RS in RSs:
+                print RS.id
                 if RS.image1:
                     image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON

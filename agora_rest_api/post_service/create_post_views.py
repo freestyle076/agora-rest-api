@@ -149,8 +149,6 @@ def create_datelocation_post(request_data,json_data):
         location: Location of event or service
     '''
     
-    
-    
     #for post_date_time (time created)
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
