@@ -40,7 +40,7 @@ let username = "khandy"
 let description = "Dress shoes and tux-seed-ohs"
 let price = "0.00"
 let title = "My first ball"
-let category = "Household"
+let category = "Events"
 
 
 
@@ -58,8 +58,8 @@ var return_date_time = ""
 
 
 //datelocation specific
-//var date_time = "01/20/15, 9:30 PM"
-var date_time = ""
+var date_time = "01/20/15, 9:30 PM"
+//var date_time = ""
 var location = "My House"
 
 //textbook specific
