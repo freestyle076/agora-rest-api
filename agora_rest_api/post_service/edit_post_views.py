@@ -79,7 +79,7 @@ def edit_post(request):
         
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = [edit_post.image1,edit_post.image2,edit_post.image3] #placeholders for image URLs
-        for i in range(len(imagesBase64Array)-1):  
+        for i in range(len(imagesBase64Array)):  
             if imagesBase64Array[i] == "deleted":
                 #Delete Image
                 json_data["message"] = helpers.delete_imagefile(settings.IMAGES_ROOT + imageURLsArray[i])
