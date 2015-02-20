@@ -72,10 +72,10 @@ def edit_post(request):
         edit_post.title = request_data['title']
         edit_post.price = price_temp
         edit_post.description = request_data['description']
-        edit_post.call = request_data['call']
-        edit_post.text = request_data['text']
-        edit_post.pref_email = request_data['pref_email']
-        edit_post.gonzaga_email = request_data['gonzaga_email']
+        edit_post.call = int(request_data['call'])
+        edit_post.text = int(request_data['text'])
+        edit_post.pref_email = int(request_data['pref_email'])
+        edit_post.gonzaga_email = int(request_data['gonzaga_email'])
         
         imagesBase64Array = request_data['images'] #images array, each as base64 string
         imageURLsArray = [edit_post.image1,edit_post.image2,edit_post.image3] #placeholders for image URLs
