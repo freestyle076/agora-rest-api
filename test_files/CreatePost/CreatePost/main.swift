@@ -2,14 +2,14 @@ import Foundation
 
 //create a mutable request with api view path /createupost/, set method to POST
 //server
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 
 //trenton
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -18,8 +18,8 @@ var session = NSURLSession.sharedSession()
 
 //image urls
 
-var imageUrls:[NSURL] = []
-//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+//var imageUrls:[NSURL] = []
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 
 
@@ -44,6 +44,7 @@ let category = "Events"
 
 
 
+
 let gonzaga_email = "1" //boolean contact option
 let pref_email = "1" //boolean contact option
 let phone = "1" //boolean contact option
@@ -58,8 +59,9 @@ var return_date_time = ""
 
 
 //datelocation specific
-var date_time = "01/20/15, 9:30 PM"
-//var date_time = ""
+
+//var date_time = "01/20/15, 9:30 PM"
+var date_time = "01/04/15, 10:30 PM"
 var location = "My House"
 
 //textbook specific
@@ -98,7 +100,6 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-    
     //downcast NSURLResponse object to NSHTTPURLResponse
     if let httpResponse = response as? NSHTTPURLResponse {
         
@@ -119,11 +120,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 
                 //response code is OK, continue with parsing JSON and reading response data
                 //THIS IS WHERE RESPONSE HANDLING CODE SHOULD GO
-                
-                var message = parseJSON!["message"] as String
-                var id = parseJSON!["id"] as Int
-                println(message)
-                
+        
             }
         }
             
@@ -136,8 +133,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                 println("Error could not parse JSON: '\(jsonStr)'")
             }
             else{
-                var message = parseJSON!["message"] as String
-                println(message)
+
             }
         }
             

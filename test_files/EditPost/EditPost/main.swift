@@ -30,13 +30,13 @@ for url in imageUrls{
 imagesBase64.append("")
 // Category must match previous category, thus, it cannot change
 let category = "Services"
-let id = "1"
+let id = "36"
 
 
 //parameter values
 //common post information
 let description = "AI"
-let price = ".10"
+let price = "0"
 let title = "Coming North"
 
 //Image values
@@ -68,7 +68,7 @@ var isbn = "1234213412"
 //this is the parameters array that will be formulated as JSON.
 //it has space for EVERY attribute of EVERY category.
 //only fill attributes that pertain to the category
-let params = ["id":id,                        // |
+let params = ["post_id":id,                        // |
     "description":description,      // |
     "price":price,                  // |
     "title":title,                  // |
@@ -109,7 +109,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
     }
     else{
         if let parseJSON = json as? Dictionary<String,AnyObject>{
-            message = parseJSON["message"] as String
+            message = parseJSON["message"]! as String
         }
     }
     

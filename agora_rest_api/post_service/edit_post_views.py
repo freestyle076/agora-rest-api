@@ -21,7 +21,7 @@ Table of Contents:
 
 time_zone_loc = pytz.timezone(settings.TIME_ZONE)
 time_zone_utc = pytz.timezone('UTC')
-date_time_format = "%m\/%d\/%Y %I:%M %p"
+date_time_format = "%m\/%d\/%y, %I:%M %p"
 
 @api_view(['POST'])
 def edit_post(request):
@@ -44,7 +44,12 @@ def edit_post(request):
         
         if category in settings.item_categories:
             edit_post = ItemPost.objects.get(id=post_id)
-            edit_post.display_value = request_data['price']
+            display_value_temp = request_data['price']
+            if request_data['price']  == '':
+                display_value_temp = ''
+            elif float(request_data['price']) == 0.:
+                display_value_temp = 'Free'
+            edit_post.display_value = display_value_temp
         elif category in settings.book_categories:
             edit_post = BookPost.objects.get(id=post_id)
             edit_post = edit_book_post(request_data,edit_post)
@@ -56,10 +61,16 @@ def edit_post(request):
             edit_post = edit_rideshare_post(request_data,edit_post)
         else:
             json_data["message"] = 'Error in Editing post: Invalid category'
-            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json') 
         
+        price_temp = request_data['price']    
+        if request_data['price']  == '':
+            price_temp = None
+        elif float(request_data['price']) == 0.:
+            price_temp = 0.
+            
         edit_post.title = request_data['title']
-        edit_post.price = request_data['price']
+        edit_post.price = price_temp
         edit_post.description = request_data['description']
         edit_post.call = request_data['call']
         edit_post.text = request_data['text']
@@ -79,11 +90,26 @@ def edit_post(request):
                 imagePath = settings.IMAGES_ROOT + imageURLsArray[i] #full filepath
                 imagefile = open(imagePath,"wb") #open
                 imagefile.write(imageData) #write
-            
+                
+        '''Shifts any pictures that may have been deleted so all pictures are filled from left to right'''
+        for j in range(2):                   
+            for i in range(1,3):
+                if imageURLsArray[i] != '':
+                    if imageURLsArray[i - 1] == '':
+                        imageURLsArray[i - 1] = category + "_" + str(post_id) + "_" + str(i - 1) + ".png" #unique filename 
+                        oldImagePath = settings.IMAGES_ROOT + imageURLsArray[i] #full filepath
+                        oldImageFile = open(oldImagePath,"rb") #open
+                        oldImageData = oldImageFile.read()
+                        newImagePath = settings.IMAGES_ROOT + imageURLsArray[i - 1] #full filepath
+                        newImageFile = open(newImagePath,"wb")
+                        newImageFile.write(oldImageData)
+                        json_data["message"] = helpers.delete_imagefile(oldImagePath)
+                        imageURLsArray[i] = ""
+                    
         '''set post's image attributes as image URLs'''
         edit_post.image1 = imageURLsArray[0]            
         edit_post.image2 = imageURLsArray[1]
-        edit_post.image3 = imageURLsArray[2]   
+        edit_post.image3 = imageURLsArray[2]                  
         edit_post.save()
         if json_data["message"] == "":
             json_data["message"] = "Successfully Edited Post!"
@@ -100,8 +126,14 @@ def edit_book_post(request_data,edit_post):
     ''' 
     Edit post function for book specific attributes
     '''
+    display_value_temp = request_data['price']
+    if request_data['price']  == '':
+        display_value_temp = ''
+    elif float(request_data['price']) == 0.:
+        display_value_temp = 'Free'
+        
     edit_post.isbn = request_data['isbn']
-    edit_post.display_value = request_data['price']
+    edit_post.display_value = display_value_temp
     return edit_post
     
 def edit_datelocation_post(request_data,edit_post):
@@ -109,11 +141,7 @@ def edit_datelocation_post(request_data,edit_post):
     Edit post function for book specific attributes
     '''
     edit_post.location = request_data['location']
-    split_date = request_data['date_time'].split(",")
-    date_part_1 = split_date[0][0:-2]
-    date_part_2 = split_date[0][-2:]
-    full_date = date_part_1 + "20" + date_part_2 + split_date[1]
-    input_date_time = datetime.datetime.strptime(full_date,date_time_format)
+    input_date_time = datetime.datetime.strptime(request_data['date_time'],date_time_format)
     edit_post.date_time = input_date_time
     edit_post.display_value = input_date_time
     return edit_post
@@ -122,19 +150,12 @@ def edit_rideshare_post(request_data,edit_post):
     ''' 
     Edit post function for book specific attributes
     '''
-    split_date_1 = request_data['departure_date_time'].split(",")
-    date_part_1 = split_date_1[0][0:-2]
-    date_part_2 = split_date_1[0][-2:]  
-    full_departure_date = date_part_1 + "20" + date_part_2 + split_date_1[1]
+    
     return_date_time = None
     
     if int(request_data["round_trip"]):
-        split_date_2 = request_data['return_date_time'].split(",")
-        date_part_3 = split_date_2[0][0:-2]
-        date_part_4 = split_date_2[0][-2:]
-        full_return_date = date_part_3 + "20" + date_part_4 + split_date_2[1]
-        return_date_time = datetime.datetime.strptime(full_return_date,date_time_format)
-    departure_date_time = datetime.datetime.strptime(full_departure_date,date_time_format)
+        return_date_time = datetime.datetime.strptime(request_data['return_date_time'],date_time_format)
+    departure_date_time = datetime.datetime.strptime(request_data['departure_date_time'],date_time_format)
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
     edit_post.departure_date_time = departure_date_time
 
