@@ -80,7 +80,6 @@ def create_book_post(request_data,json_data):
     
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC  
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
-    print "Book now: " + str(now)
     
     try:
         
@@ -153,8 +152,6 @@ def create_datelocation_post(request_data,json_data):
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
     
-    print "DL now: " + str(now)
-
     try:
         
         #inputted date_time, the event/services 'when' info
@@ -233,9 +230,7 @@ def create_rideshare_post(request_data,json_data):
     #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
-    
-    print "Created RS now: " + str(now)
-    
+        
     try:
         
         #preprocess incoming departure date time string
@@ -329,9 +324,7 @@ def create_item_post(request_data,json_data):
     #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
-    
-    print "item now: " + str(now)
-    
+        
     try:
         
         #the form of an incoming price has ramifications on price and display_value

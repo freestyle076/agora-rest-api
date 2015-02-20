@@ -103,8 +103,7 @@ def view_detailed_post(request):
             price_temp = 'Free'
         else:
             price_temp = "${:.2f}".format(float(post_info.price))
-        
-        print "price_temp " + price_temp         
+                 
         
         json_data['price'] = price_temp        
         
@@ -239,7 +238,6 @@ def refresh_post(request):
     route: /refreshpost/
     '''
     json_data = {}
-    print "inside refresh_post"
     try:
         request_data = ast.literal_eval(request.body) #parse request body
         
@@ -339,6 +337,7 @@ def report_post(request):
             message = "User " + reporter + " has already reported post " + str(post_id) + " in " + post_category
             print message
             json_data['message'] = message
+            json_data['reported'] = "0"
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
             return response
         
@@ -385,6 +384,7 @@ def report_post(request):
         message = "Successfully reported " + post_category + " post with ID " + str(post_id)
         print message
         json_data['message'] = message
+        json_data['reported'] = "1"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         return response        
         
