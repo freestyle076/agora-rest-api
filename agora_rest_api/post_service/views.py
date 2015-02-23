@@ -37,6 +37,7 @@ def delete_post(request):
     json_data = {}
     try:
         request_data = ast.literal_eval(request.body)#parse data
+        print request_data
         category = request_data["category"]
         if category in settings.item_categories:
             delete_post = ItemPost.objects.get(id=request_data['id'])

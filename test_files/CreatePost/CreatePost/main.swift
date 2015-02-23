@@ -5,11 +5,11 @@ import Foundation
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
 //kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
 
 
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -18,8 +18,8 @@ var session = NSURLSession.sharedSession()
 
 //image urls
 
-//var imageUrls:[NSURL] = []
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+var imageUrls:[NSURL] = []
+//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 
 
@@ -61,7 +61,7 @@ var return_date_time = ""
 //datelocation specific
 
 //var date_time = "01/20/15, 9:30 PM"
-var date_time = "01/04/15, 10:30 PM"
+var date_time = ""
 var location = "My House"
 
 //textbook specific

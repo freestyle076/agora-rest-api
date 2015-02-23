@@ -10,7 +10,7 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/postquery/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/postquery/")!)
 //trenton
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/postquery/")!)
 request.HTTPMethod = "POST"
@@ -20,11 +20,11 @@ var session = NSURLSession.sharedSession()
 
 
 //set filter parameters
-let categories:[String] = ["Ride Shares"] //empty list means all categories
-let keywordSearch:String = "" //empty string means no keyword search
+let categories:[String] = [] //empty list means all categories
+let keywordSearch:String = "tit" //empty string means no keyword search
 let min_price = "" //"" means no min_price
 let max_price = "" //"" means no max_price
-let free = "0" //false means not free only, true means is free only
+let free = "1" //false means not free only, true means is free only
 let divider_date_time = ""
 //let divider_date_time = "01/28/2015 10:26:54"
 let older = "1"
@@ -50,7 +50,6 @@ var response_has_returned = false
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
-    println("MADE IT")
     
     if error != nil{
         println("Error!")
@@ -91,7 +90,8 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
                         let postID = post["id"]! as Int
                         let category = post["category"]! as String
                         let post_date_time = post["post_date_time"]! as String
-                        println(post_date_time + " " + title + " - " + display_value)
+                        print(title + " - " + category + " - ")
+                        println(postID)
                         
                         //THE THUMBNAIL IMAGE IS PROCESSED HERE
                         let imageString = post["image"]! as String

@@ -156,10 +156,12 @@ def create_datelocation_post(request_data,json_data):
         
         #inputted date_time, the event/services 'when' info
         if request_data["date_time"]:
+            print "if"
             input_date_time = request_data["date_time"].replace("\\","") #
             input_date_time = time_zone_utc.localize(datetime.datetime.strptime(input_date_time,date_time_format))          
         else:
-            input_date_time = ''
+            print "else"
+            input_date_time = None
         
         #the form of an incoming price has ramifications on price and display_value
         price_temp = request_data['price']

@@ -111,17 +111,24 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                     imageString = encodestring(image) #encode image data as string for port of JSON
                 else:
                     imageString = ''
-                month = str(DL.date_time.month) #month without leading zero
-                hour = str((DL.date_time.hour) % 12) #hour without leading zero
-                day = str(DL.date_time.day)
-                if hour == "0": #weird attribute of time-keeping, 0 is actually 12
-                    hour = "12"
-                year = DL.date_time.strftime("%y") #day and year component
-                minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
+                if DL.date_time:
+                    month = str(DL.date_time.month) #month without leading zero
+                    hour = str((DL.date_time.hour) % 12) #hour without leading zero
+                    day = str(DL.date_time.day)
+                    if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+                        hour = "12"
+                        year = DL.date_time.strftime("%y") #day and year component
+                        minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
                 
-                pretty_date = month + "/" + day + "/" + year + " " + hour + minute_ampm                 
-                
-                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':pretty_date,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
+                    display_value_temp = month + "/" + day + "/" + year + " " + hour + minute_ampm
+                else:
+                    if book.price == None:
+                        display_value_temp = ''
+                    elif float(book.price) == 0.:
+                        display_value_temp = 'Free'
+                    else:
+                        display_value_temp = "${:.2f}".format(float(book.price)) 
+                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
 

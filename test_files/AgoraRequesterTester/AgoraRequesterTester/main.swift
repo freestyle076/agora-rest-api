@@ -8,12 +8,11 @@
 
 import Foundation
 
-println("Run dem jewels")
 
 var api_requester: AgoraRequester = AgoraRequester()
 
 //set filter parameters
-let categories:[String] = ["Books"] //empty list means all categories
+let categories:[String] = ["Household"] //empty list means all categories
 let keywordSearch:String = "" //empty string means no keyword search
 let min_price = "" //"" means no min_price
 let max_price = "" //"" means no max_price
@@ -31,6 +30,22 @@ let params = ["categories":categories,
     "older":older]
     as Dictionary<String,AnyObject>
 
+println("request fired")
+
+api_requester.LdapAuth("khandy", password: "Rusty3220",
+    success: { parseJSON -> Void in
+        println(parseJSON)
+    },
+    failure: { code -> Void in
+        println("error")
+        println(code)
+    },
+    badCreds: { () -> Void in
+        println("Invalid creds")
+    }
+)
+
+/*
 api_requester.POST("postquery/", params: params,
     success: {parseJSON -> Void in
                 
@@ -49,7 +64,7 @@ api_requester.POST("postquery/", params: params,
                 let postID = post["id"]! as Int
                 let category = post["category"]! as String
                 let post_date_time = post["post_date_time"]! as String
-                println(post_date_time + " " + title + " - " + category)
+                println(display_value + " " + title + " - " + category)
                 
                 //THE THUMBNAIL IMAGE IS PROCESSED HERE
                 let imageString = post["image"]! as String
@@ -67,15 +82,25 @@ api_requester.POST("postquery/", params: params,
     },
     failure: {code -> Void in
         if code == 500 {
-            //server failure
+            //500: Server failure
+            println("Server Failure!!!!!")
         }
         else if code == 400 {
-            //bad request by client
+            //400: Bad Client Request
+            println("Bad Request!!!!!")
         }
         else if code == 58 {
-            //no connection
+            //58: No Internet Connection
+            println("No Connection!!!!!")
         }
         else if code == 599 {
-            //timeout
+            //599: Request Timeout
+            println("Timeout!!!!!")
         }
-})
+    }
+)
+*/
+
+
+sleep(21)
+println("done sleeping")

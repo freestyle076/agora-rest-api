@@ -6,7 +6,7 @@ import Foundation
 
 
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/editpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/editpost/")!)
 
 request.HTTPMethod = "POST"
 
@@ -14,12 +14,12 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //image urls
-var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
-//var imageUrls:[NSURL] = []
+//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+var imageUrls:[NSURL] = []
 
 
 //formulate imageBase64 array
-var imagesBase64:[String] = []
+var imagesBase64:[String] = ["","",""]
 var imageData:NSData
 var imageBase64:String
 for url in imageUrls{
@@ -29,21 +29,16 @@ for url in imageUrls{
 }
 imagesBase64.append("")
 // Category must match previous category, thus, it cannot change
-let category = "Services"
-let id = "36"
+let category = "Ride Shares"
+let id = "66"
 
 
 //parameter values
 //common post information
 let description = "AI"
-let price = "0"
+let price = ""
 let title = "Coming North"
 
-//Image values
-//Empty String signifies non alteration of Image, "delete" signifies the image was deleted
-//Image data signifies a change in the image.
-imagesBase64[0] = "deleted"
-imagesBase64[1] = ""
 
 //contact options
 let gonzaga_email = "1" //boolean contact option
@@ -125,12 +120,12 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             println(id)
         }
             
-            //400 = BAD_REQUEST: error in creating user, display error!
+        //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
             println(message)
         }
             
-            //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
+        //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
         else if(status_code == 500){
             println("The server is down! Call the fire department!")
         }
