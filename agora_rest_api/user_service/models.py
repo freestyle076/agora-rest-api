@@ -17,4 +17,5 @@ class User(models.Model):
     gonzaga_email = models.EmailField(unique=True)
     pref_email = models.EmailField(null=True,blank=True)
     phone = models.CharField(max_length=11,null=True,blank=True)
+    recent_post_deletion = models.BooleanField(default=False)
 
