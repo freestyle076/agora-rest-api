@@ -27,10 +27,11 @@ for url in imageUrls{
     imageBase64 = imageData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(0))
     imagesBase64.append(imageBase64)
 }
-imagesBase64.append("")
+
 // Category must match previous category, thus, it cannot change
 let category = "Ride Shares"
 let id = "66"
+
 
 
 //parameter values

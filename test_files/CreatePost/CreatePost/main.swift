@@ -23,6 +23,7 @@ var imageUrls:[NSURL] = []
 
 
 
+
 //formulate imageBase64 array
 var imagesBase64:[String] = []
 var imageData:NSData
@@ -33,10 +34,9 @@ for url in imageUrls{
     imagesBase64.append(imageBase64)
 }
 
-
 //parameter values
 //common post information
-let username = "khandy"
+let username = "tmiller12"
 let description = "Dress shoes and tux-seed-ohs"
 let price = "0.00"
 let title = "My first ball"
