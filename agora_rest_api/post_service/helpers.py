@@ -1,4 +1,5 @@
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
+from agora_rest_api.user_service.models import User
 from django.db.models import Q
 from agora_rest_api import settings
 import os
@@ -61,36 +62,45 @@ def remove_post(delete_post):
 def run_clean_up():
     reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
-        
+              
     reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
    
     reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)  
     
     reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)   
+        
     d1 = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
     d2 = d1 - datetime.timedelta(days=settings.OLD_POST_CUTTOFF_LENGTH)
     
     old_posts = DateLocationPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
         
     old_posts = RideSharePost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
         
     old_posts = ItemPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
         
     old_posts = BookPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
+        User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
         
     settings.MOST_RECENT_CLEANUP = datetime.date.today()
