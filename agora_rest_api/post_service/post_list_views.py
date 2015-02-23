@@ -31,7 +31,6 @@ def user_posts(username):
     the user whose username matches parameter username
     username: user whose posts will be collected
     '''
-    print "inside user posts"
     
     try:
 
@@ -67,7 +66,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #items
         if items:
             for item in items:
-                print item.id
                 if item.image1:
                     image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -88,7 +86,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #books
         if books:
             for book in books:
-                print book.id
                 if book.image1:
                     image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -109,7 +106,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #Datelocations
         if DLs:
             for DL in DLs:
-                print DL.id
                 if DL.image1:
                     image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -132,7 +128,6 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         #Rideshares
         if RSs:
             for RS in RSs:
-                print RS.id
                 if RS.image1:
                     image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
@@ -240,13 +235,12 @@ def filter_post_list(request):
             min_price = 0.0 
         
         #display the incoming filter keywords for sanity's sake
-        '''        
+              
         print "keyword: " + str(keyword)
         print "categories: " + str(categories)
         print "max_price: " + str(max_price)
         print "min_price: " + str(min_price)
         print "free: " + str(free)
-        '''
         print "divider: " + str(divider_post_datetime)
         print "older: " + str(older)
         
@@ -308,8 +302,7 @@ def filter_post_list(request):
             '''
             
             #form edge date_time string into date_time object
-            edge_date_time = time_zone_utc.localize(datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S'))
-            print "edge_date_time: " + edge_post['post_date_time']    
+            edge_date_time = time_zone_utc.localize(datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S'))   
             
             #assign query parameter according to function parameter 'older'
             if older == "1":
@@ -343,8 +336,7 @@ def filter_post_list(request):
             #check if any more posts in ANY TABLE exist in the direction specified by 'older'
             more_exist =  items_exist or books_exist or RSs_exist or DLs_exist
             
-            
-            print "more_exist: " + str(int(more_exist))   
+             
             return more_exist
             
         #first check if there were results. If there weren't any then there

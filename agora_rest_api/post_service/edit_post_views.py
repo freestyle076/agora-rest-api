@@ -33,8 +33,6 @@ def edit_post(request):
     json_data["message"] = ""
     try:
         request_data = ast.literal_eval(request.body)#parse data
-
-        print request_data        
         
         category = request_data["category"]
         post_id = int(request_data['post_id'])
@@ -91,6 +89,7 @@ def edit_post(request):
                 imagefile = open(imagePath,"wb") #open
                 imagefile.write(imageData) #write
                 
+        
         '''Shifts any pictures that may have been deleted so all pictures are filled from left to right'''
         for j in range(2):                   
             for i in range(1,3):
