@@ -107,6 +107,7 @@ def view_detailed_post(request):
                       
         json_data['price'] = price_temp               
         json_data['description'] = post_info.description
+        enoughContactOptions = False
         if post_info.call == 1:
             json_data["call"] = post_user.phone
             if json_data["call"] != '':
