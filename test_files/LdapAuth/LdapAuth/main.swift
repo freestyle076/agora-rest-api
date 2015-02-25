@@ -15,8 +15,8 @@ var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/
 var session = NSURLSession.sharedSession()
 request.HTTPMethod = "POST"
 
-var username = "adm!n" //set username value here
-var password =  "passw0rd" //set password value here
+var username = "khandy" //set username value here
+var password =  "Rusty3220" //set password value here
 
 var params = ["username":username, "password":password] as Dictionary<String, String>
 

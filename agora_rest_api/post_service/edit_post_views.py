@@ -161,5 +161,12 @@ def edit_rideshare_post(request_data,edit_post):
     edit_post.trip = trip_details
     edit_post.round_trip = int(request_data['round_trip'])
     edit_post.return_date_time = return_date_time
-    edit_post.display_value = trip_details
+    
+    if request_data["price"] == "":
+        edit_post.display_value = ""
+    elif float(request_data["price"]) == 0.:
+        edit_post.display_value = "Free"
+    else:
+        edit_post.display_value = request_data["price"]
+        
     return edit_post

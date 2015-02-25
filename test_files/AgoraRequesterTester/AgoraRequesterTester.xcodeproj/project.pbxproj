@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		14D74DA81A8A8BFA001EC700 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D74DA71A8A8BFA001EC700 /* main.swift */; };
 		14D74DAF1A8A8DB7001EC700 /* AgoraRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D74DAE1A8A8DB7001EC700 /* AgoraRequester.swift */; };
-		14D74DB11A8A8DF2001EC700 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D74DB01A8A8DF2001EC700 /* Reachability.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,7 +27,6 @@
 		14D74DA41A8A8BFA001EC700 /* AgoraRequesterTester */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AgoraRequesterTester; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D74DA71A8A8BFA001EC700 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		14D74DAE1A8A8DB7001EC700 /* AgoraRequester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequester.swift; sourceTree = "<group>"; };
-		14D74DB01A8A8DF2001EC700 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +61,6 @@
 			children = (
 				14D74DA71A8A8BFA001EC700 /* main.swift */,
 				14D74DAE1A8A8DB7001EC700 /* AgoraRequester.swift */,
-				14D74DB01A8A8DF2001EC700 /* Reachability.swift */,
 			);
 			path = AgoraRequesterTester;
 			sourceTree = "<group>";
@@ -126,7 +123,6 @@
 			files = (
 				14D74DA81A8A8BFA001EC700 /* main.swift in Sources */,
 				14D74DAF1A8A8DB7001EC700 /* AgoraRequester.swift in Sources */,
-				14D74DB11A8A8DF2001EC700 /* Reachability.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
