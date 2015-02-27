@@ -104,27 +104,33 @@ def view_detailed_post(request):
             price_temp = 'Free'
         else:
             price_temp = "${:.2f}".format(float(post_info.price))
-                 
-        
-        json_data['price'] = price_temp        
-        
+                      
+        json_data['price'] = price_temp               
         json_data['description'] = post_info.description
+        enoughContactOptions = False
         if post_info.call == 1:
             json_data["call"] = post_user.phone
+            if json_data["call"] != '':
+                enoughContactOptions = True
         else:
             json_data["call"] = ''
         if post_info.text == 1:
             json_data["text"] = post_user.phone
+            if json_data["text"] != '':
+                enoughContactOptions = True
         else:
             json_data["text"] = ''
-        if post_info.gonzaga_email == 1:
+        if post_info.pref_email == 1:
+            json_data["pref_email"] = post_user.pref_email
+            if json_data["pref_email"] != '':
+                enoughContactOptions = True
+        else:
+            json_data["pref_email"] = ''
+            
+        if post_info.gonzaga_email == 1 or not enoughContactOptions:
             json_data["gonzaga_email"] = post_user.gonzaga_email
         else:
             json_data["gonzaga_email"] = ''
-        if post_info.pref_email == 1:
-            json_data["pref_email"] = post_user.pref_email
-        else:
-            json_data["pref_email"] = ''
         
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
