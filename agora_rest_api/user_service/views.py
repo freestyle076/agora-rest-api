@@ -15,6 +15,8 @@ import ldap
 import json
 import ast
 import sys
+import pytz
+import datetime
 
 '''
 Views for the user_service API application. The following views expose user
@@ -22,6 +24,8 @@ API methods for authenticating a user login, creating a user and editing a user
 account.
 '''
 
+time_zone_loc = pytz.timezone(settings.TIME_ZONE)
+time_zone_utc = pytz.timezone('UTC')
 
 @api_view(['POST'])
 def edit_user(request):
@@ -216,7 +220,6 @@ def ldap_authenticate(request):
             json_data['last_name'] = User.objects.get(username=user).last_name
             json_data['p_email'] = User.objects.get(username=user).pref_email
             json_data['phone'] = User.objects.get(username=user).phone 
-            json_data['posts'] = post_list_views.user_posts(user)
         else:
             json_data['exists'] ='no'
         json_data['username'] = user
@@ -252,7 +255,6 @@ def ldap_authenticate(request):
                 json_data['last_name'] = User.objects.get(username=user).last_name
                 json_data['p_email'] = User.objects.get(username=user).pref_email
                 json_data['phone'] = User.objects.get(username=user).phone 
-                json_data['posts'] = post_list_views.user_posts(user)
             else:
                 json_data['exists'] ='no'
             json_data['username'] = user
@@ -316,9 +318,22 @@ def user_posts(request):
     '''
     json_data = {}
     try:
+        #parse incoming request data, assign parameters
         request_data = ast.literal_eval(request.body)
         username = request_data['username']
-        json_data['posts'] = post_list_views.user_posts(username)
+        older = request_data['older']
+        divider = request_data['divider_date_time']
+        divider = divider.replace("\/","/")
+        
+        #get block of posts older or newer than divider
+        json_data['posts'],json_data['more_exist'] = post_list_views.user_posts(username,divider,older)
+        
+        #if user recently had a post deleted set recent_post_deletion='1'
+        user = User.objects.get(username=username)
+        json_data['recent_post_deletion'] = str(int(user.recent_post_deletion))
+        user.recent_post_deletion = False
+        user.save()
+        
         
         json_data['message'] = "successfully retrieved user posts"
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')

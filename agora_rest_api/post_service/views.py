@@ -211,13 +211,16 @@ def view_datelocation_post(request_data,json_data,Post):
     (date_time,location)
     '''
     try:
-        hour = str((Post.date_time.hour) % 12) #hour without leading zero
-        if hour == "0": #weird attribute of time-keeping, 0 is actually 12
-            hour = "12"
-        minute_ampm = Post.date_time.strftime(":%M %p") #minute and am/pm component
-        short_year = Post.date_time.strftime("%y")
-        json_data["date_time"] = str(Post.date_time.month) + "/" + str(Post.date_time.day) + "/" + short_year + ","
-        json_data["date_time"] = json_data["date_time"] + " " + hour + minute_ampm
+        if Post.date_time:
+            hour = str((Post.date_time.hour) % 12) #hour without leading zero
+            if hour == "0": #weird attribute of time-keeping, 0 is actually 12
+                hour = "12"
+            minute_ampm = Post.date_time.strftime(":%M %p") #minute and am/pm component
+            short_year = Post.date_time.strftime("%y")
+            json_data["date_time"] = str(Post.date_time.month) + "/" + str(Post.date_time.day) + "/" + short_year + ","
+            json_data["date_time"] = json_data["date_time"] + " " + hour + minute_ampm
+        else:
+            json_data["date_time"] = ''
         json_data["location"] = Post.location
         return json_data
     #general exception catching

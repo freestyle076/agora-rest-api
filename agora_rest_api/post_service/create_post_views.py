@@ -130,6 +130,7 @@ def create_book_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Book Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     
@@ -208,6 +209,7 @@ def create_datelocation_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Date_location Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
@@ -309,6 +311,7 @@ def create_rideshare_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created RideShare Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
@@ -373,6 +376,7 @@ def create_item_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Item Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     #general exception catching
