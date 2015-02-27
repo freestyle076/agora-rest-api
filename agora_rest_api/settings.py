@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'agora_rest_api.user_service',
     'agora_rest_api.post_service',
+    'mod_wsgi.server',
 )
 
 MIDDLEWARE_CLASSES = (
