@@ -110,6 +110,9 @@ def edit_post(request):
         edit_post.image2 = imageURLsArray[1]
         edit_post.image3 = imageURLsArray[2]                  
         edit_post.save()
+
+        json_data["post_date_time"] = edit_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
+        
         if json_data["message"] == "":
             json_data["message"] = "Successfully Edited Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
