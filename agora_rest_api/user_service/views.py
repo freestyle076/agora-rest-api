@@ -261,7 +261,6 @@ def ldap_authenticate(request):
             json_data['g_email'] = request_data['username']
             request_data = None #clear traces of user information after done using
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
-            request_data = None #clear traces of user information after done using
             return response
         #catch exception, the zagmail suffix didn't work
         except ldap.LDAPError, error_message:

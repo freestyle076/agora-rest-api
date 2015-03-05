@@ -22,14 +22,14 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
     
     //default initializer, specifies the target URL
     override init(){
-        self.baseURLst  = "http://147.222.165.3:8000/"
-        self.baseHTTPSURLst = "https://147.222.165.3:8001/"
+        self.baseURLst  = "https://cs-design:8001/"
+        self.baseHTTPSURLst = "https://cs-design:8001/"
         self.seshConfig = NSURLSessionConfiguration.defaultSessionConfiguration()
-        seshConfig.timeoutIntervalForRequest = 20
+        seshConfig.timeoutIntervalForRequest = 60
         super.init()
     }
     
-    func POST(route: String, params: Dictionary<String,AnyObject>, success: ((Dictionary<String,AnyObject>) -> Void)?, failure: ((Int) -> Void)?){
+    func POST(route: String, params: Dictionary<String,AnyObject>, success: ((Dictionary<String,AnyObject>) -> Void)?, failure: ((Int,String) -> Void)?){
         
         //instantiate the session
         var session = NSURLSession(configuration: self.seshConfig)
@@ -56,7 +56,7 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                 //error is not nil means there was a timeout
                 if error != nil{
                     if failure != nil{
-                        failure!(599)
+                        failure!(599,"599 connection timeout")
                     }
                 }
                 
@@ -76,7 +76,7 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                         if err != nil {
                             //error function: 500 server failure in forming response
                             if failure != nil {
-                                failure!(500)
+                                failure!(500,"500 server error")
                             }
                         }
                         
@@ -89,9 +89,15 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                     
                     //400 Bad Request, get error message
                     else if status_code == 400 {
+                        
+                        //parse the JSON response
+                        var err: NSError?
+                        var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+                        
                         //error function: 400 bad request by client
                         if failure != nil {
-                            failure!(400)
+                            let message = parseJSON!["message"] as String
+                            failure!(400,message)
                         }
                     }
                     
@@ -99,14 +105,14 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                     else if status_code == 500 {
                         //error function: 500 server failure by status code
                         if failure != nil {
-                            failure!(500)
+                            failure!(500,"500 server error")
                         }
                     }
                 }
                 else{
                     //error function: 500 server failure by response body
                     if failure != nil {
-                        failure!(500)
+                        failure!(500,"500 server error")
                     }
                 }
             })
@@ -119,14 +125,13 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
         else{
             //error function: 58 no connection
             if failure != nil {
-                failure!(58)
+                failure!(58,"58 no internet connection")
             }
         }
         
     }
     
-    func LdapAuth(username: String, password: String, success: ((Dictionary<String,AnyObject>) -> Void)?, failure: ((Int) -> Void)?, badCreds: (Void -> Void)?){
-        
+    func LdapAuth(username: String, password: String, success: ((Dictionary<String,AnyObject>) -> Void)?, failure: ((Int,String) -> Void)?, badCreds: (Void -> Void)?){
         
         //check for network connection
         if Reachability.isConnectedToNetwork(){
@@ -150,21 +155,24 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
             
             var task = session.dataTaskWithRequest(request,completionHandler: {data, response, error -> Void in
                 
+                println("in completion handler")
+                
                 //error is not nil means unresponsive server (dead or timeout)
                 if error != nil{
                     if failure != nil{
-                        println("599 unresponsive server")
-                        failure!(599)
+                        failure!(599,"599 connection timeout")
                     }
                 }
                     
                 //else proceed...
                 else if let httpResponse = response as? NSHTTPURLResponse{
                     
+                    
                     let status_code = httpResponse.statusCode
                     
                     //200 OK, continue as planned
                     if status_code == 200 {
+                        println(200)
                         
                         //parse the JSON response
                         var err: NSError?
@@ -172,10 +180,11 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                         
                         //error parsing
                         if err != nil {
+                            
                             //error function: 500 server failure in forming response
                             if failure != nil {
-                                println("500 failure in forming response")
-                                failure!(500)
+                                let message = parseJSON!["message"] as String
+                                failure!(500,message)
                             }
                         }
                             
@@ -188,6 +197,7 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                         
                     //400 Bad Request, get error message
                     else if status_code == 400 {
+                        println(400)
                         //error function: 400 bad request by client
                         if badCreds != nil {
                             println("400 bad request by client")
@@ -197,18 +207,23 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
                         
                         //500 server failure
                     else if status_code == 500 {
+                        println(500)
                         //error function: 500 server failure by status code
                         if failure != nil {
-                            println("500 server failure by status code")
-                            failure!(500)
+                            failure!(500,"500 server failure by status code")
                         }
+                    }
+                    else{
+                        println(status_code)
+                        println("final else")
                     }
                 }
                 else{
+                    println(500)
+                    println("could not cast")
                     //error function: 500 server failure by response body
                     if failure != nil {
-                        println("500 server failure by response body")
-                        failure!(500)
+                        failure!(500,"500 server failure by response body")
                     }
                 }
             })
@@ -220,15 +235,16 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
         else{
             //error function: 58 no connection
             if failure != nil {
-                println("58 no connection")
-                failure!(58)
+                failure!(58,"58 no connection")
             }
         }
     
     }
     
     func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential!) -> Void) {
+        println("challenge")
         completionHandler(NSURLSessionAuthChallengeDisposition.UseCredential, NSURLCredential(forTrust: challenge.protectionSpace.serverTrust))
+        
         
     }
     

@@ -2,10 +2,10 @@ import Foundation
 
 //create a mutable request with api view path /createupost/, set method to POST
 //server
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
 
 //kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
 
 
 //trenton
@@ -36,11 +36,11 @@ for url in imageUrls{
 
 //parameter values
 //common post information
-let username = "tmiller12"
-let description = "Dress shoes and tux-seed-ohs"
+let username = "khandy"
+let description = "I'm offering an all expense paid vacation to cancun!"
 let price = "0.00"
-let title = "My first ball"
-let category = "Events"
+let title = "Trip To Cancun!!!"
+let category = "Ride Shares"
 
 
 

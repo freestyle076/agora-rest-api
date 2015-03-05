@@ -21,10 +21,10 @@ var session = NSURLSession.sharedSession()
 
 //set filter parameters
 let categories:[String] = [] //empty list means all categories
-let keywordSearch:String = "tit" //empty string means no keyword search
-let min_price = "" //"" means no min_price
-let max_price = "" //"" means no max_price
-let free = "1" //false means not free only, true means is free only
+let keywordSearch:String = "" //empty string means no keyword search
+let min_price = "5" //"" means no min_price
+let max_price = "100" //"" means no max_price
+let free = "0" //false means not free only, true means is free only
 let divider_date_time = ""
 //let divider_date_time = "01/28/2015 10:26:54"
 let older = "1"

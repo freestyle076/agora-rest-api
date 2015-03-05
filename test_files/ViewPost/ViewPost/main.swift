@@ -2,9 +2,9 @@ import Foundation
 
 //create a mutable request with api view path /viewpost, set method to POST
 //kyle
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/viewpost")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/viewpost/")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/viewpost/")!)
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/viewpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
@@ -12,8 +12,8 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 //common post information
-var postid = "178"
-var category = "Household"
+var postid = "45"
+var category = "Events"
 
 
 //this is the parameters array that will be formulated as JSON.

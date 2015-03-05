@@ -308,20 +308,40 @@ def filter_post_list(request):
         keyword.strip() #removing leading or trailing whitespace
         keyword.replace("  "," ") #remove accidental double spaces
         
-        #min_price and max_price not specified
+        
+        
+        #establish queries for max_price and min_price
+        allow_nulls = True
+        #if no max price set to upper bound
         if not max_price:
             max_price = 10000.0
+        #else set to given max_price and no nulls
         else:
             max_price = float(max_price)
-        if not min_price:           
+            allow_nulls = False
+        #if no min_price set to lower bound
+        if not min_price:   
             min_price = 0.0
+        #else set to given min_price and no nulls
         else:
             min_price = float(min_price)
+            allow_nulls = False
         
         #react to free flag
         if free == "1":
             max_price = 0.0
             min_price = 0.0 
+            allow_nulls = False
+        
+        #if nulls are allowed include in price Qs
+        if allow_nulls:
+            
+            max_price_Q = Q(price__lte=max_price) | Q(price__isnull=True)
+            min_price_Q = Q(price__gte=min_price) | Q(price__isnull=True)
+        #else don't include nulls in price Qs
+        else:
+            max_price_Q = Q(price__lte=max_price)
+            min_price_Q = Q(price__gte=min_price)
         
         #display the incoming filter keywords for sanity's sake
               
@@ -362,22 +382,22 @@ def filter_post_list(request):
         #category is of item type
         if helpers.category_intersect(settings.item_categories,categories):
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.book_categories,categories):
             #keyword applied to display_value, title, description, isbn
-            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.datelocation_categories,categories):
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.rideshare_categories,categories):
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #populate the response with listview formatted results (grabs and encodes image data)
         results = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)
