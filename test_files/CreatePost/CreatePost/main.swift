@@ -2,10 +2,10 @@ import Foundation
 
 //create a mutable request with api view path /createupost/, set method to POST
 //server
-//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/createpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.110:8000/createpost/")!)
 
-//kyle
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.164.91:8000/createpost/")!)
+//kyl
+//var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.133:8000/createpost/")!)
 
 
 //trenton
@@ -18,8 +18,8 @@ var session = NSURLSession.sharedSession()
 
 //image urls
 
-var imageUrls:[NSURL] = []
-//var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
+
+var imageUrls:[NSURL] = [NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!,NSURL(fileURLWithPath: "/Users/trentonmiller/Desktop/Seahawk.png")!]
 
 
 
@@ -39,16 +39,16 @@ for url in imageUrls{
 let username = "tmiller12"
 let description = "Dress shoes and tux-seed-ohs"
 let price = "0.00"
-let title = "My first ball"
+let title = "This Worked!!!!"
 let category = "Events"
 
 
 
 
-let gonzaga_email = "1" //boolean contact option
+let gonzaga_email = "0" //boolean contact option
 let pref_email = "1" //boolean contact option
-let phone = "1" //boolean contact option
-let text = "1" //boolean contact option
+let phone = "0" //boolean contact option
+let text = "0" //boolean contact option
 
 //rideshare specific
 var departure_date_time = ""

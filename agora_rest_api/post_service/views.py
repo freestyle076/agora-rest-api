@@ -61,8 +61,62 @@ def delete_post(request):
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response    
-    
+'''    
+@api_view(['POST'])
+def get_images(request):  
+
+    POST method for retrieving images from posts. 
+    Request body must contain the following data in JSON format:
+        postId: Identifier for what particular post to grab
+        category: Category to signify which table to search through. 
+    route: /getimages/
+   
+    json_data = {}
+    try: 
+        request_data = ast.literal_eval(request.body) #parse data
+
+        print request_data 
         
+        category = request_data['category'] #switch on category
+        post_id = request_data['post_id']
+        if category in settings.item_categories:
+            post_info = ItemPost.objects.get(id=post_id)    
+        elif category in settings.book_categories:
+            post_info = BookPost.objects.get(id=post_id)
+        elif category in settings.datelocation_categories:
+            post_info = DateLocationPost.objects.get(id=post_id)
+        elif category in settings.rideshare_categories:
+            post_info = RideSharePost.objects.get(id=post_id)
+        else:
+            json_data['message'] =  'Error in viewing post: Invalid category'
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+
+        image_URLs_array = ['','','']
+        images_array = ['','','']
+        
+        pre_image_string = settings.IMAGES_ROOT
+        image_URLs_array[0] = pre_image_string + post_info.image1
+        image_URLs_array[1] = pre_image_string + post_info.image2
+        image_URLs_array[2] = pre_image_string + post_info.image3
+        for i in range(len(image_URLs_array)):
+            if image_URLs_array[i] != settings.IMAGES_ROOT:
+                image_file = open(image_URLs_array[i])
+                image_data = image_file.read()
+                images_array[i] = image_data
+                image_file.close()
+      
+        json_data["image1"] = images_array[0]    
+        json_data["image2"] = images_array[1]    
+        json_data["image3"] = images_array[2]  
+            
+        return HttpResponse(images_array,status=status.HTTP_200_OK,content_type='image/png')
+    
+    except Exception,e:
+        print str(e)
+        json_data['message'] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        return response
+'''         
 @api_view(['POST'])
 def view_detailed_post(request):
     '''
@@ -131,24 +185,6 @@ def view_detailed_post(request):
             json_data["gonzaga_email"] = post_user.gonzaga_email
         else:
             json_data["gonzaga_email"] = ''
-        
-        image_URLs_array = ['','','']
-        images_base64_array = ['','','']
-        
-        pre_image_string = settings.IMAGES_ROOT
-        image_URLs_array[0] = pre_image_string + post_info.image1
-        image_URLs_array[1] = pre_image_string + post_info.image2
-        image_URLs_array[2] = pre_image_string + post_info.image3
-        for i in range(len(image_URLs_array)):
-            if image_URLs_array[i] != settings.IMAGES_ROOT:
-                image_file = open(image_URLs_array[i],"rb")
-                image_data = image_file.read()
-                images_base64_array[i] = encodestring(image_data)
-                image_file.close()
-      
-        json_data["image1"] = images_base64_array[0]    
-        json_data["image2"] = images_base64_array[1]    
-        json_data["image3"] = images_base64_array[2]  
 
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         

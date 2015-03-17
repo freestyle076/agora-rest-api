@@ -4,7 +4,7 @@ import Foundation
 //kyle
 //var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.121:8000/viewpost")!)
 //trenton
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/viewpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.110:8000/getimages/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
@@ -12,8 +12,8 @@ var session = NSURLSession.sharedSession()
 
 //parameter values
 //common post information
-var postid = "283"
-var category = "Electronics"
+var postid = "54"
+var category = "Events"
 
 
 //this is the parameters array that will be formulated as JSON.
@@ -33,65 +33,27 @@ request.addValue("application/json", forHTTPHeaderField: "Accept")
 //define NSURLSession data task with completionHandler call back function
 var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
     
+    
     //read the message from the response
-    var title = ""
-    var description = ""
-    var price = ""
-    var departure_date_time = ""
-    var return_date_time = ""
-    var round_trip = false
-    var trip = ""
-    var gonzaga_email = ""
-    var pref_email = ""
-    var call = ""
-    var text = ""
-    var isbn = ""
-    var location = ""
-    var date_time = ""
     var imageString: [String] = ["","",""]
     var json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? NSDictionary
+    
     if(err != nil) {
         println(err!.localizedDescription)
         let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
         println("Error could not parse JSON: '\(jsonStr)'")
     }
     else{
-        if let parseJSON = json as? Dictionary<String,AnyObject>{
-            title = parseJSON["title"] as String
-            description = parseJSON["description"] as String
-            price = parseJSON["price"] as String
-            gonzaga_email = parseJSON["gonzaga_email"] as String
-            pref_email = parseJSON["pref_email"] as String
-            call = parseJSON["call"] as String
-            text = parseJSON["text"] as String
-            
-            println(gonzaga_email)
+        if let parseJSON = json as? Dictionary<String,UIImage>{
 
-            if category == "Books"{
-                isbn = parseJSON["isbn"] as String
-            }
-          
-            if category == "Events" || category == "Services"{
-                location = parseJSON["location"] as String
-                date_time = parseJSON["date_time"] as String
-            }
-
-            if category == "Ride Shares"{
-                departure_date_time = parseJSON["departure_date_time"] as String
-                round_trip = parseJSON["round_trip"] as Bool
-                trip = parseJSON["trip"] as String
-                if round_trip{
-                    return_date_time = parseJSON["return_date_time"] as String
-                }
-            }
             //The Three images are processed here
-            imageString[0] = parseJSON["image1"]! as String
-            imageString[1] = parseJSON["image2"]! as String
+            imageString[0] = parseJSON["image1"]! as UIImage
+            imageString[1] = parseJSON["image2"]! as UIImage
             imageString[2] = parseJSON["image3"]! as String
             if !imageString[0].isEmpty {
                 let imageData1 = NSData(base64EncodedString: imageString[0], options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
-                    
-                //do stuff with the image here
+                
+                println(imageString[0])
             }
             else{
                 //CASE IN WHICH THE POST HAD NO IMAGE 1
@@ -112,7 +74,7 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
             else{
                 //CASE IN WHICH THE POST HAD NO IMAGE 3
             }
-
+            
         }
     }
     
@@ -125,50 +87,9 @@ var task = session.dataTaskWithRequest(request, completionHandler: {data, respon
         //200 = OK: user created, carry on!
         if(status_code == 200){
             
-            print("Title = ")
-            println(title)
-            print("Description = ")
-            println(description)
-            print("Category = ")
-            println(category)
-            print("Price = ")
-            println(price)
-            print("Gonzaga email = ")
-            println(gonzaga_email)
-            print("Pref email = ")
-            println(pref_email)
-            print("Call = ")
-            println(call)
-            print("Text = ")
-            println(text)
-            if category == "Ride Shares"{
-                print("Departure Date Time = ")
-                println(departure_date_time)
-                print("Round Trip = ")
-                println(round_trip)
-                print("Trip = ")
-                println(trip)
-                if round_trip{
-                    print("Return Date Time = ")
-                    println(return_date_time)
-                }
-            }
-            if category == "Events" || category == "Services"{
-                print("Date Time = ")
-                println(date_time)
-                print("Location = ")
-                println(location)
-            }
-            if category == "Books"{
-                print("ISBN = ")
-                println(isbn)
-            }
-
         }
-            
             //400 = BAD_REQUEST: error in creating user, display error!
         else if(status_code == 400){
-            println(title)
         }
             
             //500 = INTERNAL_SERVER_ERROR. Oh snap *_*
