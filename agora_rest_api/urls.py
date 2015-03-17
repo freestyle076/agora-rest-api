@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^deletepost/','agora_rest_api.post_service.views.delete_post'),
     (r'^postquery/','agora_rest_api.post_service.post_list_views.filter_post_list'),
     (r'^refreshpost/','agora_rest_api.post_service.views.refresh_post'),
-    (r'^reportpost/','agora_rest_api.post_service.views.report_post')    
+    (r'^reportpost/','agora_rest_api.post_service.views.report_post'),
+    (r'^getimage/','agora_rest_api.post_service.image_views.get_image'),
 )
 
