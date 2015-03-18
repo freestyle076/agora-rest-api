@@ -25,30 +25,112 @@ Table of Contents:
 time_zone_loc = pytz.timezone(settings.TIME_ZONE)
 time_zone_utc = pytz.timezone('UTC')
 
-def user_posts(username):
+def user_posts(username,divider,older):
     '''
     Gathers an aggregate list of posts, in listview format, that belong to
     the user whose username matches parameter username
     username: user whose posts will be collected
+    divider: date time divider specifying where to resume loading posts
+    older: flag signifying post return direction. 
+        1: posts older than divider chronologically
+        0: posts younger than divider chronologically
     '''
     
-    try:
-
-        #collect posts belonging to the user
-        item_rs = ItemPost.objects.filter(Q(username_id__exact=username))
-        book_rs = BookPost.objects.filter(Q(username_id__exact=username))
-        DL_rs = DateLocationPost.objects.filter(Q(username_id__exact=username))
-        RS_rs = RideSharePost.objects.filter(Q(username_id__exact=username))
-        
-        #prepare the results: listview format in order of post date        
-        return prepare_results(item_rs,book_rs,DL_rs,RS_rs)
+    print "username: " + username
+    print "divider: " + str(divider)
+    print "older: " + str(older)
     
+    try:
+    
+        #get oldest post as datetime object
+        #if none provided (base case) then set oldest_date to now plus two hours (just to be safe...)
+        if not divider:
+            divider_post_datetime = datetime.datetime.now(pytz.timezone('UTC')) + datetime.timedelta(hours=2)
+
+        
+        #else use provided datetime
+        else:
+            divider_post_datetime = time_zone_utc.localize(datetime.datetime.strptime(divider,'%m/%d/%Y %H:%M:%S'))        
+        
+        
+        #alter database queries according 
+        #older means post_date_time less than divider in descending order
+        if older == "1":
+            datetime_Q = Q(post_date_time__lt=divider_post_datetime)
+            order_by_string = "-post_date_time"
+            edge_index = -1
+        #newer (not older) means post_date_time greater than divider in ascending order
+        else:
+            datetime_Q = Q(post_date_time__gt=divider_post_datetime)
+            order_by_string = "post_date_time"
+            edge_index = 0
+            
+        #collect posts belonging to the user
+        item_rs = ItemPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        book_rs = BookPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        RS_rs = RideSharePost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        
+        #prepare the results: listview format in order of post date
+        posts = prepare_results(item_rs,book_rs,DL_rs,RS_rs,limit=settings.PAGING_COUNT)
+        
+        def more_to_gather(older,edge_post):
+            '''
+            Checks if there are more posts in the older or newer direction as specified 
+            by the older variable. Returns true if there are more, false if there are not.
+            '''
+            
+            #form edge date_time string into date_time object
+            edge_date_time = time_zone_utc.localize(datetime.datetime.strptime(edge_post['post_date_time'],'%m/%d/%Y %H:%M:%S'))   
+            
+            #assign query parameter according to function parameter 'older'
+            if older == "1":
+                date_time_compare_Q = Q(post_date_time__lt=edge_date_time)
+            else:
+                date_time_compare_Q = Q(post_date_time__gt=edge_date_time)
+
+            #default exist variables to False for each table
+            items_exist = False
+            books_exist = False           
+            RSs_exist = False           
+            DLs_exist = False           
+
+            
+            #more item posts?
+            items_exist = ItemPost.objects.filter(date_time_compare_Q,Q(username_id__exact=username)).exists()
+            
+            #more book posts?
+            books_exist = BookPost.objects.filter(date_time_compare_Q,Q(username_id__exact=username)).exists()
+            
+            #more RS posts?
+            RSs_exist = RideSharePost.objects.filter(date_time_compare_Q,Q(username_id__exact=username)).exists()
+                
+            #more DL posts?
+            DLs_exist = DateLocationPost.objects.filter(date_time_compare_Q,Q(username_id__exact=username)).exists()
+            
+            #check if any more posts in ANY TABLE exist in the direction specified by 'older'
+            more_exist =  items_exist or books_exist or RSs_exist or DLs_exist
+            
+             
+            return more_exist
+    
+        #first check if there were results. If there weren't any then there
+        #couldn't be any more...
+        if posts:
+            #if there are results then check to see if there are more results
+            more_exist = str(int(more_to_gather(older,posts[edge_index])))
+        else:
+            more_exist = "0"
+            
+        
+        return posts,more_exist
+        
     #general exception handling
     except Exception, e:
         raise e
         
 
-def prepare_results(items, books, DLs, RSs, limit=0):
+def prepare_results(items, books, DLs, RSs, limit=None):
     '''
     Prepares a list a filter request results, each in listview post format.
     Returns a list of objects, ready to be included in a JSON object.
@@ -122,12 +204,12 @@ def prepare_results(items, books, DLs, RSs, limit=0):
                 
                     display_value_temp = month + "/" + day + "/" + year + " " + hour + minute_ampm
                 else:
-                    if book.price == None:
+                    if DL.price == None:
                         display_value_temp = ''
-                    elif float(book.price) == 0.:
+                    elif float(DL.price) == 0.:
                         display_value_temp = 'Free'
                     else:
-                        display_value_temp = "${:.2f}".format(float(book.price)) 
+                        display_value_temp = "${:.2f}".format(float(DL.price)) 
                 listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
@@ -166,7 +248,7 @@ def prepare_results(items, books, DLs, RSs, limit=0):
         posts.sort(key=lambda x: datetime_key(x['post_date_time']),reverse=True)
         
         
-        if limit > 0:
+        if limit:
             posts = posts[:limit]
         
         print "Number of posts: " + str(len(posts))        
@@ -226,20 +308,40 @@ def filter_post_list(request):
         keyword.strip() #removing leading or trailing whitespace
         keyword.replace("  "," ") #remove accidental double spaces
         
-        #min_price and max_price not specified
+        
+        
+        #establish queries for max_price and min_price
+        allow_nulls = True
+        #if no max price set to upper bound
         if not max_price:
             max_price = 10000.0
+        #else set to given max_price and no nulls
         else:
             max_price = float(max_price)
-        if not min_price:           
+            allow_nulls = False
+        #if no min_price set to lower bound
+        if not min_price:   
             min_price = 0.0
+        #else set to given min_price and no nulls
         else:
             min_price = float(min_price)
+            allow_nulls = False
         
         #react to free flag
         if free == "1":
             max_price = 0.0
             min_price = 0.0 
+            allow_nulls = False
+        
+        #if nulls are allowed include in price Qs
+        if allow_nulls:
+            
+            max_price_Q = Q(price__lte=max_price) | Q(price__isnull=True)
+            min_price_Q = Q(price__gte=min_price) | Q(price__isnull=True)
+        #else don't include nulls in price Qs
+        else:
+            max_price_Q = Q(price__lte=max_price)
+            min_price_Q = Q(price__gte=min_price)
         
         #display the incoming filter keywords for sanity's sake
               
@@ -280,22 +382,22 @@ def filter_post_list(request):
         #category is of item type
         if helpers.category_intersect(settings.item_categories,categories):
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.book_categories,categories):
             #keyword applied to display_value, title, description, isbn
-            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.datelocation_categories,categories):
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.rideshare_categories,categories):
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),Q(price__lte=max_price) | Q(price__isnull=True),Q(price__gte=min_price) | Q(price__isnull=True),Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #populate the response with listview formatted results (grabs and encodes image data)
         results = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)

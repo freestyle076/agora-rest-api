@@ -11,6 +11,102 @@ import Foundation
 
 var api_requester: AgoraRequester = AgoraRequester()
 
+
+
+//----------------------------------------userposts----------------------------------------
+
+
+let username = "jquiring"
+let divider_date_time = ""
+//let divider_date_time = "02/24/2015 01:03:14"
+let older = "1"
+
+let params = ["username":username,
+    "divider_date_time":divider_date_time,
+    "older":older]
+    as Dictionary<String,AnyObject>
+
+/*
+api_requester.POST("userposts/",params:params,
+    success: {parseJSON -> Void in
+        let posts: AnyObject = parseJSON["posts"]!
+        let more = parseJSON["more_exist"] as String
+        let recent_del: String = parseJSON["recent_post_deletion"] as String
+
+        if posts.count > 0{
+            for i in 0...(posts.count - 1){
+                let post: AnyObject! = posts[i]
+                let postID = post["id"]! as Int
+                let title = post["title"]! as String
+                let post_date_time = post["post_date_time"]! as String
+                let display_value = post["display_value"]! as String
+                
+                print(title + " ")
+                println(postID)
+                
+                //THE THUMBNAIL IMAGE IS PROCESSED HERE
+                let imageString = post["image"]! as String
+                if !imageString.isEmpty {
+                    let imageData = NSData(base64EncodedString: imageString, options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+                    
+                    //do stuff with the image here
+                }
+                else{
+                    //CASE IN WHICH THE POST HAD NO IMAGE
+                }
+
+            }
+        }
+    },
+    failure: {code,message -> Void in
+        if(code == 500){
+            println("500 user")
+            //server error
+        }
+        else if (code == 599){
+            println("599 user")
+            //timeout
+        }
+        else if (code == 58){
+            println("58 user")
+            //no internet connection
+        }
+    }
+)*/
+
+
+//----------------------------------------ldapauth----------------------------------------
+
+/*
+api_requester.LdapAuth("khandy", password: "Rusty3220",
+    success: { parseJSON -> Void in
+        println("success")
+        println(parseJSON)
+    },
+    failure: {code,message -> Void in
+        if(code == 500){
+            //server error
+            println(500)
+        }
+        else if (code == 599){
+            //timeout
+            println(599)
+        }
+        else if (code == 58){
+            //no internet connection
+            println(58)
+        }
+    },
+    badCreds: { () -> Void in
+        println("bad")
+        //function for bad credentials
+    }
+)*/
+
+
+//----------------------------------------filterposts----------------------------------------
+
+/*
 //set filter parameters
 let categories:[String] = ["Household"] //empty list means all categories
 let keywordSearch:String = "" //empty string means no keyword search
@@ -22,28 +118,14 @@ let divider_date_time = ""
 let older = "1"
 
 let params = ["categories":categories,
-    "keywordSearch":keywordSearch,
-    "min_price":min_price,
-    "max_price":max_price,
-    "free":free,
-    "divider_date_time":divider_date_time,
-    "older":older]
-    as Dictionary<String,AnyObject>
-
-println("request fired")
-
-api_requester.LdapAuth("khandy", password: "Rusty3220",
-    success: { parseJSON -> Void in
-        println(parseJSON)
-    },
-    failure: { code -> Void in
-        println("error")
-        println(code)
-    },
-    badCreds: { () -> Void in
-        println("Invalid creds")
-    }
-)
+"keywordSearch":keywordSearch,
+"min_price":min_price,
+"max_price":max_price,
+"free":free,
+"divider_date_time":divider_date_time,
+"older":older]
+as Dictionary<String,AnyObject>
+*/
 
 /*
 api_requester.POST("postquery/", params: params,
@@ -80,7 +162,7 @@ api_requester.POST("postquery/", params: params,
         }
     
     },
-    failure: {code -> Void in
+    failure: {code,message -> Void in
         if code == 500 {
             //500: Server failure
             println("Server Failure!!!!!")
