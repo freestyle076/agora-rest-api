@@ -116,8 +116,6 @@ IMAGES_ROOT = RESOURCE_ROOT + 'images/'
 
 STATIC_URL = '/static/'
 
-REPORT_THRESHOLD = 3
-
 APPLE_USERNAME = 'apple_adm!n'
 
 APPLE_PASS = 'apple_passw0rd'
