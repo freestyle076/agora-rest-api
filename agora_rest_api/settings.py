@@ -98,7 +98,7 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
 
 MOST_RECENT_CLEANUP = datetime.date.today() - datetime.timedelta(days=1)
 
-OLD_POST_CUTTOFF_LENGTH = 21 # Number of days Before a Post is Deleted
+OLD_POST_CUTTOFF_LENGTH = 31 # Number of days Before a Post is Deleted
 
 MAX_REPORT_THRESHOLD = 3 # Number of reports that a post will get deleted for
 

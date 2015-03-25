@@ -11,9 +11,90 @@ import Foundation
 
 var api_requester: AgoraRequester = AgoraRequester()
 
+//----------------------------------------postquery----------------------------------------
+
+/*
+//set filter parameters
+let categories:[String] = ["Household","Events"] //empty list means all categories
+let keywordSearch:String = "" //empty string means no keyword search
+let min_price = "" //"" means no min_price
+let max_price = "" //"" means no max_price
+let free = "0" //false means not free only, true means is free only
+let divider_date_time = ""
+//let divider_date_time = "01/28/2015 10:26:54"
+let older = "1"
+
+let params = ["categories":categories,
+    "keywordSearch":keywordSearch,
+    "min_price":min_price,
+    "max_price":max_price,
+    "free":free,
+    "divider_date_time":divider_date_time,
+    "older":older]
+    as Dictionary<String,AnyObject>
+
+api_requester.PostQuery(params,
+    info: {parseJSON -> Void in
+        println("info received")
+    },
+    imageReceived: {category,postID,imageData -> Void in
+        print("Received image for" + category + " ")
+        println(postID)
+        imageData.writeToFile("/Users/kylehandy/Desktop/" + category + String(postID) + ".png",atomically: false)
+    },
+    failure: {code,message -> Void in
+        print("failure!!")
+        print(code)
+        println(" " + message)
+    }
+)
+*/
+
+//----------------------------------------viewposts----------------------------------------
+
+/*
+api_requester.ViewPost("Household", id: 284,
+    info: {parseJSON -> Void in
+        println("info received")
+    },
+    image1: {imageData -> Void in
+        if imageData == nil{
+            println("image received 1")
+            //case where image1 is nil
+        }
+        else{
+            println("image received 1")
+            //case where image1 exists
+        }
+    },
+    image2: {imageData -> Void in
+        if imageData == nil{
+            //case where image2 is nil
+        }
+        else{
+            //case where image2 exists
+        }
+
+    },
+    image3: {imageData -> Void in
+        if imageData == nil{
+            //case where image3 is nil
+        }
+        else{
+            //case where image3 exists
+        }
+    },
+    failure: {code,message -> Void in
+        println("failure")
+        println(code)
+        println(message)
+    }
+)
+*/
 
 
 //----------------------------------------userposts----------------------------------------
+
 
 
 let username = "jquiring"
@@ -26,7 +107,7 @@ let params = ["username":username,
     "older":older]
     as Dictionary<String,AnyObject>
 
-/*
+
 api_requester.POST("userposts/",params:params,
     success: {parseJSON -> Void in
         let posts: AnyObject = parseJSON["posts"]!
@@ -72,7 +153,8 @@ api_requester.POST("userposts/",params:params,
             //no internet connection
         }
     }
-)*/
+)
+
 
 
 //----------------------------------------ldapauth----------------------------------------
@@ -125,9 +207,9 @@ let params = ["categories":categories,
 "divider_date_time":divider_date_time,
 "older":older]
 as Dictionary<String,AnyObject>
-*/
 
-/*
+
+
 api_requester.POST("postquery/", params: params,
     success: {parseJSON -> Void in
                 
