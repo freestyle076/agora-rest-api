@@ -5,7 +5,6 @@ from agora_rest_api import settings
 import os
 import datetime
 import pytz
-import re
 
 # -*- coding: utf-8 -*-
 """
@@ -64,28 +63,36 @@ def run_clean_up():
     for post in reported_posts:
         print "Reported Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
               
     reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
-   
+        
     reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)  
     
     reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)   
         
     d1 = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
@@ -95,28 +102,36 @@ def run_clean_up():
     for post in old_posts:
         print "Old Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
         
     old_posts = RideSharePost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
         print "Old Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
         
     old_posts = ItemPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
         print "Old Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
         
     old_posts = BookPost.objects.filter(Q(post_date_time__lt=d2))
     for post in old_posts:
         print "Old Post being deleted -> "
         print post
-        User.objects.get(username=post.username_id).recent_post_deletion = 1
+        del_user = User.objects.get(username=post.username_id)
+        del_user.recent_post_deletion = 1
+        del_user.save()
         remove_post(post)
         
     settings.MOST_RECENT_CLEANUP = datetime.date.today()
