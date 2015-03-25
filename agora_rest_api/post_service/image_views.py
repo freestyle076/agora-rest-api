@@ -39,12 +39,14 @@ def get_image(request):
             image_name = post_info.image3
             
         if image_name != '':
+            json_data["image"] = True
             image_url = settings.IMAGES_ROOT + image_name
             image_data = open(image_url,"r").read()
             response = form_multipart_response(json_data,image_data,image_name)
             return response
         else:
-            response = HttpResponse(status=status.HTTP_204_NO_CONTENT,content_type="image/png")
+            json_data["image"] = False
+            response = form_multipart_response(json_data,None,image_name)
             return response
             
         
@@ -57,18 +59,22 @@ def form_multipart_response(json_data,image_data,image_name):
     BOUNDARY = "$AGORA_boundary$"
     CRLF = "\r\n"
     _content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-    
+        
     response = HttpResponse(status=status.HTTP_200_OK,content_type=_content_type)
     response.write('--' + BOUNDARY + CRLF)
     response.write('Content-Disposition: form-data; name="json"' + CRLF)
     response.write('' + CRLF)
     response.write(json.dumps(json_data) + CRLF)
-    response.write('--' + BOUNDARY + CRLF)
-    response.write('Content-Disposition: form-data; name="image"; filename="%s"\r\n' % image_name)
-    response.write('Content-Type: image/png' + CRLF)
-    #response.write('Content-Transfer-Encoding: binary' + CRLF)
-    response.write('' + CRLF)
-    response.write(image_data + CRLF)
+
+    if image_data:
+        print "writing image"
+        print json_data
+        response.write('--' + BOUNDARY + CRLF)
+        response.write('Content-Disposition: form-data; name="image"; filename="%s"\r\n' % image_name)
+        response.write('Content-Type: image/png' + CRLF)
+        #response.write('Content-Transfer-Encoding: binary' + CRLF)
+        response.write('' + CRLF)
+        response.write(image_data + CRLF)
     response.write('--' + BOUNDARY + '--' + CRLF)
     response.write('' + CRLF)
     return response

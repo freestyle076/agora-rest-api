@@ -63,28 +63,32 @@ def run_clean_up():
     reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
-        print post
+        print post.id
+        print post.category
         User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
               
     reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
-        print post
+        print post.id
+        print post.category
         User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)
    
     reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
-        print post
+        print post.id
+        print post.category
         User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)  
     
     reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     for post in reported_posts:
         print "Reported Post being deleted -> "
-        print post
+        print post.id
+        print post.category
         User.objects.get(username=post.username_id).recent_post_deletion = 1
         remove_post(post)   
         

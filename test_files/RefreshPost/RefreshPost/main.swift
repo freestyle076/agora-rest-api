@@ -17,8 +17,8 @@ request.HTTPMethod = "POST"
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var post_id = "43"
-var category = "Books"
+var post_id = "66"
+var category = "Events"
 
 //prepare parameters for json serialization
 var params = ["post_id":post_id, "category":category] as Dictionary<String, String>
