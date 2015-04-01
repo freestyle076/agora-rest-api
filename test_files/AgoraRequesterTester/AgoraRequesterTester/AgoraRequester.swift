@@ -708,6 +708,186 @@ class AgoraRequester: NSObject, NSURLSessionDelegate {
         
     }
     
+    func UserPosts(params: Dictionary<String,AnyObject>, info: ((Dictionary<String,AnyObject>) -> Void)?, imageReceived: ((String,Int,NSData) -> Void)?, failure: ((Int,String) -> Void)?){
+        //instantiate the session
+        var session = NSURLSession(configuration: self.seshConfig)
+        
+        //check for network connection
+        if Reachability.isConnectedToNetwork(){
+            
+            //init request, set target URL
+            var infoRequest = NSMutableURLRequest(URL: NSURL(string: self.baseURLst + "userposts/")!)
+            
+            //request headers: JSON -> and <-
+            infoRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            infoRequest.addValue("application/json", forHTTPHeaderField: "Accept")
+            
+            //AgoraRequest.POST uses method POST
+            infoRequest.HTTPMethod = "POST"
+            
+            //load up JSON object into request body
+            infoRequest.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: nil)
+            
+            var infoTask = session.dataTaskWithRequest(infoRequest, completionHandler: {data, response, error -> Void in
+                //error is not nil means there was a timeout
+                if error != nil{
+                    if failure != nil{
+                        failure!(599,"599 connection timeout")
+                    }
+                }
+                    
+                    //else proceed...
+                else if let httpResponse = response as? NSHTTPURLResponse{
+                    
+                    let status_code = httpResponse.statusCode
+                    
+                    //200 OK/204 no content, continue as planned
+                    if status_code == 200 {
+                        
+                        //parse the JSON response
+                        var err: NSError?
+                        var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+                        
+                        //error parsing
+                        if err != nil {
+                            //error function: 500 server failure in forming response
+                            if failure != nil {
+                                failure!(500,"500 server error")
+                            }
+                        }
+                            
+                            //if callback provided run callback function with provided JSON results
+                        else{
+                            
+                            let posts: AnyObject = parseJSON!["posts"]!
+                            if posts.count > 0 {
+                                for i in 0...(posts.count - 1){
+                                    let post: AnyObject = posts[i]!
+                                    let category = post["category"]! as String
+                                    let postID = post["id"]! as Int
+                                    let pictureID = "0"
+                                    
+                                    let imageRequest = NSMutableURLRequest(URL: NSURL(string: self.baseURLst + "getimage/")!)
+                                    imageRequest.HTTPMethod = "POST"
+                                    imageRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                    
+                                    let params = ["category": category, "post_id": String(postID), "picture_id":pictureID] as Dictionary<String,AnyObject>
+                                    
+                                    //load up JSON object into request body
+                                    imageRequest.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: nil)
+                                    
+                                    println("imageTask " + category + " " + String(postID))
+                                    
+                                    let imageTask = session.dataTaskWithRequest(imageRequest, completionHandler: {data, response, error -> Void in
+                                        //error is not nil means unresponsive server (dead or timeout)
+                                        if error != nil{
+                                            if failure != nil{
+                                                failure!(599,"599 connection timeout")
+                                            }
+                                        }
+                                            
+                                            //else proceed...
+                                        else if let httpResponse = response as? NSHTTPURLResponse{
+                                            let status_code = httpResponse.statusCode
+                                            //200 OK, continue as planned
+                                            if status_code == 200 {
+                                                if imageReceived != nil{
+                                                    let (parseJSON,imageData: NSData?) = self.DissectMultipart(data)
+                                                    let postID: Int = (parseJSON["post_id"] as String).toInt()!
+                                                    let category = parseJSON["category"] as String
+                                                    if imageReceived != nil && imageData != nil {
+                                                        imageReceived!(category,postID,imageData!)
+                                                    }
+                                                    else{
+                                                        println("no image for " + category + " " + String(postID))
+                                                    }
+                                                }
+                                            }
+                                                
+                                                //400 Bad Request, get error message
+                                            else if status_code == 400 {
+                                                if failure != nil{
+                                                    failure!(400,"Bad Request")
+                                                }
+                                            }
+                                                
+                                                //500 server failure
+                                            else if status_code == 500 {
+                                                println(500)
+                                                //error function: 500 server failure by status code
+                                                if failure != nil {
+                                                    failure!(500,"500 server failure by status code")
+                                                }
+                                            }
+                                            else{
+                                                println(status_code)
+                                                println("final else")
+                                            }
+                                        }
+                                        else{
+                                            //error function: 500 server failure by response body
+                                            if failure != nil {
+                                                failure!(500,"500 server failure by response body")
+                                            }
+                                        }
+                                        }
+                                    )
+                                    imageTask.resume()
+                                }
+                            }
+                            if info != nil {
+                                info!(parseJSON!)
+                            }
+                        }
+                        
+                    }
+                        
+                        //400 Bad Request, get error message
+                    else if status_code == 400 {
+                        
+                        //parse the JSON response
+                        var err: NSError?
+                        var parseJSON = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &err) as? Dictionary<String,AnyObject>
+                        
+                        //error function: 400 bad request by client
+                        if failure != nil {
+                            let message = parseJSON!["message"] as String
+                            failure!(400,message)
+                        }
+                    }
+                        
+                        //500 server failure
+                    else if status_code == 500 {
+                        //error function: 500 server failure by status code
+                        if failure != nil {
+                            failure!(500,"500 server error")
+                        }
+                    }
+                }
+                    
+                else{
+                    //error function: 500 server failure by response body
+                    if failure != nil {
+                        failure!(500,"500 server error")
+                    }
+                }
+                
+                }
+            )
+            
+            infoTask.resume()
+        }
+            //else no network connection
+        else{
+            //error function: 58 no connection
+            if failure != nil {
+                failure!(58,"58 no internet connection")
+            }
+        }
+        
+
+    }
+    
     func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential!) -> Void) {
         println("challenge")
         completionHandler(NSURLSessionAuthChallengeDisposition.UseCredential, NSURLCredential(forTrust: challenge.protectionSpace.serverTrust))

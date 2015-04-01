@@ -10,15 +10,15 @@ import Foundation
 
 //create a mutable request with api view path /createuser/, set method to POST
 //server IP address
-var request = NSMutableURLRequest(URL: NSURL(string: "http://147.222.165.3:8000/refreshpost/")!)
+var request = NSMutableURLRequest(URL: NSURL(string: "https://cs-design.gonzaga.edu:8000/refreshpost/")!)
 request.HTTPMethod = "POST"
 
 //open NSURLSession
 var session = NSURLSession.sharedSession()
 
 //parameter values
-var post_id = "66"
-var category = "Events"
+var post_id = "307"
+var category = "Electronics"
 
 //prepare parameters for json serialization
 var params = ["post_id":post_id, "category":category] as Dictionary<String, String>
