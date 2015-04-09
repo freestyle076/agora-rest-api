@@ -164,7 +164,10 @@ def view_detailed_post(request):
         if post_info.image3:
             image_count += 1
         json_data["image_count"] = image_count
-
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_post_views = analytic.num_post_views + 1 
+        analytic.save()
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         
 

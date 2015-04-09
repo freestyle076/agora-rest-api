@@ -1,5 +1,6 @@
 from rest_framework import status
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
+from agora_rest_api.user_service.models import Analytics
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
@@ -130,6 +131,10 @@ def create_book_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_item_posts = analytic.num_item_posts + 1 
+        analytic.save()
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Book Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -207,6 +212,10 @@ def create_datelocation_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_events_posts = analytic.num_events_posts + 1 
+        analytic.save()
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Date_location Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -309,6 +318,10 @@ def create_rideshare_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_rideshare_posts = analytic.num_rideshare_posts + 1 
+        analytic.save()
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created RideShare Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -374,6 +387,10 @@ def create_item_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_item_posts = analytic.num_item_posts + 1 
+        analytic.save()
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Item Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')

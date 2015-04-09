@@ -29,4 +29,4 @@ class Analytics(models.Model):
     num_events_posts = models.PositiveIntegerField(default=0)
     num_manually_deleted_posts = models.PositiveIntegerField(default=0)
     num_deleted_reported_posts = models.PositiveIntegerField(default=0)
-    
+    num_post_views = models.PositiveIntegerField(default=0)
