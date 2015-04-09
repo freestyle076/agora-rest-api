@@ -13,6 +13,7 @@ class ListPost(models.Model):
     category = models.CharField(max_length=30)
     post_date_time = models.DateTimeField()
     report_count = models.PositiveSmallIntegerField(default=0)
+    deleted = models.BooleanField(default=False)
     last_refresh_date = models.DateField(default=default_refresh_date)
     image1 = models.CharField(max_length=50,blank=True,default='') #url
     

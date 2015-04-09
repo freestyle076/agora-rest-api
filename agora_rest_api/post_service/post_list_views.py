@@ -66,10 +66,10 @@ def user_posts(username,divider,older):
             edge_index = 0
             
         #collect posts belonging to the user
-        item_rs = ItemPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
-        book_rs = BookPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
-        DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
-        RS_rs = RideSharePost.objects.filter(datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        item_rs = ItemPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        book_rs = BookPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        DL_rs = DateLocationPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
+        RS_rs = RideSharePost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(username_id__exact=username)).order_by(order_by_string)[:settings.PAGING_COUNT]
         
         #prepare the results: listview format in order of post date
         posts = prepare_results(item_rs,book_rs,DL_rs,RS_rs,limit=settings.PAGING_COUNT)
@@ -151,8 +151,10 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 if item.image1:
                     image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
+                    has_image = True
                 else:
                     imageString = ''
+                    has_image = False
                     
                 if item.price == None:
                     display_value_temp = ''
@@ -161,7 +163,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(item.price))
 
-                listview_item = {'id':item.id,'title':item.title,'category':item.category,'display_value':display_value_temp,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_item = {'has_image':has_image,'id':item.id,'title':item.title,'category':item.category,'display_value':display_value_temp,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
                 
                 
@@ -171,8 +173,10 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 if book.image1:
                     image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
+                    has_image = True
                 else:
                     imageString = ''
+                    has_image = False
 
                 if book.price == None:
                     display_value_temp = ''
@@ -181,7 +185,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(book.price))                    
                     
-                listview_book = {'id':book.id,'title':book.title,'category':book.category,'display_value':display_value_temp,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_book = {'has_image':has_image,'id':book.id,'title':book.title,'category':book.category,'display_value':display_value_temp,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
 
 
@@ -191,8 +195,10 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 if DL.image1:
                     image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
+                    has_image = True
                 else:
                     imageString = ''
+                    has_image = False
                 if DL.date_time:
                     month = str(DL.date_time.month) #month without leading zero
                     hour = str((DL.date_time.hour) % 12) #hour without leading zero
@@ -210,7 +216,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                         display_value_temp = 'Free'
                     else:
                         display_value_temp = "${:.2f}".format(float(DL.price)) 
-                listview_DL = {'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
+                listview_DL = {'has_image':has_image,'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
 
@@ -220,8 +226,10 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 if RS.image1:
                     image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
                     imageString = encodestring(image) #encode image data as string for port of JSON
+                    has_image = True
                 else:
                     imageString = ''
+                    has_image = False
                 
                 if RS.price == None:
                     display_value_temp = ''
@@ -230,7 +238,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(RS.price)) 
                     
-                listview_RS = {'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_RS = {'has_image':has_image,'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
 
@@ -382,22 +390,22 @@ def filter_post_list(request):
         #category is of item type
         if helpers.category_intersect(settings.item_categories,categories):
             #keyword applied to display_value, title, description
-            item_rs = ItemPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            item_rs = ItemPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.book_categories,categories):
             #keyword applied to display_value, title, description, isbn
-            book_rs = BookPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            book_rs = BookPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(isbn__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.datelocation_categories,categories):
             #keyword applied to display_value, title, description, location
-            DL_rs = DateLocationPost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            DL_rs = DateLocationPost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(location__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #category is of book type
         if helpers.category_intersect(settings.rideshare_categories,categories):
             #keyword applied to display_value, title, description, trip
-            RS_rs = RideSharePost.objects.filter(datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
+            RS_rs = RideSharePost.objects.filter(Q(deleted__exact=False),datetime_Q,Q(category__in=categories),max_price_Q,min_price_Q,Q(display_value__icontains=keyword) | Q(title__icontains=keyword)  | Q(description__icontains=keyword) | Q(trip__icontains=keyword)).order_by(order_by_string)[:settings.PAGING_COUNT]
             
         #populate the response with listview formatted results (grabs and encodes image data)
         results = prepare_results(item_rs, book_rs, DL_rs, RS_rs, limit=settings.PAGING_COUNT)
