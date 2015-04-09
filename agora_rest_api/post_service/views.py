@@ -4,6 +4,7 @@ from agora_rest_api.post_service import helpers
 from agora_rest_api.user_service.models import User, Analytics
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
+from base64 import encodestring
 from django.http import HttpResponse
 import datetime
 import json
@@ -134,6 +135,35 @@ def view_detailed_post(request):
             json_data["gonzaga_email"] = post_user.gonzaga_email
         else:
             json_data["gonzaga_email"] = ''
+        
+        image_URLs_array = ['','','']
+        images_base64_array = ['','','']
+        
+        pre_image_string = settings.IMAGES_ROOT
+        image_URLs_array[0] = pre_image_string + post_info.image1
+        image_URLs_array[1] = pre_image_string + post_info.image2
+        image_URLs_array[2] = pre_image_string + post_info.image3
+        for i in range(len(image_URLs_array)):
+            if image_URLs_array[i] != settings.IMAGES_ROOT:
+                image_file = open(image_URLs_array[i],"rb")
+                image_data = image_file.read()
+                images_base64_array[i] = encodestring(image_data)
+                image_file.close()
+                
+                
+        json_data["image1"] = images_base64_array[0]    
+        json_data["image2"] = images_base64_array[1]    
+        json_data["image3"] = images_base64_array[2]
+        
+        #count up the images
+        image_count = 0
+        if post_info.image1:
+            image_count += 1
+        if post_info.image2:
+            image_count += 1
+        if post_info.image3:
+            image_count += 1
+        json_data["image_count"] = image_count
 
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         

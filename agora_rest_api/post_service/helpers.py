@@ -37,7 +37,24 @@ def delete_imagefile(filename):
         json_data["message"] = str(e)   
         return json_data["message"]
         
-        
+
+def remove_post(delete_post):
+    '''
+    new delete post function that doesn't ACTUALLY delete posts, 
+    just marks it as deleted...
+    '''    
+    json_data = {}
+    json_data["message"] = ""
+    try:
+        delete_post.deleted = True
+        delete_post.save()        
+        return json_data["message"]
+    except Exception,e:
+        print str(e)
+        json_data["message"] = str(e) 
+        return json_data["message"]
+
+"""    
 def remove_post(delete_post):
     json_data = {}
     json_data["message"] = ""
@@ -57,7 +74,8 @@ def remove_post(delete_post):
         print str(e)
         json_data["message"] = str(e) 
         return json_data["message"]
-        
+"""    
+    
 def run_clean_up():
     reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
     analytic = Analytics.objects.get(id=1)
