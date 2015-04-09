@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -6,8 +6,7 @@ from django.http import HttpResponse
 from django.db import utils
 from django.core import validators
 
-from serializers import UserSerializer
-from models import User
+from models import User, Analytics
 from agora_rest_api.post_service import post_list_views
 from agora_rest_api import settings
 
@@ -142,7 +141,10 @@ def create_user(request):
             pref_email=request_data['pref_email'],
             phone=request_data['phone'])
         created_user.save()
-        
+        #Increment number of Users
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_users = analytic.num_users + 1 
+        analytic.save()
         #if no exception thrown return success
         json_data['message'] = "Successfully created user!"
         request_data = None #clear traces of user information after done using

@@ -1,7 +1,7 @@
 from rest_framework import status
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
 from agora_rest_api.post_service import helpers
-from agora_rest_api.user_service.models import User
+from agora_rest_api.user_service.models import User, Analytics
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
@@ -50,6 +50,10 @@ def delete_post(request):
             json_data = {'message': 'Error in Editing post: Invalid category'}
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
         json_data["message"] = helpers.remove_post(delete_post)
+        #Increment number of Item posts
+        analytic = Analytics.objects.get(id=1)
+        analytic.num_manually_deleted_posts = analytic.num_manually_deleted_posts + 1 
+        analytic.save()
         if json_data["message"] == "":
             json_data['message'] = "Succesfully Deleted Post"   
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')

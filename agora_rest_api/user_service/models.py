@@ -19,3 +19,14 @@ class User(models.Model):
     phone = models.CharField(max_length=11,null=True,blank=True)
     recent_post_deletion = models.BooleanField(default=False)
 
+class Analytics(models.Model):
+    '''
+    Analytics Table for us to keep track of app usage data
+    '''
+    num_users = models.PositiveIntegerField(default=0)
+    num_item_posts = models.PositiveIntegerField(default=0)
+    num_rideshare_posts = models.PositiveIntegerField(default=0)
+    num_events_posts = models.PositiveIntegerField(default=0)
+    num_manually_deleted_posts = models.PositiveIntegerField(default=0)
+    num_deleted_reported_posts = models.PositiveIntegerField(default=0)
+    
