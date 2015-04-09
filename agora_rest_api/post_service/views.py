@@ -4,8 +4,8 @@ from agora_rest_api.post_service import helpers
 from agora_rest_api.user_service.models import User
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
-from django.http import HttpResponse
 from base64 import encodestring
+from django.http import HttpResponse
 import datetime
 import json
 import ast
@@ -61,7 +61,6 @@ def delete_post(request):
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response    
-    
         
 @api_view(['POST'])
 def view_detailed_post(request):
@@ -97,6 +96,7 @@ def view_detailed_post(request):
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
+        json_data['username'] = post_info.username
         
         if post_info.price == None:
             price_temp = ''
