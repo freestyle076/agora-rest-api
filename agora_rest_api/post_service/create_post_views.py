@@ -271,7 +271,7 @@ def create_rideshare_post(request_data,json_data):
         if request_data["start_location"]:
             trip_details = trip_details + "From " + request_data["start_location"]
             if request_data["end_location"]:
-                trip_details = trip_details + " To " + request_data["end_location"]
+                trip_details = trip_details + " To*& " + request_data["end_location"]
         #if there is no start location look to include end location only
         elif request_data["end_location"]:
             trip_details = trip_details + "To " + request_data["end_location"]

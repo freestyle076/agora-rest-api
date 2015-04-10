@@ -149,11 +149,8 @@ def prepare_results(items, books, DLs, RSs, limit=None):
         if items:
             for item in items:
                 if item.image1:
-                    image = open(settings.IMAGES_ROOT + str(item.image1),'rb').read()
-                    imageString = encodestring(image) #encode image data as string for port of JSON
                     has_image = True
                 else:
-                    imageString = ''
                     has_image = False
                     
                 if item.price == None:
@@ -163,7 +160,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(item.price))
 
-                listview_item = {'has_image':has_image,'id':item.id,'title':item.title,'category':item.category,'display_value':display_value_temp,'image':imageString,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_item = {'has_image':has_image,'id':item.id,'title':item.title,'category':item.category,'display_value':display_value_temp,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
                 
                 
@@ -171,11 +168,8 @@ def prepare_results(items, books, DLs, RSs, limit=None):
         if books:
             for book in books:
                 if book.image1:
-                    image = open(settings.IMAGES_ROOT + str(book.image1),'rb').read()
-                    imageString = encodestring(image) #encode image data as string for port of JSON
                     has_image = True
                 else:
-                    imageString = ''
                     has_image = False
 
                 if book.price == None:
@@ -185,7 +179,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(book.price))                    
                     
-                listview_book = {'has_image':has_image,'id':book.id,'title':book.title,'category':book.category,'display_value':display_value_temp,'image':imageString,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_book = {'has_image':has_image,'id':book.id,'title':book.title,'category':book.category,'display_value':display_value_temp,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
 
 
@@ -193,11 +187,8 @@ def prepare_results(items, books, DLs, RSs, limit=None):
         if DLs:
             for DL in DLs:
                 if DL.image1:
-                    image = open(settings.IMAGES_ROOT + str(DL.image1),'rb').read()
-                    imageString = encodestring(image) #encode image data as string for port of JSON
                     has_image = True
                 else:
-                    imageString = ''
                     has_image = False
                 if DL.date_time:
                     month = str(DL.date_time.month) #month without leading zero
@@ -216,7 +207,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                         display_value_temp = 'Free'
                     else:
                         display_value_temp = "${:.2f}".format(float(DL.price)) 
-                listview_DL = {'has_image':has_image,'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'image':imageString,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
+                listview_DL = {'has_image':has_image,'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
 
@@ -224,11 +215,8 @@ def prepare_results(items, books, DLs, RSs, limit=None):
         if RSs:
             for RS in RSs:
                 if RS.image1:
-                    image = open(settings.IMAGES_ROOT + str(RS.image1),'rb').read()
-                    imageString = encodestring(image) #encode image data as string for port of JSON
                     has_image = True
                 else:
-                    imageString = ''
                     has_image = False
                 
                 if RS.price == None:
@@ -238,7 +226,7 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                 else:
                     display_value_temp = "${:.2f}".format(float(RS.price)) 
                     
-                listview_RS = {'has_image':has_image,'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'image':imageString,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
+                listview_RS = {'has_image':has_image,'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
 

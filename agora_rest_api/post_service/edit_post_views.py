@@ -169,7 +169,16 @@ def edit_rideshare_post(request_data,edit_post):
     else:
         departure_date_time = None    
     
-    trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
+    #trip details field
+    trip_details = ""
+    #if there is a start location provided then include start, check for end...
+    if request_data["start_location"]:
+        trip_details = trip_details + "From " + request_data["start_location"]
+        if request_data["end_location"]:
+            trip_details = trip_details + " To*& " + request_data["end_location"]
+    #if there is no start location look to include end location only
+    elif request_data["end_location"]:
+        trip_details = trip_details + "To " + request_data["end_location"]
     
     edit_post.departure_date_time = departure_date_time
 
