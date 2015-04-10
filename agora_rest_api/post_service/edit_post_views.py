@@ -21,7 +21,7 @@ Table of Contents:
 
 time_zone_loc = pytz.timezone(settings.TIME_ZONE)
 time_zone_utc = pytz.timezone('UTC')
-date_time_format = "%m\/%d\/%y, %I:%M %p"
+date_time_format = "%m/%d/%y, %I:%M %p"
 
 @api_view(['POST'])
 def edit_post(request):
@@ -143,7 +143,11 @@ def edit_datelocation_post(request_data,edit_post):
     Edit post function for book specific attributes
     '''
     edit_post.location = request_data['location']
-    input_date_time = datetime.datetime.strptime(request_data['date_time'],date_time_format)
+    if request_data["date_time"]:
+        input_date_time = request_data["date_time"].replace("\\","") #
+        input_date_time = time_zone_utc.localize(datetime.datetime.strptime(input_date_time,date_time_format))          
+    else:
+        input_date_time = None
     edit_post.date_time = input_date_time
     edit_post.display_value = input_date_time
     return edit_post
@@ -152,13 +156,21 @@ def edit_rideshare_post(request_data,edit_post):
     ''' 
     Edit post function for book specific attributes
     '''
-    
+
     return_date_time = None
-    
     if int(request_data["round_trip"]):
-        return_date_time = datetime.datetime.strptime(request_data['return_date_time'],date_time_format)
-    departure_date_time = datetime.datetime.strptime(request_data['departure_date_time'],date_time_format)
+        if request_data["return_date_time"]:
+            return_date_time = request_data["return_date_time"].replace("\\","") #
+            return_date_time = time_zone_utc.localize(datetime.datetime.strptime(return_date_time,date_time_format))          
+  
+    if request_data["departure_date_time"]:
+        departure_date_time = request_data["departure_date_time"].replace("\\","") #
+        departure_date_time = time_zone_utc.localize(datetime.datetime.strptime(departure_date_time,date_time_format))          
+    else:
+        departure_date_time = None    
+    
     trip_details = "From " + request_data["start_location"] + " To " + request_data["end_location"]
+    
     edit_post.departure_date_time = departure_date_time
 
     edit_post.trip = trip_details
