@@ -1,5 +1,5 @@
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
-from agora_rest_api.user_service.models import User
+from agora_rest_api.user_service.models import User, Analytics
 from django.db.models import Q
 from agora_rest_api import settings
 import os
@@ -78,6 +78,7 @@ def remove_post(delete_post):
     
 def run_clean_up():
     reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
+    analytic = Analytics.objects.get(id=1)
     for post in reported_posts:
         print "Reported Post being deleted -> "
         print post.id
@@ -85,6 +86,9 @@ def run_clean_up():
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        #Increment number of Item posts
+        analytic.num_deleted_reported_posts = analytic.num_rideshare_posts + 1 
+        analytic.save()
         remove_post(post)
               
     reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
@@ -95,6 +99,8 @@ def run_clean_up():
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        analytic.num_deleted_reported_posts = analytic.num_rideshare_posts + 1 
+        analytic.save()
         remove_post(post)
         
     reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
@@ -105,6 +111,8 @@ def run_clean_up():
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        analytic.num_deleted_reported_posts = analytic.num_rideshare_posts + 1 
+        analytic.save()
         remove_post(post)
     
     reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
@@ -115,6 +123,8 @@ def run_clean_up():
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        analytic.num_deleted_reported_posts = analytic.num_rideshare_posts + 1 
+        analytic.save()
         remove_post(post) 
         
     d1 = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
