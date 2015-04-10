@@ -96,8 +96,7 @@ def view_detailed_post(request):
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         post_user = User.objects.get(username=post_info.username_id)
         json_data['title'] = post_info.title
-        json_data['username'] = post_info.username
-        
+        json_data['username'] = post_info.username_id
         if post_info.price == None:
             price_temp = ''
         elif float(post_info.price) == 0.:
@@ -131,6 +130,7 @@ def view_detailed_post(request):
             json_data["gonzaga_email"] = post_user.gonzaga_email
         else:
             json_data["gonzaga_email"] = ''
+                
         
         image_URLs_array = ['','','']
         images_base64_array = ['','','']
@@ -145,8 +145,7 @@ def view_detailed_post(request):
                 image_data = image_file.read()
                 images_base64_array[i] = encodestring(image_data)
                 image_file.close()
-                
-                
+        
         json_data["image1"] = images_base64_array[0]    
         json_data["image2"] = images_base64_array[1]    
         json_data["image3"] = images_base64_array[2]
@@ -161,6 +160,7 @@ def view_detailed_post(request):
             image_count += 1
         json_data["image_count"] = image_count
 
+        print json_data
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         
 
