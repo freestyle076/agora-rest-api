@@ -76,7 +76,7 @@ DATABASES = {
         'NAME': 'sustainability_app',
         'USER': 'sustainability',
         'PASSWORD' : 'Dh4Pks7.6',
-        'HOST': '147.222.165.3',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -103,10 +103,15 @@ OLD_POST_CUTTOFF_LENGTH = 31
 # Number of reports that a post will get deleted for
 MAX_REPORT_THRESHOLD = 3 
 
+<<<<<<< HEAD
 #Designates the Root ip and location of server
 SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
 
 #Designates location of resources on server
+=======
+SERVER_ROOT = "147.222.165.3:/home/cpsc04/khandy"
+
+>>>>>>> 5eef85185324ca48e374091df91ea892a1e5e73e
 RESOURCE_ROOT = PROJECT_PATH + '/agora_rest_api/resources/'
 
 #Designates location of Image files on server

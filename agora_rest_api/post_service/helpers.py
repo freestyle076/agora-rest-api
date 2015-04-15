@@ -85,7 +85,7 @@ def run_clean_up():
         del_user.recent_post_deletion = 1
         del_user.save()
         #Increment number of deleted reported posts
-        analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
+        analytic.num_deleted_reported_posts = analytic.num_deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
               
@@ -95,7 +95,7 @@ def run_clean_up():
         del_user.recent_post_deletion = 1
         del_user.save()
         #Increment number of deleted reported posts
-        analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
+        analytic.num_deleted_reported_posts = analytic.num_deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
         
@@ -105,7 +105,7 @@ def run_clean_up():
         del_user.recent_post_deletion = 1
         del_user.save()
         #Increment number of deleted reported posts
-        analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
+        analytic.num_deleted_reported_posts = analytic.num_deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
     
@@ -115,7 +115,7 @@ def run_clean_up():
         del_user.recent_post_deletion = 1
         del_user.save()
         #Increment number of deleted reported posts
-        analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
+        analytic.num_deleted_reported_posts = analytic.num_deleted_reported_posts + 1 
         analytic.save()
         remove_post(post) 
         
