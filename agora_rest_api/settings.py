@@ -76,7 +76,7 @@ DATABASES = {
         'NAME': 'sustainability_app',
         'USER': 'sustainability',
         'PASSWORD' : 'Dh4Pks7.6',
-        'HOST': '147.222.165.3',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -102,9 +102,7 @@ OLD_POST_CUTTOFF_LENGTH = 31 # Number of days Before a Post is Deleted
 
 MAX_REPORT_THRESHOLD = 3 # Number of reports that a post will get deleted for
 
-SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
-
-#MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/resources/'
+SERVER_ROOT = "147.222.165.3:/home/cpsc04/khandy"
 
 RESOURCE_ROOT = PROJECT_PATH + '/agora_rest_api/resources/'
 
