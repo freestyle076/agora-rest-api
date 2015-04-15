@@ -1,8 +1,7 @@
-from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
+from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User, Analytics
 from django.db.models import Q
 from agora_rest_api import settings
-import os
 import datetime
 import pytz
 
@@ -23,28 +22,16 @@ def category_intersect(super_category,categories):
         for category2 in categories:
             if category1 == category2:
                 return True
-                
-def delete_imagefile(filename):
-    json_data = {}
-    try:
-        if os.path.isfile(filename):
-            os.remove(filename)
-        else:
-            json_data["message"] = ("Error: %s file  not found" % filename)
-            return json_data["message"]
-    except Exception,e:
-        print str(e)
-        json_data["message"] = str(e)   
-        return json_data["message"]
-        
+     
 
 def remove_post(delete_post):
     '''
-    new delete post function that doesn't ACTUALLY delete posts, 
-    just marks it as deleted...
+    Delete post function that doesn't Actually delete a post, 
+    just marks it as deleted
     '''    
     json_data = {}
     json_data["message"] = ""
+    #Assigns boolean variable to mark post as deleted
     try:
         delete_post.deleted = True
         delete_post.save()        
@@ -74,55 +61,60 @@ def remove_post(delete_post):
         print str(e)
         json_data["message"] = str(e) 
         return json_data["message"]
-"""    
+             
+def delete_imagefile(filename):
+    json_data = {}
+    try:
+        if os.path.isfile(filename):
+            os.remove(filename)
+        else:
+            json_data["message"] = ("Error: %s file  not found" % filename)
+            return json_data["message"]
+    except Exception,e:
+        print str(e)
+        json_data["message"] = str(e)   
+        return json_data["message"]
+"""
     
 def run_clean_up():
-    reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
+    reported_posts = DateLocationPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD)).exclude(deleted=1)
     analytic = Analytics.objects.get(id=1)
+    #Gathers and deletes all posts that have been reported max number of times or more
     for post in reported_posts:
-        print "Reported Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
-        #Increment number of Item posts
+        #Increment number of deleted reported posts
         analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
               
-    reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
+    reported_posts = ItemPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD)).exclude(deleted=1)
     for post in reported_posts:
-        print "Reported Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        #Increment number of deleted reported posts
         analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
         
-    reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
+    reported_posts = RideSharePost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD)).exclude(deleted=1)
     for post in reported_posts:
-        print "Reported Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        #Increment number of deleted reported posts
         analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
         analytic.save()
         remove_post(post)
     
-    reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD))
+    reported_posts = BookPost.objects.filter(Q(report_count__gt=settings.MAX_REPORT_THRESHOLD)).exclude(deleted=1)
     for post in reported_posts:
-        print "Reported Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
+        #Increment number of deleted reported posts
         analytic.num_deleted_reported_posts = analytic.deleted_reported_posts + 1 
         analytic.save()
         remove_post(post) 
@@ -130,46 +122,36 @@ def run_clean_up():
     d1 = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
     d2 = d1 - datetime.timedelta(days=settings.OLD_POST_CUTTOFF_LENGTH)
     
-    old_posts = DateLocationPost.objects.filter(Q(post_date_time__lt=d2))
+    #Gathers and deletes all posts that have are older than our cutoff length of time
+    old_posts = DateLocationPost.objects.filter(Q(post_date_time__lt=d2)).exclude(deleted=1)
     for post in old_posts:
-        print "Old Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
         remove_post(post)
         
-    old_posts = RideSharePost.objects.filter(Q(post_date_time__lt=d2))
+    old_posts = RideSharePost.objects.filter(Q(post_date_time__lt=d2)).exclude(deleted=1)
     for post in old_posts:
-        print "Old Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
         remove_post(post)
         
-    old_posts = ItemPost.objects.filter(Q(post_date_time__lt=d2))
+    old_posts = ItemPost.objects.filter(Q(post_date_time__lt=d2)).exclude(deleted=1)
     for post in old_posts:
-        print "Old Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
         remove_post(post)
         
-    old_posts = BookPost.objects.filter(Q(post_date_time__lt=d2))
+    old_posts = BookPost.objects.filter(Q(post_date_time__lt=d2)).exclude(deleted=1)
     for post in old_posts:
-        print "Old Post being deleted -> "
-        print post.id
-        print post.category
         del_user = User.objects.get(username=post.username_id)
         del_user.recent_post_deletion = 1
         del_user.save()
         remove_post(post)
         
+    #Reassigns day of most recent cleanup to today    
     settings.MOST_RECENT_CLEANUP = datetime.date.today()
     
         

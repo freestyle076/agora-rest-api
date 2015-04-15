@@ -10,8 +10,6 @@ import json
 import ast
 import pytz
 
-# -*- coding: utf-8 -*-
-
 """
 Table of Contents:
     create_post(request)
@@ -20,7 +18,7 @@ Table of Contents:
     create_rideshare_post(request_data,json_data)
     create_item_post(request_data,json_data)
 """
-
+#Time Zone and date time settings
 time_zone_loc = pytz.timezone(settings.TIME_ZONE)
 time_zone_utc = pytz.timezone('UTC')
 date_time_format = "%m/%d/%y, %I:%M %p"
@@ -75,10 +73,10 @@ def create_post(request):
 def create_book_post(request_data,json_data):
     '''
     POST method for creating a book  post
-    Request body must contain the following data in JSON format:
+    Request body must contain all generic post data and 
+    the following data in JSON format:
         isbn: isbn of book to be sold
     '''
-    
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC  
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
     
@@ -87,15 +85,16 @@ def create_book_post(request_data,json_data):
         #the form of an incoming price has ramifications on price and display_value
         price_temp = request_data['price']
         display_value_temp = price_temp
-        #price is NULL 
+        #price is empty set price to none  
         if request_data['price']  == '':
             price_temp = None
             display_value_temp = ''
+        #if price is 0 set display value to free
         elif float(request_data['price']) == 0.:
             price_temp = 0.
             display_value_temp = 'Free'
         
-        '''partially create post, hold for images'''
+        #partially create post, hold for images
         created_post = BookPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
@@ -110,7 +109,7 @@ def create_book_post(request_data,json_data):
             display_value = display_value_temp,
             post_date_time = now)
             
-        '''read images from request, format URLs and save images on disc'''
+        #read images from request, format URLs and save images on disc
         ID = created_post.id #id of the partially created post
         json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
@@ -124,17 +123,19 @@ def create_book_post(request_data,json_data):
             imagefile.write(imageData) #write
 
         
-        '''set post's image attributes as image URLs'''
+        #set post's image attributes as image URLs
         created_post.image1 = imageURLsArray[0]            
         created_post.image2 = imageURLsArray[1]
         created_post.image3 = imageURLsArray[2]              
         
-        '''save and respond with success'''
+        #save and respond with success
         created_post.save()
-        #Increment number of Item posts
+        
+        #Increment number of Item posts in analytics database
         analytic = Analytics.objects.get(id=1)
         analytic.num_item_posts = analytic.num_item_posts + 1 
         analytic.save()
+        
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Book Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -148,8 +149,9 @@ def create_book_post(request_data,json_data):
         
 def create_datelocation_post(request_data,json_data):
     '''
-    POST method for creating any post
-    Request body must contain the following data in JSON format:
+    POST method for creating a datelocation post
+    Request body must contain all generic post data and 
+    the following data in JSON format:
         date_time: Date and Time of event or service desired
         location: Location of event or service
     '''
@@ -172,10 +174,11 @@ def create_datelocation_post(request_data,json_data):
         #price is NULL 
         if request_data['price']  == '':
             price_temp = None
+        #if price is 0 set display value to free
         elif float(request_data['price']) == 0.:
             price_temp = 0.       
         
-        '''partially create post, hold for images'''
+        #partially create post, hold for images
         created_post = DateLocationPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
@@ -212,7 +215,8 @@ def create_datelocation_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
-        #Increment number of Item posts
+        
+        #Increment number of Event posts in analytics database
         analytic = Analytics.objects.get(id=1)
         analytic.num_events_posts = analytic.num_events_posts + 1 
         analytic.save()
@@ -229,15 +233,15 @@ def create_datelocation_post(request_data,json_data):
 def create_rideshare_post(request_data,json_data): 
     '''
     POST method for creating a rideshare post
-    Request body must contain the following data in JSON format:
+    Request body must contain all generic post data and 
+    the following data in JSON format:
         start_location: Beginning place of rideshare
         end_location: End place of rideshare
         round_trip: Boolean Value signifying 
         departure_date_time: date and time of departure
         return_date_time: date and time of return if it is a round trip
     '''
-        
-    
+
     #for post_date_time
     utc_now = time_zone_utc.localize(datetime.datetime.utcnow()) #get UTC now, timezone set to UTC
     now = time_zone_loc.normalize(utc_now) #normalize to local timezone
@@ -283,6 +287,7 @@ def create_rideshare_post(request_data,json_data):
         if request_data['price']  == '':
             price_temp = None
             display_value_temp = ''
+        #if price is 0 set display value to free
         elif float(request_data['price']) == 0.:
             price_temp = 0.
             display_value_temp = 'Free'        
@@ -325,7 +330,7 @@ def create_rideshare_post(request_data,json_data):
         
         '''save and respond with success'''
         created_post.save()
-        #Increment number of Item posts
+        #Increment number of Rideshare posts in analytics database
         analytic = Analytics.objects.get(id=1)
         analytic.num_rideshare_posts = analytic.num_rideshare_posts + 1 
         analytic.save()
@@ -341,7 +346,9 @@ def create_rideshare_post(request_data,json_data):
         
 def create_item_post(request_data,json_data):
     '''
-    POST method for creating an item post
+    POST method for creating a rideshare post
+    Request body must contain all generic post data:
+
     '''
 
     #for post_date_time
@@ -357,11 +364,12 @@ def create_item_post(request_data,json_data):
         if request_data['price']  == '':
             price_temp = None
             display_value_temp = ''
+        #if price is 0 set display value to free
         elif float(request_data['price']) == 0.:
             price_temp = 0.
             display_value_temp = 'Free'
         
-        '''partially create post, hold for images'''
+        #partially create post, hold for images'
         created_post = ItemPost.objects.create(
             username_id=request_data['username'],
             title=request_data['title'],
@@ -374,7 +382,8 @@ def create_item_post(request_data,json_data):
             text=int(request_data['text']),
             display_value = display_value_temp,
             post_date_time = now)
-        '''read images from request, format URLs and save images on disc'''
+            
+        #read images from request, format URLs and save images on disc
         ID = created_post.id #id of the partially created post
         json_data['id'] = ID
         image_root = settings.IMAGES_ROOT #images folder path
@@ -387,17 +396,20 @@ def create_item_post(request_data,json_data):
             imagefile = open(imagePath,"wb") #open
             imagefile.write(imageData) #write
         
-        '''set post's image attributes as image URLs'''
+        #set post's image attributes as image URLs
         created_post.image1 = imageURLsArray[0]            
         created_post.image2 = imageURLsArray[1]
         created_post.image3 = imageURLsArray[2]              
         
-        '''save and respond with success'''
+        #save and respond with success
         created_post.save()
-        #Increment number of Item posts
+        
+        #Increment number of Item posts in analytics database
         analytic = Analytics.objects.get(id=1)
         analytic.num_item_posts = analytic.num_item_posts + 1 
         analytic.save()
+        
+        
         json_data["post_date_time"] = created_post.post_date_time.strftime('%m/%d/%Y %H:%M:%S')
         json_data['message'] = "Succesfully created Item Post!"
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')

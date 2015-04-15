@@ -95,19 +95,21 @@ USE_L10N = True
 USE_TZ = True
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__name__))
-
+#Variable storing the last time the cleanup procedure was run
 MOST_RECENT_CLEANUP = datetime.date.today() - datetime.timedelta(days=1)
 
-OLD_POST_CUTTOFF_LENGTH = 31 # Number of days Before a Post is Deleted
+# Number of days Before a Post is Deleted
+OLD_POST_CUTTOFF_LENGTH = 31 
+# Number of reports that a post will get deleted for
+MAX_REPORT_THRESHOLD = 3 
 
-MAX_REPORT_THRESHOLD = 3 # Number of reports that a post will get deleted for
-
+#Designates the Root ip and location of server
 SERVER_ROOT = "147.222.165.3:/home/cpsc04/kylehandy"
 
-#MEDIA_ROOT = SERVER_ROOT + '/agora_rest_api/resources/'
-
+#Designates location of resources on server
 RESOURCE_ROOT = PROJECT_PATH + '/agora_rest_api/resources/'
 
+#Designates location of Image files on server
 IMAGES_ROOT = RESOURCE_ROOT + 'images/'
 
 
@@ -116,13 +118,20 @@ IMAGES_ROOT = RESOURCE_ROOT + 'images/'
 
 STATIC_URL = '/static/'
 
-APPLE_USERNAME = 'apple_adm!n'
 
+APPLE_USERNAME = 'apple_adm!n'
 APPLE_PASS = 'apple_passw0rd'
+
+
+#Paging Count designates the number of posts that will be sent to the app 
+#after each new request for more posts
 
 PAGING_COUNT = 10
 
 TIME_ZONE = 'US/Pacific'
+
+
+#Categories - This designates what type of post our categories fall into 
 
 item_categories = ['Electronics','Household','Recreation','Clothing']
 book_categories = ['Books']
