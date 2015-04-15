@@ -1,12 +1,10 @@
 from rest_framework import status
 from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
-from agora_rest_api.post_service import views as post_service_views
 from agora_rest_api.post_service import helpers
 from agora_rest_api import settings
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
 from django.db.models import Q
-from base64 import encodestring
 import datetime
 import json
 import ast
@@ -36,9 +34,6 @@ def user_posts(username,divider,older):
         0: posts younger than divider chronologically
     '''
     
-    print "username: " + username
-    print "divider: " + str(divider)
-    print "older: " + str(older)
     
     try:
     
@@ -141,52 +136,53 @@ def prepare_results(items, books, DLs, RSs, limit=None):
     '''    
     
     posts = []
-    
-    print "inside prepare results"    
-    
+        
     try:
         #items
         if items:
-            for item in items:
-                if item.image1:
+            for item in items: #iterate through each post
+                if item.image1: #check for default image
                     has_image = True
                 else:
                     has_image = False
-                    
+                
+                #switch on price value
                 if item.price == None:
-                    display_value_temp = ''
-                elif float(item.price) == 0.:
-                    display_value_temp = 'Free'
+                    display_value_temp = '' #null is empty string
+                elif float(item.price) == 0.: 
+                    display_value_temp = 'Free' #zero is free
                 else:
                     display_value_temp = "${:.2f}".format(float(item.price))
-
+                    
+                #format and append to posts list
                 listview_item = {'has_image':has_image,'id':item.id,'title':item.title,'category':item.category,'display_value':display_value_temp,'post_date_time':item.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_item)
                 
                 
         #books
         if books:
-            for book in books:
-                if book.image1:
+            for book in books: #iterate through each post
+                if book.image1: #check for default image
                     has_image = True
                 else:
                     has_image = False
 
                 if book.price == None:
-                    display_value_temp = ''
+                    display_value_temp = '' #null is empty string
                 elif float(book.price) == 0.:
-                    display_value_temp = 'Free'
+                    display_value_temp = 'Free' #zero is free
                 else:
                     display_value_temp = "${:.2f}".format(float(book.price))                    
                     
+                #format and append to posts list
                 listview_book = {'has_image':has_image,'id':book.id,'title':book.title,'category':book.category,'display_value':display_value_temp,'post_date_time':book.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_book)
 
 
         #Datelocations
         if DLs:
-            for DL in DLs:
-                if DL.image1:
+            for DL in DLs: #iterate through each post
+                if DL.image1: #check for default image
                     has_image = True
                 else:
                     has_image = False
@@ -202,30 +198,33 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                     display_value_temp = month + "/" + day + "/" + year + " " + hour + minute_ampm
                 else:
                     if DL.price == None:
-                        display_value_temp = ''
+                        display_value_temp = '' #null is empty string
                     elif float(DL.price) == 0.:
-                        display_value_temp = 'Free'
+                        display_value_temp = 'Free' #zero is free
                     else:
-                        display_value_temp = "${:.2f}".format(float(DL.price)) 
+                        display_value_temp = "${:.2f}".format(float(DL.price))
+                
+                #format and append to posts list
                 listview_DL = {'has_image':has_image,'id':DL.id,'title':DL.title,'category':DL.category,'display_value':display_value_temp,'post_date_time':DL.post_date_time.strftime('%m/%d/%Y %H:%M:%S'),}
                 posts.append(listview_DL)
 
 
         #Rideshares
         if RSs:
-            for RS in RSs:
-                if RS.image1:
+            for RS in RSs: #iterate through each post
+                if RS.image1: #check for default image
                     has_image = True
                 else:
                     has_image = False
                 
                 if RS.price == None:
-                    display_value_temp = ''
+                    display_value_temp = '' #null is empty string
                 elif float(RS.price) == 0.:
-                    display_value_temp = 'Free'
+                    display_value_temp = 'Free' #zero is free
                 else:
                     display_value_temp = "${:.2f}".format(float(RS.price)) 
                     
+                #format and append to posts list
                 listview_RS = {'has_image':has_image,'id':RS.id,'title':RS.title,'category':RS.category,'display_value':display_value_temp,'post_date_time':RS.post_date_time.strftime('%m/%d/%Y %H:%M:%S')}
                 posts.append(listview_RS)
                                      
@@ -243,12 +242,10 @@ def prepare_results(items, books, DLs, RSs, limit=None):
         #sort the list of posts on their post_date_time attribute
         posts.sort(key=lambda x: datetime_key(x['post_date_time']),reverse=True)
         
-        
+        #if a limit is provided then take 0 ~ limit - 1
         if limit:
             posts = posts[:limit]
-        
-        print "Number of posts: " + str(len(posts))        
-        
+                
         return posts
         
     #ensure that exceptions are raised to the point of being included in the http response
@@ -269,13 +266,16 @@ def filter_post_list(request):
         free: Free items only flag. Sets min_price,max_price = 0
     route: /postquery/
     '''
+    
+    #if this is the first time the filter_post_list function has been called
+    #on this day then run the cleanup function
     if settings.MOST_RECENT_CLEANUP != datetime.date.today():
         helpers.run_clean_up()
+        
     json_data = {}
     try:
         #parse request
         request_data = ast.literal_eval(request.body)
-        
         
         #get filter parameters from request
         keyword = request_data['keywordSearch']
@@ -299,11 +299,9 @@ def filter_post_list(request):
             divider_post_datetime = time_zone_utc.localize(datetime.datetime.strptime(divider,'%m/%d/%Y %H:%M:%S'))
         
                 
-        
         #clean keyword input
         keyword.strip() #removing leading or trailing whitespace
         keyword.replace("  "," ") #remove accidental double spaces
-        
         
         
         #establish queries for max_price and min_price
@@ -337,17 +335,7 @@ def filter_post_list(request):
         #else don't include nulls in price Qs
         else:
             max_price_Q = Q(price__lte=max_price)
-            min_price_Q = Q(price__gte=min_price)
-        
-        #display the incoming filter keywords for sanity's sake
-              
-        print "keyword: " + str(keyword)
-        print "categories: " + str(categories)
-        print "max_price: " + str(max_price)
-        print "min_price: " + str(min_price)
-        print "free: " + str(free)
-        print "divider: " + str(divider_post_datetime)
-        print "older: " + str(older)
+            min_price_Q = Q(price__gte=min_price)    
         
         
         #set active categories---------------
@@ -450,6 +438,7 @@ def filter_post_list(request):
             #if there are results then check to see if there are more results
             more_exist = str(int(more_to_gather(older,results[edge_index])))
         else:
+            #else there are no more results
             more_exist = "0"
             
         json_data['more_exist'] = more_exist
@@ -464,7 +453,6 @@ def filter_post_list(request):
     
     #catch all unhandled exceptions
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response

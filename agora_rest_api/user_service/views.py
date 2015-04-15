@@ -15,7 +15,6 @@ import json
 import ast
 import sys
 import pytz
-import datetime
 
 '''
 Views for the user_service API application. The following views expose user
@@ -44,21 +43,22 @@ def edit_user(request):
     #attempting edit on provided json data
     try:
         request_data = ast.literal_eval(request.body) #parse data
+        
         #changes to pref_email must be validatad as email (pass empty string)
         pref_email = request_data['pref_email']
         if(pref_email != ""):
+            #make sure that the preferred email isn't a gonzaga email
             if '@zagmail.gonzaga.edu' in pref_email or '@gonzaga.edu' in pref_email:
-                #return bad_request 400 code
+                #return bad_request 400 code if preferred email is gonzaga email
                 json_data['message'] = "Invalid email"
-                print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 request_data = None #clear traces of user information after done using
                 return response
             try:
+                #use django email validator to validate eamil address
                 validators.validate_email(request_data['pref_email'])
             except validators.ValidationError:
                 json_data['message'] = "Enter a valid email address."
-                print json_data["message"]
                 response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
                 request_data = None #clear traces of user information after done using
                 return response     

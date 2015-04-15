@@ -35,8 +35,10 @@ def delete_post(request):
     '''
     json_data = {}
     try:
-        request_data = ast.literal_eval(request.body)#parse data
-        print request_data
+        #parse data
+        request_data = ast.literal_eval(request.body)
+        
+        #switch on post category
         category = request_data["category"]
         if category in settings.item_categories:
             delete_post = ItemPost.objects.get(id=request_data['id'])
@@ -46,21 +48,26 @@ def delete_post(request):
             delete_post = DateLocationPost.objects.get(id=request_data['id'])
         elif category in settings.rideshare_categories:
             delete_post = RideSharePost.objects.get(id=request_data['id'])
+        #catch case in which category doesn't exist
         else:
             json_data = {'message': 'Error in Editing post: Invalid category'}
-            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')    
+            return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        
+        #returned value from helpers.remove_post is either empty string or error
         json_data["message"] = helpers.remove_post(delete_post)
-        #Increment number of Item posts
+        
+        #Increment number of Item posts in analytics
         analytic = Analytics.objects.get(id=1)
         analytic.num_manually_deleted_posts = analytic.num_manually_deleted_posts + 1 
         analytic.save()
+        
+        #if returned value from helpers.remove_post is empty then return success
         if json_data["message"] == "":
             json_data['message'] = "Succesfully Deleted Post"   
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
     
     #catch all unhandled exceptions
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response    
@@ -77,12 +84,14 @@ def view_detailed_post(request):
 
     json_data = {}
     try:
-        request_data = ast.literal_eval(request.body) #parse data
+        #parse data
+        request_data = ast.literal_eval(request.body)
 
-        print request_data        
-        
-        category = request_data['category'] #switch on category
+        #get id of post        
         post_id = request_data['post_id']
+        
+        #switch on category        
+        category = request_data['category'] 
         if category in settings.item_categories:
             post_info = ItemPost.objects.get(id=post_id)    
         elif category in settings.book_categories:
@@ -94,21 +103,35 @@ def view_detailed_post(request):
         elif category in settings.rideshare_categories:
             post_info = RideSharePost.objects.get(id=post_id)
             json_data = view_rideshare_post(request_data,json_data,post_info)
+        
+        #catch case in which category doesn't exist
         else:
             json_data['message'] =  'Error in viewing post: Invalid category'
             return HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
-        post_user = User.objects.get(username=post_info.username_id)
+
+        #assign return values for title and username        
         json_data['title'] = post_info.title
-        json_data['username'] = post_info.username_id
+        json_data['username'] = post_info.username_id        
+        
+        #get associated user object        
+        post_user = User.objects.get(username=post_info.username_id)
+        
+        #formulate returned price value according to stored price value
         if post_info.price == None:
-            price_temp = ''
+            price_temp = '' #null price is empty string
         elif float(post_info.price) == 0.:
-            price_temp = 'Free'
+            price_temp = 'Free' #zero is free
         else:
             price_temp = "${:.2f}".format(float(post_info.price))
                       
-        json_data['price'] = price_temp               
+        #return formulated price value
+        json_data['price'] = price_temp
+
+        #return description             
         json_data['description'] = post_info.description
+        
+        #ensure that at least one contact option is allowed
+        #if not, default to allowing Zagmail
         enoughContactOptions = False
         if post_info.call == 1:
             json_data["call"] = post_user.phone
@@ -134,7 +157,7 @@ def view_detailed_post(request):
         else:
             json_data["gonzaga_email"] = ''
         
-        #count up the images
+        #count up the images for image_count returned value
         image_count = 0
         if post_info.image1:
             image_count += 1
@@ -151,9 +174,8 @@ def view_detailed_post(request):
         
         return HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
         
-
+    #general exception catching
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -164,11 +186,11 @@ def view_book_post(request_data,json_data,Post):
     (isbn)
     '''
     try:
+        #additional isbn field
         json_data["isbn"] = Post.isbn
         return json_data
     #general exception catching
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         return json_data
 
@@ -178,7 +200,10 @@ def view_rideshare_post(request_data,json_data,Post):
     (roundtrip,trip,departure_date_time,return_date_time)
     '''
     try:
+        #additional trip field
         json_data["trip"] = Post.trip
+        
+        #if there is a departure_date_time then correctly format it 
         if Post.departure_date_time:
             hour = str((Post.departure_date_time.hour) % 12) #hour without leading zero
             if hour == "0": #weird attribute of time-keeping, 0 is actually 12
@@ -187,9 +212,13 @@ def view_rideshare_post(request_data,json_data,Post):
             year_short = Post.departure_date_time.strftime("%y") #short version of year (without century)
             json_data["departure_date_time"] = str(Post.departure_date_time.month) + "/" + str(Post.departure_date_time.day) + "/" + year_short + ","
             json_data["departure_date_time"] = json_data["departure_date_time"] + " " + hour + minute_ampm
+        #else return empty string
         else:
             json_data["departure_date_time"] = ''
+        
+        #if the post is a round trip then handle return_date_time
         if Post.round_trip:
+            #if there is a return_date_time then correctly format it 
             if Post.return_date_time:
                 hour = str((Post.return_date_time.hour) % 12) #hour without leading zero
                 if hour == "0": #weird attribute of time-keeping, 0 is actually 12
@@ -198,15 +227,18 @@ def view_rideshare_post(request_data,json_data,Post):
                 year_short = Post.return_date_time.strftime("%y") #short version of year (without century)
                 json_data["return_date_time"] = str(Post.return_date_time.month) + "/" + str(Post.return_date_time.day) + "/" + year_short + ","
                 json_data["return_date_time"] = json_data["return_date_time"] + " " + hour + minute_ampm
+            #else return empty string
             else:
                 json_data["return_date_time"] = ''
+            #return that the post is a round_trip
             json_data["round_trip"] = 1
+        #else the post isn't a round trip
         else:
             json_data["round_trip"] = 0
         return json_data
+        
     #general exception catching
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         return json_data
 
@@ -216,6 +248,7 @@ def view_datelocation_post(request_data,json_data,Post):
     (date_time,location)
     '''
     try:
+        #if there is a date_time then correctly format it
         if Post.date_time:
             hour = str((Post.date_time.hour) % 12) #hour without leading zero
             if hour == "0": #weird attribute of time-keeping, 0 is actually 12
@@ -224,18 +257,17 @@ def view_datelocation_post(request_data,json_data,Post):
             short_year = Post.date_time.strftime("%y")
             json_data["date_time"] = str(Post.date_time.month) + "/" + str(Post.date_time.day) + "/" + short_year + ","
             json_data["date_time"] = json_data["date_time"] + " " + hour + minute_ampm
+        #else return empty string
         else:
             json_data["date_time"] = ''
         json_data["location"] = Post.location
         return json_data
     #general exception catching
     except Exception,e:
-        print str(e)
         json_data['message'] = str(e)
         return json_data
 
 
-        
 @api_view(['POST'])
 def refresh_post(request):
     '''
@@ -314,7 +346,6 @@ def refresh_post(request):
         
     #general exception handling
     except Exception, e:
-        print str(e)
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response
@@ -344,7 +375,6 @@ def report_post(request):
         if existing_report:
             #respond with HTTP 200 OK
             message = "User " + reporter + " has already reported post " + str(post_id) + " in " + post_category
-            print message
             json_data['message'] = message
             json_data['reported'] = "0"
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
@@ -369,7 +399,6 @@ def report_post(request):
         #category doesn't exist, respond with 400 BAD REQUEST
         else:
             error_message = "Non existent category: " + post_category
-            print error_message
             json_data['message'] = error_message
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response
@@ -377,7 +406,6 @@ def report_post(request):
         #post not found by ID, respond with 400 BAD REQUEST          
         if not post:
             error_message = "Post with post_id " + str(post_id) + "could not be found"
-            print error_message
             json_data['message'] = error_message
             response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
             return response        
@@ -399,7 +427,6 @@ def report_post(request):
         
     #general exception handling
     except Exception, e:
-        print str(e)
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         return response

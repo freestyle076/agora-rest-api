@@ -1,4 +1,4 @@
-from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost, PostReport
+from agora_rest_api.post_service.models import BookPost, DateLocationPost, ItemPost, RideSharePost
 from agora_rest_api.user_service.models import User, Analytics
 from django.db.models import Q
 from agora_rest_api import settings
@@ -54,6 +54,8 @@ def remove_post(delete_post):
         json_data["message"] = str(e) 
         return json_data["message"]
 
+
+#old delete post function that actually deletes posts and associated data
 """    
 def remove_post(delete_post):
     json_data = {}
