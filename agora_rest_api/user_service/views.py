@@ -341,8 +341,36 @@ def user_posts(request):
         request_data = None #clear traces of user information after done using
         return response
     except Exception,e:
-        print str(e)
         json_data["message"] = str(e)
         response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
         request_data = None #clear traces of user information after done using
         return response
+
+
+@api_view(['GET'])
+def stats(request):
+    '''
+    GET method for retrieving the current set of usage statistics
+    no parameters
+    '''
+    json_data = {}
+    try:
+        analytic = Analytics.objects.get(id=1)
+        json_data['# Users'] = analytic.num_users
+        json_data['# Items Posts'] = analytic.num_item_posts
+        json_data['# Rideshare Posts'] = analytic.num_rideshare_posts
+        json_data['# Events Posts'] = analytic.num_events_posts
+        json_data['# Manually Deleted Posts'] = analytic.num_manually_deleted_posts
+        json_data['# Deleted Reported Posts'] = analytic.num_deleted_reported_posts
+        json_data['# Post Views'] = analytic.num_post_views
+        json_data['message'] = "Go ZigZaga"
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_200_OK,content_type='application/json')
+        request_data = None #clear traces of user information after done using
+        return response
+        
+    except Exception,e:
+        json_data["message"] = str(e)
+        response = HttpResponse(json.dumps(json_data),status=status.HTTP_400_BAD_REQUEST,content_type='application/json')
+        request_data = None #clear traces of user information after done using
+        return response
+

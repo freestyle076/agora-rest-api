@@ -192,8 +192,8 @@ def prepare_results(items, books, DLs, RSs, limit=None):
                     day = str(DL.date_time.day)
                     if hour == "0": #weird attribute of time-keeping, 0 is actually 12
                         hour = "12"
-                        year = DL.date_time.strftime("%y") #day and year component
-                        minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
+                    year = DL.date_time.strftime("%y") #day and year component
+                    minute_ampm = DL.date_time.strftime(":%M%p") #minute and am/pm component
                 
                     display_value_temp = month + "/" + day + "/" + year + " " + hour + minute_ampm
                 else:
