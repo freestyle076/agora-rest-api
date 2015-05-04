@@ -47,7 +47,8 @@ def create_post(request):
     try:
         #evaulte request body
         request_data = ast.literal_eval(request.body) #parse data
-        
+ 	request_data["description"] = request_data["description"].replace("\/","/")
+        request_data["title"] = request_data["title"].replace("\/","/")       
         #switch functions on category
         category = request_data['category'] #switch on category
         if category in settings.item_categories: 
@@ -169,6 +170,8 @@ def create_datelocation_post(request_data,json_data):
         else:
             input_date_time = None
         
+	request_data["location"] = request_data["location"].replace("\/","/")
+
         #the form of an incoming price has ramifications on price and display_value
         price_temp = request_data['price']
         #price is NULL 
@@ -271,6 +274,10 @@ def create_rideshare_post(request_data,json_data):
         
         #trip details field
         trip_details = ""
+
+	request_data["start_location"] = request_data["start_location"].replace("\/","/")
+        request_data["end_location"] = request_data["end_location"].replace("\/","/")
+
         #if there is a start location provided then include start, check for end...
         if request_data["start_location"]:
             trip_details = trip_details + "From " + request_data["start_location"]
